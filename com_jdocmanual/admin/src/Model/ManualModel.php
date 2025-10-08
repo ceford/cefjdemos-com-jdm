@@ -103,6 +103,13 @@ class ManualModel extends ListModel
             return array('placeholder', '', 'The html field has not been populated. Select the GFM Files menu.');
         }
 
+        if ($manual === 'magazine') {
+            $host = $_SERVER['HTTP_HOST'];  // e.g., "localhost" or "my.publicsite.org"
+            if ($host !== 'localhost') {
+                $row->html = InthispageHelper::trim2review($row->html);
+            }
+        }
+
         // First page load needs the ToC processed here.
         list ($in_this_page, $content) = InthispageHelper::doToc($row->html);
 

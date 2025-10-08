@@ -5,7 +5,7 @@
         <description>Display Joomla documentation in Manual format</description>
         <element>com_jdocmanual</element>
         <type>component</type>
-        <version>4.7.5</version>
+        <version>4.8.0</version>
         <client>administrator</client>
         <infourl title="Jdocmanual Extension">https://github.com/ceford/cefjdemos-com-jdm/blob/main/README.md</infourl>
         <downloads>

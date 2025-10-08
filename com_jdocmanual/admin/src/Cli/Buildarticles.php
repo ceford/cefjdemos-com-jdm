@@ -48,7 +48,7 @@ class Buildarticles
      * Third bracket is filename
      * Fourth bracket is title or empty
      */
-    protected $pattern = '/\!\[(.*?)\]\(..\/..\/..(\/.*)?\/(.*?\.png|.*?\.jpg)(.*)\)/m';
+    protected $pattern = '/\!\[(.*?)\]\(..\/..\/..(\/.*)?\/(.*?\.png|.*?\.jpg|.*?\.gif)(.*)\)/m';
 
     /**
      * Regex pattern to select Display title from GFM comment string.

@@ -80,6 +80,12 @@ class ContentController extends BaseController
         if (empty($row)) {
             $content = array('Placeholder', 'Please select a document');
         } else {
+            if ($manual === 'magazine') {
+                $host = $_SERVER['HTTP_HOST'];  // e.g., "localhost" or "my.publicsite.org"
+                if ($host !== 'localhost') {
+                    $row->html = InthispageHelper::trim2review($row->html);
+                }
+            }
             // separate the Table of Contents - return array(toc, content);
             $content = InthispageHelper::doToc($row->html);
 

@@ -138,4 +138,29 @@ class InthispageHelper
         </div>';
         return $tmpl;
     }
+
+    public static function trim2review($html)
+    {
+        $dom = new \DOMDocument();
+        libxml_use_internal_errors(true); // suppress warnings for malformed HTML
+        $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
+
+        $xpath = new \DOMXPath($dom);
+
+        // Find the first <h2> element with class="original"
+        $h2 = $xpath->query('//h2[contains(concat(" ", normalize-space(@class), " "), " original ")]')->item(0);
+
+        if ($h2) {
+            // Remove everything after this h2
+            while ($h2->nextSibling) {
+                $h2->parentNode->removeChild($h2->nextSibling);
+            }
+            // Optionally remove the h2 itself (comment out if you want to keep it)
+            $h2->parentNode->removeChild($h2);
+        }
+
+        // Get the resulting trimmed HTML
+        return $dom->saveHTML();
+    }
 }

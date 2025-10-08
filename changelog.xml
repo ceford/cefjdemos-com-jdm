@@ -2,6 +2,14 @@
     <changelog>
         <element>com_jdocmanual</element>
         <type>component</type>
+        <version>4.8.0</version>
+        <add>
+            <item>Code to handle visibility of Magazine articles.</item>
+        </add>
+    </changelog>
+    <changelog>
+        <element>com_jdocmanual</element>
+        <type>component</type>
         <version>4.7.5</version>
         <fix>
             <item>Spinner layout was corrupt.</item>

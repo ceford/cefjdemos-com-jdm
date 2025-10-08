@@ -7,7 +7,7 @@
 	<creationDate>October 2021</creationDate>
 	<copyright>(C) 2021-2024 Clifford E Ford. All rights reserved.</copyright>
 	<license>GNU General Public License version 3</license>
-	<version>4.7.5</version>
+	<version>4.8.0</version>
 	<description><![CDATA[Display Joomla documentation from the Joomla Docs site]]></description>
 	<namespace path="src">Cefjdemos\Component\Jdocmanual</namespace>
 
