@@ -179,7 +179,37 @@ class Buildproxy
         File::copy($src . 'help.css', $dst . 'help.css');
         File::copy($src . 'index.php', $dst . 'index.php');
 
+        // Check for name changes in the source help files
+        $this->check_sources();
+
         return;
+    }
+
+    /**
+     * The help pages list in the admin Help section come from toc.json
+     * There have been name changes so check that they
+     */
+    protected function check_sources() {
+        // Read in the list of help pages
+        $sources_file = JPATH_SITE . 'administrator/help/en-GB/toc.json';
+        $jdoc_sources = file_get_contents($sources_file);
+        $files = json_decode($jdoc_sources, true);
+        $db = $this->db;
+
+        // Check that is is in the database
+        foreach ($files as $key => $value) {
+            // The key is the part needed, example: Contacts:_Edit_Category
+            $query = $db->getQuery(true);
+            $query->select($db->quoteName('id'))
+                ->from($db->quoteName('#__jdm_articles'))
+                ->where($db->quoteName('source_url') . ' LIKE :key')
+                ->where($db->quoteName('manual') . '=' . $db->quoteName('help'))
+                ->bind(':key', '%', $key, ParameterType::STRING);
+            $db->setQuery($query);
+            if (empty($db->loadResult())) {
+                $this->summary .= "Article in toc.json is missing: {$key}\n";
+            }
+        }
     }
 
     /**

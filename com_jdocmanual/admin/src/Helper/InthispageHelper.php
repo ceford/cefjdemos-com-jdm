@@ -141,6 +141,9 @@ class InthispageHelper
 
     public static function trim2review($html)
     {
+        // Ensure UTF-8 input
+        $html = mb_convert_encoding($html, 'HTML-ENTITIES', 'UTF-8');
+
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true); // suppress warnings for malformed HTML
         $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
