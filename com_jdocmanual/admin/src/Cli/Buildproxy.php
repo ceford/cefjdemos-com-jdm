@@ -191,7 +191,7 @@ class Buildproxy
      */
     protected function check_sources() {
         // Read in the list of help pages
-        $sources_file = JPATH_SITE . 'administrator/help/en-GB/toc.json';
+        $sources_file = JPATH_SITE . '/administrator/help/en-GB/toc.json';
         $jdoc_sources = file_get_contents($sources_file);
         $files = json_decode($jdoc_sources, true);
         $db = $this->db;
@@ -200,11 +200,12 @@ class Buildproxy
         foreach ($files as $key => $value) {
             // The key is the part needed, example: Contacts:_Edit_Category
             $query = $db->getQuery(true);
+            $newkey = "%{$key}";
             $query->select($db->quoteName('id'))
                 ->from($db->quoteName('#__jdm_articles'))
                 ->where($db->quoteName('source_url') . ' LIKE :key')
-                ->where($db->quoteName('manual') . '=' . $db->quoteName('help'))
-                ->bind(':key', '%', $key, ParameterType::STRING);
+                ->where($db->quoteName('manual') . '=' . $db->quote('help'))
+                ->bind(':key', $newkey, ParameterType::STRING);
             $db->setQuery($query);
             if (empty($db->loadResult())) {
                 $this->summary .= "Article in toc.json is missing: {$key}\n";

@@ -78,7 +78,8 @@ $msg =<<<EOF
     </head>
     <body>
         <main>
-        The Help page you requested is missing!";
+        The Help page you requested is missing!
+        <p>{$key}</p>
         </main>
     </body>
 </html>
