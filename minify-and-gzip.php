@@ -17,9 +17,11 @@ function runCommand(string $cmd): void {
     }
 }
 
-function shouldProcess(string $source, string $target): bool {
-    if (!file_exists($target)) return true;
-    return filemtime($source) > filemtime($target);
+function shouldProcess($dir, string $source, string $target): bool {
+    if (!file_exists($dir . '/'  . $target)) {
+        return true;
+    }
+    return filemtime($dir . '/' . $source) > filemtime($dir . '/' . $target);
 }
 
 function minifyAndGzip(string $file, string $type, $dir): void {
@@ -28,7 +30,7 @@ function minifyAndGzip(string $file, string $type, $dir): void {
     $minFile = "$base.min.$ext";
     $gzFile  = "$minFile.gz";
 
-    if (shouldProcess($file, $minFile)) {
+    if (shouldProcess($dir, $file, $minFile)) {
         echo "Minifying: $file → $minFile\n";
         if ($type === 'js') {
             runCommand("uglifyjs $file -o $dir/$minFile");
@@ -37,7 +39,7 @@ function minifyAndGzip(string $file, string $type, $dir): void {
         }
     }
 
-    if (shouldProcess($minFile, $gzFile)) {
+    if (shouldProcess($dir, $minFile, $gzFile)) {
         echo "Gzipping: $minFile → $gzFile\n";
         runCommand("gzip -k -9 -f $dir/$minFile");
     }
