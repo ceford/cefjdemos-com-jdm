@@ -21,7 +21,7 @@ use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildproxy;
 use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Checkhistory;
 
 // phpcs:disable PSR1.Files.SideEffects
-\defined('JPATH_PLATFORM') or die;
+\defined(constant_name: '_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 class JdocmanualCommand extends AbstractCommand

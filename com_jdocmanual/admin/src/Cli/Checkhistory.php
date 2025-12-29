@@ -17,7 +17,7 @@ use Joomla\Database\DatabaseAwareTrait;
 use Joomla\Filesystem\File;
 
 // phpcs:disable PSR1.Files.SideEffects
-\defined('JPATH_PLATFORM') or die;
+\defined(constant_name: '_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**

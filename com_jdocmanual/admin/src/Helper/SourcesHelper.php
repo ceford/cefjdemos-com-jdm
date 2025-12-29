@@ -14,7 +14,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
-\defined('JPATH_PLATFORM') or die;
+\defined(constant_name: '_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
