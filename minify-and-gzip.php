@@ -1,6 +1,8 @@
 #!/usr/bin/env php
 <?php
 
+// Script provided by ChatGPT - but needs fixes to not process min files.
+
 // Set paths
 $jsDir  = __DIR__ . '/com_jdocmanual/media/js';
 $cssDir = __DIR__ . '/com_jdocmanual/media/css';
@@ -43,7 +45,12 @@ function minifyAndGzip(string $file, string $type, $dir): void {
 
 function processDirectory(string $dir, string $type): void {
     $files = glob("$dir/*.$type");
+
     foreach ($files as $file) {
+        if (preg_match('/\.min\./', basename($file))) {
+            continue;
+        }
+
         minifyAndGzip($file, $type, $dir);
     }
 }
