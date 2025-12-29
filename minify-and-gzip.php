@@ -21,7 +21,7 @@ function shouldProcess($dir, string $source, string $target): bool {
     if (!file_exists($dir . '/'  . $target)) {
         return true;
     }
-    return filemtime($dir . '/' . $source) > filemtime($dir . '/' . $target);
+    return filemtime($source) > filemtime($dir . '/' . $target);
 }
 
 function minifyAndGzip(string $file, string $type, $dir): void {
