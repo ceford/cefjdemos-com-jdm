@@ -20,6 +20,10 @@ class ComposerStaticInit6a66fbf207a39f47ba937a0469cf6b5e
         array (
             'Psr\\EventDispatcher\\' => 20,
         ),
+        'N' => 
+        array (
+            'Nette\\' => 6,
+        ),
         'L' => 
         array (
             'League\\Config\\' => 14,
@@ -44,6 +48,11 @@ class ComposerStaticInit6a66fbf207a39f47ba937a0469cf6b5e
         'Psr\\EventDispatcher\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/event-dispatcher/src',
+        ),
+        'Nette\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nette/schema/src',
+            1 => __DIR__ . '/..' . '/nette/utils/src',
         ),
         'League\\Config\\' => 
         array (
@@ -100,6 +109,7 @@ class ComposerStaticInit6a66fbf207a39f47ba937a0469cf6b5e
         'Nette\\Schema\\Processor' => __DIR__ . '/..' . '/nette/schema/src/Schema/Processor.php',
         'Nette\\Schema\\Schema' => __DIR__ . '/..' . '/nette/schema/src/Schema/Schema.php',
         'Nette\\Schema\\ValidationException' => __DIR__ . '/..' . '/nette/schema/src/Schema/ValidationException.php',
+        'Nette\\ShouldNotHappenException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',
         'Nette\\SmartObject' => __DIR__ . '/..' . '/nette/utils/src/SmartObject.php',
         'Nette\\StaticClass' => __DIR__ . '/..' . '/nette/utils/src/StaticClass.php',
         'Nette\\UnexpectedValueException' => __DIR__ . '/..' . '/nette/utils/src/exceptions.php',

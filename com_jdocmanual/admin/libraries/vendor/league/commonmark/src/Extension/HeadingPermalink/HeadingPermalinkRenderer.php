@@ -67,7 +67,7 @@ final class HeadingPermalinkRenderer implements NodeRendererInterface, XmlNodeRe
             $attrs->set('id', $idPrefix . $slug);
         }
 
-        //$attrs->set('href', '#' . $fragmentPrefix . $slug);
+        $attrs->set('href', '#' . $fragmentPrefix . $slug);
         $attrs->append('class', $this->config->get('heading_permalink/html_class'));
 
         $hidden = $this->config->get('heading_permalink/aria_hidden');
