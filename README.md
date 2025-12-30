@@ -108,13 +108,11 @@ should end up with a directory structure like this:
 ```bash
 /home/username/manuals/user/en/articles/
 /home/username/manuals/user/en/images/
-/home/username/manuals/user/en/articles-index.txt
 /home/username/manuals/user/en/menus-index.txt
 ```
 
 If you add data for another language it will follow the same pattern, except
-that the articles-index.txt and menus-index.txt files are only present in the
-in the **/en/** folder.
+that the menus-index.txt file is only present in the **/en/** folder.
 
 ## Jdocmanual Configuration
 

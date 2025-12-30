@@ -228,7 +228,7 @@ class Buildarticles
     }
 
     /**
-     * Read the articles-index.txt file and make an array of articles data.
+     * Read the menu-index.txt file and make an array of articles data.
      *
      * @param string    $manual     The manual name.
      * @param string    $language   The language name.
@@ -237,8 +237,7 @@ class Buildarticles
      */
     protected function getArticlesIndex($manual, $language)
     {
-        // Read in articles-index.txt - changed to new format ini
-        $articles_index = $this->gfmfiles_path . $manual . '/en/articles-index.txt';
+        $articles_index = $this->gfmfiles_path . $manual . '/en/menu-index.txt';
         if (!file_exists($articles_index)) {
             $summary = "Skipping {$manual} - file does not exist: /en/{$articles_index}\n";
             return [false, $summary];
@@ -253,9 +252,21 @@ class Buildarticles
             if (empty($line)) {
                 continue;
             }
+            // Skip if line begins with semi-colon
+            if (ltrim($line)[0] === ';') {
+                continue;
+            }
+            // Skip if line begins with heading= or heading-1=
+            if (substr($line, 0, 7) === 'heading') {
+                continue;
+            }
+
             // The lines may contain more than two = symbols.
             $one_article = explode('=', $line, 3);
-            array_pop($one_article);
+
+            // Remove the manual from the start of the line.
+            array_shift($one_article);
+
             $articles[] = implode('/', $one_article);
         }
         return [true, $articles];

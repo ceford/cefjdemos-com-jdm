@@ -12,7 +12,7 @@ declare(strict_types=1);
 
 \defined('_JEXEC') or die;
 
-require JPATH_COMPONENT . '/libraries/vendor/autoload.php';
+require JPATH_ADMINISTRATOR . '/components/com_jdocmanual/libraries/vendor/autoload.php';
 
 use Jfcherng\Diff\Renderer\RendererConstant;
 

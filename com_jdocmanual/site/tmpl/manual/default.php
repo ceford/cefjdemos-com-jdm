@@ -54,4 +54,4 @@ $activeMenuitem = $sitemenu->getActive();
     <?php include 'site-layout.php'; ?>
 <?php endif; ?>
 
-<?php include_once JPATH_COMPONENT . '/layouts/modalbox.php'; ?>
+<?php include_once JPATH_SITE . '/components/com_jdocmanual/layouts/modalbox.php'; ?>

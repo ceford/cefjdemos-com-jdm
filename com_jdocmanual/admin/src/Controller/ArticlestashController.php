@@ -357,42 +357,6 @@ class ArticlestashController extends FormController
                             " Response:  {$result}"
                         );
 
-                        // If this is a new article make an entry in en/articles-index.txt
-                        if (empty($existing_page_id)) {
-                            // Example: manual=heading=menu-items.md
-                            $new_entry = $data['heading'] . '=' . $data['filename'] . '=' . $data['source_url'] . "\n";
-                            $append_to = $gfmfiles_path . '/' . $data['manual'] . '/en/articles-index.txt';
-                            $result = file_put_contents($append_to, $new_entry, FILE_APPEND);
-                            // No messages for now?
-                            if (empty($result)) {
-                                $msg = 'Failed: ';
-                                $this->app->enqueueMessage(
-                                    sprintf(
-                                        'COM_JDOCMANUAL_ARTICLES_SOURCE_URL_ADD_FAILED',
-                                        $append_to
-                                    ),
-                                    'warning'
-                                );
-                            } else {
-                                $msg = 'Success: ';
-                                $this->app->enqueueMessage(
-                                    Text::_('COM_JDOCMANUAL_ARTICLES_SOURCE_URL_ADD_SUCCESS'),
-                                    'success'
-                                );
-                            }
-                            try {
-                                file_put_contents(
-                                    JPATH_SITE . 'administrator/logs/jdocmanual.php',
-                                    $msg . $append_to . ' Entry: ' . $new_entry . "\n",
-                                    FILE_APPEND
-                                );
-                            } catch (PDOException $e) {
-                                // Carry on...
-                            }
-
-                            // Output an entry to the menu-index.txt file
-                        }
-
                         // Here, delete the stash.
                         $model->delete($data['id']);
                     }

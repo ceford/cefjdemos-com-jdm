@@ -95,7 +95,7 @@ class HtmlView extends BaseHtmlView
         $original_english = $this->setOriginalEnglish($basepath);
 
         // Should make the diff parameters into a class with static functions?
-        require_once(JPATH_COMPONENT . '/src/Helper/diffoptions.php');
+        require_once(JPATH_ADMINISTRATOR . '/components/com_jdocmanual/src/Helper/diffoptions.php');
 
         // If the language is English the Stash is either from the stash record or the original English.
         if ($this->item->language === 'en') {
@@ -287,7 +287,7 @@ class HtmlView extends BaseHtmlView
      */
     protected function setDiff($old, $new)
     {
-        require(JPATH_COMPONENT . '/src/Helper/diffoptions.php');
+        require(JPATH_ADMINISTRATOR . '/components/com_jdocmanual/src/Helper/diffoptions.php');
         // make the line endings consistent
         $new = preg_replace('~\R~u', "\n", $new);
         $old = preg_replace('~\R~u', "\n", $old);

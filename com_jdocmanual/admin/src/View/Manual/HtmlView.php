@@ -271,7 +271,7 @@ class HtmlView extends BaseHtmlView
 
             $childBar = $dropdown->getChildToolbar();
 
-            $layout = new FileLayout('toolbar.toggle-joomla-menu', JPATH_COMPONENT_ADMINISTRATOR . '/layouts');
+            $layout = new FileLayout('toolbar.toggle-joomla-menu', JPATH_ADMINISTRATOR . '/components/com_jdocmanual/layouts');
             $childBar->appendButton('Custom', $layout->render([]), 'toggle-joomla-menu');
 
             $childBar->linkButton('notes')
