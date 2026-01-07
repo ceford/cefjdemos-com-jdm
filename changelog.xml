@@ -2,6 +2,14 @@
     <changelog>
         <element>com_jdocmanual</element>
         <type>component</type>
+        <version>4.9.1</version>
+        <change>
+            <item>Remove index.php from Javascript urls.</item>
+        </change>
+    </changelog>
+    <changelog>
+        <element>com_jdocmanual</element>
+        <type>component</type>
         <version>4.9.0</version>
         <change>
             <item>No longer using the articles-index.txt file.</item>

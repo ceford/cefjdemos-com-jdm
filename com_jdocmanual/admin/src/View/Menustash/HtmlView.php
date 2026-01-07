@@ -89,7 +89,7 @@ class HtmlView extends BaseHtmlView
         $source = file_get_contents($basepath . '/' . $this->item->manual . '/en/menu-index.txt');
 
         $this->form->setValue('source', null, $source);
-        require_once(JPATH_ADMINISTRATOR . '/com_jdocmanul/src/Helper/diffoptions.php');
+        require_once(JPATH_ADMINISTRATOR . '/components/com_jdocmanual/src/Helper/diffoptions.php');
 
         // if there is a stash record use the stash content.
         if (!empty($this->item->id)) {

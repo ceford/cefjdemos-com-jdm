@@ -117,7 +117,7 @@ let getPage = function (event) {
       // Is this a Site or Administrator instance?
         if (url.href.indexOf('/administrator/') > 0) {
             // Replace /jdocmanual with option=jdocmanual
-            url.href = url.href.replace('/administrator/jdocmanual?', '/administrator/index.php?option=com_jdocmanual&view=manual&');
+            url.href = url.href.replace('/administrator/jdocmanual?', '/administrator/?option=com_jdocmanual&view=manual&');
         }
         location = url;
         return;
@@ -177,7 +177,7 @@ async function setPanelContent(manual, heading, filename)
 
   // get token from javascript loaded in the page
     const token = Joomla.getOptions('csrf.token', '');
-    let url = 'index.php?option=com_jdocmanual&task=content.fillpanel';
+    let url = '?option=com_jdocmanual&task=content.fillpanel';
     let data = new URLSearchParams();
 
     let new_cookie = heading + '--' + filename;
@@ -359,7 +359,7 @@ modalbox && modalbox.addEventListener('show.bs.modal', function (event) {
 async function sendFeedback(likeitornot)
 {
     const token = Joomla.getOptions('csrf.token', '');
-    let url = 'index.php?option=com_jdocmanual&task=feedback.likeitornot';
+    let url = '?option=com_jdocmanual&task=feedback.likeitornot';
     let manual = document.getElementById("manual").getAttribute('value');
     let language = document.getElementById("language").getAttribute('value');
     let heading = document.getElementById("heading").getAttribute('value');
@@ -391,34 +391,6 @@ async function sendFeedback(likeitornot)
         // result contains comment and stage(1 or 2)
         comment.value = result.comment;
         if (result.stage === 1) {
-            modalSave.classList.remove('hidden');
-        } else {
-            modalSave.classList.add('hidden');
-        }
-    }
-}
-
-async function setModalContent(itemTask, itemId, saveTask)
-{
-    const token = Joomla.getOptions('csrf.token', '');
-    let url = 'index.php?option=com_mycomponent&task=' + itemTask;
-    let data = new URLSearchParams();
-    data.append(`itemId`, itemId);
-    data.append(token, 1);
-    const options = {
-        method: 'POST',
-        body: data
-    }
-    let response = await fetch(url, options);
-    if (!response.ok) {
-        throw new Error(Joomla.Text._('COM_MYCOMPONENT_JS_ERROR_STATUS') + `${response.status}`);
-    } else {
-        let result = await response.text();
-        let description = document.querySelector(".modal-body");
-        description.innerHTML = result;
-        let modalSave = document.querySelector("#modal-save");
-        if (saveTask) {
-            modalSave.setAttribute('saveTask', saveTask);
             modalSave.classList.remove('hidden');
         } else {
             modalSave.classList.add('hidden');
