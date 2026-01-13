@@ -13,13 +13,11 @@ namespace Cefjdemos\Component\Jdocmanual\Administrator\Cli;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Database\ParameterType;
-use Joomla\CMS\Plugin\PluginHelper;
 use Cefjdemos\Component\Jdocmanual\Administrator\Helper\Markdown2html;
 use Cefjdemos\Component\Jdocmanual\Administrator\Helper\Responsive;
-use Cefjdemos\Component\Jdocmanual\Administrator\Helper\BuildHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
-\defined(constant_name: '_JEXEC') or die;
+\defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**

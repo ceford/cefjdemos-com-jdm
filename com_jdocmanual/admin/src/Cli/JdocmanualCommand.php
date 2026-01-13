@@ -11,9 +11,7 @@ namespace Cefjdemos\Component\Jdocmanual\Administrator\Cli;
 use Joomla\Console\Command\AbstractCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildarticles;
 use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildmenus;
@@ -21,7 +19,7 @@ use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildproxy;
 use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Checkhistory;
 
 // phpcs:disable PSR1.Files.SideEffects
-\defined(constant_name: '_JEXEC') or die;
+\defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
 class JdocmanualCommand extends AbstractCommand
