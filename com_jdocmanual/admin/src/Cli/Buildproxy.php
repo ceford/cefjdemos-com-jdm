@@ -238,7 +238,7 @@ class Buildproxy
         $db->setQuery($query);
         $rows = $db->loadObjectList();
 
-        $counts = $this->do_rows($rows);
+        $counts = (array) $this->do_rows($rows);
         $this->fix_urls($rows);
 
         // Do the other languages second.
