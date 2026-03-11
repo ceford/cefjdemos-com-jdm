@@ -307,9 +307,11 @@ pre {
 
 p code,
 li code,
-ol code {
+ol code,
+table code {
     color: var(--highlight-a11y-color-text-red);
 }
+
 .offcanvas.show {
   -webkit-transform: none;
   transform: none;
