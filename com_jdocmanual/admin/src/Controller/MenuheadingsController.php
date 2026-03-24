@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Controller;
@@ -32,17 +33,17 @@ class MenuheadingsController extends AdminController
     /**
      * The prefix to use with controller messages.
      *
-     * @var    string
-     * @since  1.0
+     * @var     string
+     * @since   1.0
      */
     protected $text_prefix = 'COM_JDOCMANUAL_ARTICLES_STASHES';
 
     /**
      * Update a heading display_title with Javascript call from Menu Headings list
      *
-     * @return string   A message for the calling JavaScript
+     * @return  string   A message for the calling JavaScript
      *
-     * @since 1.0
+     * @since   1.0
      */
     public function update()
     {
@@ -104,9 +105,9 @@ class MenuheadingsController extends AdminController
     /**
      * Build a menu for the selected manual and language
      *
-     * @return void   result A message is enqueued.
+     * @return  void   result A message is enqueued.
      *
-     * @since 1.0
+     * @since   1.0
      */
     public function buildmenus()
     {
@@ -130,9 +131,9 @@ class MenuheadingsController extends AdminController
     /**
      * Import the menu headings for all languages.
      *
-     * @return void   result A message is enqueued.
+     * @return  void   result A message is enqueued.
      *
-     * @since 1.0
+     * @since   1.0
      */
     public function import()
     {
@@ -149,9 +150,9 @@ class MenuheadingsController extends AdminController
         $db = Factory::getContainer()->get('DatabaseDriver');
         try {
             $db->truncateTable('#__jdm_menu_headings');
-        } catch (Exception $e) {
-            $this->app->enqueueMessage("Result: no action! Failed to truncate table.", 'warning');
-                return;
+        } catch (\Exception $e) {
+            $this->app->enqueueMessage($e->getMessage(), 'warning');
+            return;
         }
 
         $columns = $db->quoteName(array('manual', 'language', 'heading', 'display_title'));
@@ -211,7 +212,7 @@ class MenuheadingsController extends AdminController
      *
      * @return void   result A message is enqueued.
      *
-     * @since 1.0
+     * @since   1.0
      */
     public function export()
     {

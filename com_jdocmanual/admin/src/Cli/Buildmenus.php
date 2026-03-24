@@ -6,6 +6,7 @@
  *
  * @copyright   Copyright (C) 2003 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Cli;
@@ -31,7 +32,7 @@ class Buildmenus
      * Path to local source of markdown files.
      *
      * @var     string
-     * @since   1.0.0
+     * @since   1.0
      */
     protected $gfmfiles_path;
 
@@ -39,7 +40,7 @@ class Buildmenus
      * The content of the menu-index.txt files.
      *
      * @var     string
-     * @since   1.0.0
+     * @since   1.0
      */
     protected $menu_index;
 
@@ -47,7 +48,7 @@ class Buildmenus
      * Accumulate a summary to return to caller.
      *
      * @var     string
-     * @since  1.0.0
+     * @since   1.0
      */
     protected $summary = '';
 
@@ -368,7 +369,7 @@ class Buildmenus
      * @param   string  $language   The code of the language to save.
      * @param   string  $html       The html to save
      *
-     * @return  $void
+     * @return  void
      */
     protected function saveMenu($manual, $language, $html)
     {

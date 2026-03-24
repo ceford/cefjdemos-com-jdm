@@ -5,7 +5,7 @@
         <description>Display Joomla documentation in Manual format</description>
         <element>com_jdocmanual</element>
         <type>component</type>
-        <version>4.9.1</version>
+        <version>4.10.0</version>
         <client>administrator</client>
         <infourl title="Jdocmanual Extension">https://github.com/ceford/cefjdemos-com-jdm/blob/main/README.md</infourl>
         <downloads>
@@ -15,6 +15,6 @@
         <tags>
             <tag>stable</tag>
         </tags>
-        <targetplatform name="joomla" version="[456].[012345]" />
+        <targetplatform name="joomla" version="[4567].[012345]" />
     </update>
 </updates>

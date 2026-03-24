@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\View\Source;
@@ -14,7 +15,6 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -58,19 +58,20 @@ class HtmlView extends BaseHtmlView
      */
     public function display($tpl = null)
     {
-        // Initialise variables.
-        $this->form  = $this->get('Form');
-        $this->item  = $this->get('Item');
-        $this->state = $this->get('State');
+        $model       = $this->getModel();
+        $model->setUseExceptions(true);
 
-        // Check for errors.
-        if (count($errors = $this->get('Errors'))) {
-            throw new GenericDataException(implode("\n", $errors), 500);
+        try {
+            $this->item  = $model->getItem();
+            $this->form  = $model->getForm();
+            $this->state = $model->getState();
+        } catch (\Exception $e) {
+            throw new GenericDataException($e->getMessage(), 500, $e);
         }
 
         $this->addToolbar();
 
-        return parent::display($tpl);
+        parent::display($tpl);
     }
 
     /**
@@ -78,7 +79,7 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function addToolbar()
     {

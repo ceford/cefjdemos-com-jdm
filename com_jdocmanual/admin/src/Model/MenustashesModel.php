@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Model;
@@ -28,7 +29,7 @@ class MenustashesModel extends ListModel
      *
      * @param   array  $config  An optional associative array of configuration settings.
      *
-     * @since   1.6
+     * @since   1.0
      * @see     \Joomla\CMS\MVC\Controller\BaseController
      */
     public function __construct($config = array())
@@ -54,7 +55,7 @@ class MenustashesModel extends ListModel
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function populateState($ordering = 'a.manual', $direction = 'asc')
     {
@@ -82,7 +83,7 @@ class MenustashesModel extends ListModel
      *
      * @return  string  A store id.
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function getStoreId($id = '')
     {
@@ -99,7 +100,7 @@ class MenustashesModel extends ListModel
      *
      * @return  \Joomla\Database\DatabaseQuery
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function getListQuery()
     {
@@ -180,12 +181,12 @@ class MenustashesModel extends ListModel
      *
      * @return  array  An array of query result objects.
      *
-     * @since  1.0.0
+     * @since   1.0
      */
     public function getMystashes()
     {
         $user  = $this->getCurrentUser();
-        $db    = $this->getDbo();
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->select($db->quoteName(array('a.id', 'a.user_id', 'a.manual', 'a.pr')))
         ->from($db->quoteName('#__jdm_menu_stashes') . ' AS a')
@@ -200,11 +201,11 @@ class MenustashesModel extends ListModel
      *
      * @return  array  An array of query result objects.
      *
-     * @since  1.0.0
+     * @since   1.0
      */
     public function getPullrequests()
     {
-        $db    = $this->getDbo();
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
         $query->select($db->quoteName(array('a.id', 'a.user_id', 'a.manual', 'a.pr')))
         ->from($db->quoteName('#__jdm_menu_stashes') . ' AS a')

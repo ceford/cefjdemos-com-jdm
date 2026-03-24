@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\View\Menuheadings;
@@ -17,7 +18,6 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Pagination\Pagination;
-use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\Registry\Registry;
 
@@ -36,7 +36,7 @@ class HtmlView extends BaseHtmlView
      * The search tools form
      *
      * @var    Form
-     * @since  1.6
+     * @since   1.0
      */
     public $filterForm;
 
@@ -44,7 +44,7 @@ class HtmlView extends BaseHtmlView
      * The active search filters
      *
      * @var    array
-     * @since  1.6
+     * @since   1.0
      */
     public $activeFilters = [];
 
@@ -52,7 +52,7 @@ class HtmlView extends BaseHtmlView
      * Category data
      *
      * @var    array
-     * @since  1.6
+     * @since   1.0
      */
     protected $categories = [];
 
@@ -60,7 +60,7 @@ class HtmlView extends BaseHtmlView
      * An array of items
      *
      * @var    array
-     * @since  1.6
+     * @since   1.0
      */
     protected $items = [];
 
@@ -68,7 +68,7 @@ class HtmlView extends BaseHtmlView
      * The pagination object
      *
      * @var    Pagination
-     * @since  1.6
+     * @since   1.0
      */
     protected $pagination;
 
@@ -76,15 +76,15 @@ class HtmlView extends BaseHtmlView
      * The model state
      *
      * @var    Registry
-     * @since  1.6
+     * @since   1.0
      */
     protected $state;
 
     /**
      * The media tree
      *
-     * @var    Array
-     * @since  4.0
+     * @var     Array
+     * @since   4.0
      */
     protected $tree;
 
@@ -95,22 +95,22 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      * @throws  Exception
      */
     public function display($tpl = null): void
     {
-        /** @var JdocmanualModel $model */
         $model               = $this->getModel();
-        $this->items         = $model->getItems();
-        $this->pagination    = $model->getPagination();
-        $this->state         = $model->getState();
-        $this->filterForm    = $model->getFilterForm();
-        $this->activeFilters = $model->getActiveFilters();
+        $model->setUseExceptions(true);
 
-        // Check for errors.
-        if (count($errors = $this->get('Errors'))) {
-            throw new GenericDataException(implode("\n", $errors), 500);
+        try {
+            $this->items         = $model->getItems();
+            $this->pagination    = $model->getPagination();
+            $this->state         = $model->getState();
+            $this->filterForm    = $model->getFilterForm();
+            $this->activeFilters = $model->getActiveFilters();
+        } catch (\Exception $e) {
+            throw new GenericDataException($e->getMessage(), 500, $e);
         }
 
         $this->addToolbar();
@@ -123,7 +123,7 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function addToolbar(): void
     {
@@ -131,8 +131,7 @@ class HtmlView extends BaseHtmlView
 
         $user  = $this->getCurrentUser();
 
-        // Get the toolbar object instance
-        $toolbar = Toolbar::getInstance('toolbar');
+        $toolbar = $this->getDocument()->getToolbar();
 
         ToolbarHelper::title(Text::_('COM_JDOCMANUAL_MENUHEADINGS'), 'menuheadings jdocmanual');
 

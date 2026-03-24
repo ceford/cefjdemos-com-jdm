@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\View\Menustash;
@@ -16,7 +17,6 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Button\BasicButton;
-use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Cefjdemos\Component\Jdocmanual\Administrator\Helper\BuildmenusHelper;
 use Jfcherng\Diff\DiffHelper;
@@ -32,6 +32,14 @@ use Jfcherng\Diff\DiffHelper;
  */
 class HtmlView extends BaseHtmlView
 {
+
+    /**
+     * The difference between old and new versions.
+     *
+     * @var string
+     */
+    protected $diff;
+
     /**
      * The \JForm object
      *
@@ -71,63 +79,65 @@ class HtmlView extends BaseHtmlView
      */
     public function display($tpl = null)
     {
-        // Initialise variables.
-        $this->form = $this->get('Form');
-        $this->item = $this->get('Item');
-        $this->state = $this->get('State');
+        $model          = $this->getModel();
+        $model->setUseExceptions(true);
 
-        // Users/ceford/data/manuals/
-        $params = ComponentHelper::getParams('com_jdocmanual');
-        $basepath = $params->get('gfmfiles_path');
+        try {
+            $this->item     = $model->getItem();
+            $this->form     = $model->getForm();
+            $this->state    = $model->getState();
 
-        // Check that the basepath is not empty - forgotten to enter it on installation.
-        if (empty($basepath)) {
-            Factory::getApplication()->enqueueMessage(Text::_('COM_JDOCMANUAL_ARTICLES_BASEPATH_MISSING'), 'error');
-            return false;
-        }
+            // Users/ceford/data/manuals/
+            $params = ComponentHelper::getParams('com_jdocmanual');
+            $basepath = $params->get('gfmfiles_path');
 
-        $source = file_get_contents($basepath . '/' . $this->item->manual . '/en/menu-index.txt');
+            // Check that the basepath is not empty - forgotten to enter it on installation.
+            if (empty($basepath)) {
+                Factory::getApplication()->enqueueMessage(Text::_('COM_JDOCMANUAL_ARTICLES_BASEPATH_MISSING'), 'error');
+                return false;
+            }
 
-        $this->form->setValue('source', null, $source);
-        require_once(JPATH_ADMINISTRATOR . '/components/com_jdocmanual/src/Helper/diffoptions.php');
+            $source = file_get_contents($basepath . '/' . $this->item->manual . '/en/menu-index.txt');
 
-        // if there is a stash record use the stash content.
-        if (!empty($this->item->id)) {
-            $stash = $this->item->menu_text;
-            $old = $source;
-        } else {
-            // Get the source text.
-            $stash = $source;
-            $old = $stash;
-            Factory::getApplication()->enqueueMessage(Text::_('COM_JDOCMANUAL_ARTICLES_ARTICLE_COPIED'), 'warning');
-        }
-        $new = $stash;
-        $this->form->setValue('menu_text', null, $stash);
+            $this->form->setValue('source', null, $source);
+            require_once(JPATH_ADMINISTRATOR . '/components/com_jdocmanual/src/Helper/diffoptions.php');
 
-        // make the line endings consistent
-        $new = preg_replace('~\R~u', "\n", $new);
-        $old = preg_replace('~\R~u', "\n", $old);
-        // The diff is the difference between the stash and the source.
-        $this->diff = DiffHelper::calculate(
-            $old,
-            $new,
-            'SideBySide',
-            $diffOptions,
-            $rendererOptions,
-        );
+            // if there is a stash record use the stash content.
+            if (!empty($this->item->id)) {
+                $stash = $this->item->menu_text;
+                $old = $source;
+            } else {
+                // Get the source text.
+                $stash = $source;
+                $old = $stash;
+                Factory::getApplication()->enqueueMessage(Text::_('COM_JDOCMANUAL_ARTICLES_ARTICLE_COPIED'), 'warning');
+            }
+            $new = $stash;
+            $this->form->setValue('menu_text', null, $stash);
 
-        // Fill the preview field.
-        $mh = new BuildmenusHelper();
-        $this->preview = $mh->buildmenus($this->item->manual, $new, 'en');
+            // make the line endings consistent
+            $new = preg_replace('~\R~u', "\n", $new);
+            $old = preg_replace('~\R~u', "\n", $old);
+            // The diff is the difference between the stash and the source.
+            $this->diff = DiffHelper::calculate(
+                $old,
+                $new,
+                'SideBySide',
+                $diffOptions,
+                $rendererOptions,
+            );
 
-        // Check for errors.
-        if (count($errors = $this->get('Errors'))) {
-            throw new GenericDataException(implode("\n", $errors), 500);
+            // Fill the preview field.
+            $mh = new BuildmenusHelper();
+            $this->preview = $mh->buildmenus($this->item->manual, $new, 'en');
+
+        } catch (\Exception $e) {
+            throw new GenericDataException($e->getMessage(), 500, $e);
         }
 
         $this->addToolbar();
 
-        return parent::display($tpl);
+        parent::display($tpl);
     }
 
     /**
@@ -135,7 +145,7 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function addToolbar()
     {
@@ -158,7 +168,7 @@ class HtmlView extends BaseHtmlView
             ToolbarHelper::cancel('menustash.cancel');
         }
 
-        $bar = Toolbar::getInstance();
+        $bar = $this->getDocument()->getToolbar();
 
         if (!$isNew) {
             $button = (new BasicButton('gfm-delete'))

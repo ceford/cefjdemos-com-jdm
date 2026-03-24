@@ -4,8 +4,9 @@
  * @package     jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Helper;
@@ -34,7 +35,7 @@ class SetupHelper
      *
      * @return  void
      *
-     * @since  1.0.0
+     * @since   1.0
      */
     protected function setcookie($name, $value, $days)
     {
@@ -64,7 +65,7 @@ class SetupHelper
      *
      * @return  array   Setup data for a page load.
      *
-     * @since  1.0.0
+     * @since   1.0
      */
     public function setup()
     {

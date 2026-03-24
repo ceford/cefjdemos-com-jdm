@@ -78,6 +78,15 @@
 		/>
 
 		<field
+			name="eid"
+			type="text"
+			label="COM_JDOCMANUAL_ARTICLE_EID_LABEL"
+			class="readonly"
+			default="0"
+			readonly="true"
+		/>
+
+		<field
 			name="original_english"
 			type="editor"
 			label="COM_JDOCMANUAL_ARTICLE_ORIGINAL_ENGLISH_LABEL"

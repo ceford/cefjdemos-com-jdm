@@ -1,11 +1,12 @@
 <?php
 
 /**
- * @package     jdocmanual.Administrator
- * @subpackage  com_jdocmanual
+ * @package     jdocmanual
+ * @subpackage  Administrator
  *
- * @copyright   Copyright (C) 2021 Clifford E Ford
+ * @copyright   (C) 2021 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 defined('_JEXEC') or die;

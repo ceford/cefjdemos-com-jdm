@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Model;
@@ -33,7 +34,7 @@ class SourceModel extends AdminModel
      *
      * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function canDelete($record)
     {
@@ -53,7 +54,7 @@ class SourceModel extends AdminModel
      * @return  boolean     True if allowed to change the state of the record.
      *                      Defaults to the permission set in the component.
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function canEditState($record)
     {
@@ -76,7 +77,7 @@ class SourceModel extends AdminModel
      *
      * @return  Form|boolean  A Form object on success, false on failure
      *
-     * @since   1.6
+     * @since   1.0
      */
     public function getForm($data = array(), $loadData = true)
     {
@@ -113,7 +114,7 @@ class SourceModel extends AdminModel
      *
      * @return  mixed  The data for the form.
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function loadFormData()
     {
@@ -136,7 +137,7 @@ class SourceModel extends AdminModel
      *
      * @return  boolean  True on success.
      *
-     * @since   4.0.0
+     * @since   4.0
      */
     public function publish(&$pks, $value = 1)
     {
@@ -149,7 +150,14 @@ class SourceModel extends AdminModel
         $query->whereIn($db->quoteName('id'), $pks)
         ->bind(':value', $value, ParameterType::INTEGER);
         $db->setQuery($query);
-        $db->execute();
+        try {
+            $db->execute();
+        } catch (\RuntimeException $e) {
+            $this->app->enqueueMessage($e->getMessage(), 'error');
+
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -159,7 +167,7 @@ class SourceModel extends AdminModel
      *
      * @return  boolean  True on success.
      *
-     * @since   1.6
+     * @since   1.0
      */
     public function save($data)
     {

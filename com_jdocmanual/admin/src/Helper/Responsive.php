@@ -198,11 +198,11 @@ class Responsive
   /**
    * Create the thumbs
    *
-   * @param string   $dirname      the folder name
-   * @param string   $filename     the file name
-   * @param string   $extension    the file extension
+   * @param string   $dirname       the folder name
+   * @param string   $filename      the file name
+   * @param string   $extension     the file extension
    *
-   * @return void
+   * @return object | void          image data
    *
    * @since  1.0
    */
@@ -285,7 +285,8 @@ class Responsive
         try {
             $thumbs = new Thumbs($this->driver);
             return $thumbs->create($img, $options, $srcSets);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
+            $this->app->enqueueMessage($e->getMessage(), 'error');
         }
     }
 

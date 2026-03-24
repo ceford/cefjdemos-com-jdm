@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Model;
@@ -37,7 +38,7 @@ class ArticlestashModel extends AdminModel
      *
      * @return  Form|boolean  A Form object on success, false on failure
      *
-     * @since   1.6
+     * @since   1.0
      */
     public function getForm($data = array(), $loadData = true)
     {
@@ -50,7 +51,7 @@ class ArticlestashModel extends AdminModel
         );
 
         if (empty($form)) {
-            return false;
+            throw new \RuntimeException(Text::_('COM_JDOCMANUAL_ARTICLESTASH_MODEL_BAD_FORM'));
         }
 
         return $form;
@@ -114,6 +115,7 @@ class ArticlestashModel extends AdminModel
             $db->setQuery($query);
             $item = $db->loadObject();
             $item->id = 0;
+            $item->eid = $eid;
             $item->markdown_text = '';
             return $item;
         }
@@ -142,6 +144,7 @@ class ArticlestashModel extends AdminModel
             $item = $db->loadObject();
             $item->id = 0;
             $item->markdown_text = '';
+            $item->eid = $eid;
             return $item;
         }
 
@@ -172,6 +175,7 @@ class ArticlestashModel extends AdminModel
             $item->id = 0;
             $item->language = $language;
             $item->markdown_text = '';
+            $item->eid = $eid;
             return $item;
         }
 
@@ -185,6 +189,7 @@ class ArticlestashModel extends AdminModel
         $item->filename = '';
         $item->display_title = '';
         $item->id = 0;
+        $item->eid = 0;
         return $item;
     }
 
@@ -193,7 +198,7 @@ class ArticlestashModel extends AdminModel
      *
      * @return  mixed  The data for the form.
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function loadFormData()
     {
@@ -219,7 +224,7 @@ class ArticlestashModel extends AdminModel
      *
      * @see     \Joomla\CMS\Form\FormRule
      * @see     JFilterInput
-     * @since   3.7.0
+     * @since   1.0
      */
     public function validate($form, $data, $group = null)
     {
@@ -232,8 +237,7 @@ class ArticlestashModel extends AdminModel
         }
         if (empty($data['id'])) {
             if ($this->isduplicate($data)) {
-                // do nat save a new duplicate
-                return false;
+                throw new \RuntimeException(Text::_('COM_JDOCMANUAL_ARTICLESTASH_MODEL_DUPLICATE'));
             }
         }
 
@@ -247,7 +251,7 @@ class ArticlestashModel extends AdminModel
      *
      * @return  boolean  True on success.
      *
-     * @since   1.6
+     * @since   1.0
      */
     public function save($data)
     {
@@ -268,33 +272,15 @@ class ArticlestashModel extends AdminModel
             }
 
             // Bind the data.
-            if (!$table->bind($data)) {
-                $this->setError($table->getError());
-
-                return false;
-            }
-
-            // Prepare the row for saving
-            $this->prepareTable($table);
-
-            // Check the data.
-            if (!$table->check()) {
-                $this->setError($table->getError());
-
-                return false;
-            }
+            $table->bind($data);
 
             // Store the data.
-            if (!$table->store()) {
-                $this->setError($table->getError());
-
-                return false;
-            }
+            $table->store();
 
             // Clean the cache.
             $this->cleanCache();
         } catch (\Exception $e) {
-            $this->setError($e->getMessage());
+            $this->app->enqueueMessage($e->getMessage(), 'error');
 
             return false;
         }
@@ -340,9 +326,10 @@ class ArticlestashModel extends AdminModel
         $db->setQuery($query);
         $id = $db->loadResult();
 
+        // Check if this would be a duplicate
         if (!empty($id)) {
-            // this would be a duplicate
-            $this->setError(Text::_('COM_JDOCMANUAL_ARTICLES_ERROR_DUPLICATE'));
+            $this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_ARTICLES_ERROR_DUPLICATE'), 'error');
+
             return true;
         }
         // check also for a valid heading and filenemae.
@@ -360,7 +347,7 @@ class ArticlestashModel extends AdminModel
      *
      * @return  Table  A Table object
      *
-     * @since   3.0
+     * @since   1.0
      * @throws  \Exception
      */
     public function getTable($name = 'Articlestash', $prefix = 'Table', $options = array())

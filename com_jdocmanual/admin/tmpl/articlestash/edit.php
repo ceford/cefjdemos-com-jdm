@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 use Joomla\CMS\HTML\HTMLHelper;
@@ -87,20 +88,14 @@ $articlestash_edit_route = 'index.php?option=com_jdocmanual&view=articlestash&la
                 <div class="row">
                     <div class="col-12 col-lg-9">
                         <?php echo $this->form->renderField('display_title'); ?>
-                        <?php echo $this->form->renderField('source_url'); ?>
                         <?php echo $this->form->renderField('manual'); ?>
                         <?php echo $this->form->renderField('language'); ?>
                         <?php echo $this->form->renderField('heading'); ?>
                         <?php echo $this->form->renderField('filename'); ?>
+                        <?php echo $this->form->renderField('source_url'); ?>
                         <?php echo $this->form->renderField('id'); ?>
                         <?php echo $this->form->renderField('page_id'); ?>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3">
-                <div class="card card-light">
-                    <div class="card-body">
-                        <?php echo LayoutHelper::render('joomla.edit.global', $this); ?>
+                        <?php echo $this->form->renderField('eid'); ?>
                     </div>
                 </div>
             </div>
@@ -126,7 +121,7 @@ $articlestash_edit_route = 'index.php?option=com_jdocmanual&view=articlestash&la
                 </div>
             </div>
         <?php else : ?>
-            <div id="preview-area">
+            <div id="english-area">
             <?php echo $this->form->renderField('markdown_text'); ?>
             </div>
         <?php endif; ?>
@@ -139,7 +134,7 @@ $articlestash_edit_route = 'index.php?option=com_jdocmanual&view=articlestash&la
         <?php endif; ?>
 
         <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'source', Text::_('COM_JDOCMANUAL_ARTICLE_TAB_SOURCE')); ?>
-        <div id="preview-area">
+        <div id="source-area">
             <?php echo $this->form->renderField('source'); ?>
         </div>
         <?php echo HTMLHelper::_('uitab.endTab'); ?>

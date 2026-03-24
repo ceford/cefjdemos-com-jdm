@@ -24,6 +24,7 @@ CREATE TABLE IF NOT EXISTS `#__jdm_article_stashes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
   `page_id` int(11) NOT NULL,
+  `eid` INT(11) NOT NULL,
   `source_url` varchar(512) NOT NULL,
   `manual` varchar(128) NOT NULL,
   `language` char(7) NOT NULL,

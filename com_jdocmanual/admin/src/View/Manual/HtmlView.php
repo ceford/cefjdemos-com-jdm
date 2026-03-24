@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\View\Manual;
@@ -14,7 +15,6 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Layout\FileLayout;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Cefjdemos\Component\Jdocmanual\Administrator\Helper\SetupHelper;
 use Cefjdemos\Component\Jdocmanual\Administrator\Helper\CheckdbHelper;
@@ -34,7 +34,7 @@ class HtmlView extends BaseHtmlView
      * The search tools form
      *
      * @var    Form
-     * @since  1.6
+     * @since   1.0
      */
     public $filterForm;
 
@@ -42,7 +42,7 @@ class HtmlView extends BaseHtmlView
      * The active search filters
      *
      * @var    array
-     * @since  1.6
+     * @since   1.0
      */
     public $activeFilters = [];
 
@@ -50,7 +50,7 @@ class HtmlView extends BaseHtmlView
      * Category data
      *
      * @var    array
-     * @since  1.6
+     * @since   1.0
      */
     protected $categories = [];
 
@@ -58,7 +58,7 @@ class HtmlView extends BaseHtmlView
      * An array for the list of index languages
      *
      * @var    array
-     * @since  1.6
+     * @since   1.0
      */
     protected $index_languages = [];
 
@@ -66,7 +66,7 @@ class HtmlView extends BaseHtmlView
      * An array of items
      *
      * @var    array
-     * @since  1.6
+     * @since   1.0
      */
     protected $items = [];
 
@@ -74,7 +74,7 @@ class HtmlView extends BaseHtmlView
      * An array for the list of manuals
      *
      * @var    array
-     * @since  1.6
+     * @since   1.0
      */
     protected $manuals = [];
 
@@ -82,7 +82,7 @@ class HtmlView extends BaseHtmlView
      * An array for the list of page languages
      *
      * @var    array
-     * @since  1.6
+     * @since   1.0
      */
     protected $page_languages = [];
 
@@ -90,7 +90,7 @@ class HtmlView extends BaseHtmlView
      * The pagination object
      *
      * @var    Pagination
-     * @since  1.6
+     * @since   1.0
      */
     protected $pagination;
 
@@ -98,7 +98,7 @@ class HtmlView extends BaseHtmlView
      * The model state
      *
      * @var    Registry
-     * @since  1.6
+     * @since   1.0
      */
     protected $state;
 
@@ -120,8 +120,8 @@ class HtmlView extends BaseHtmlView
     /**
      * Set to 1 if there are records in the the #__jdm_articles table.
      *
-     * @var integer;
-     * @since 4.0
+     * @var     integer;
+     * @since   4.0
      */
     protected $dbisgood;
 
@@ -132,56 +132,57 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      * @throws  Exception
      */
     public function display($tpl = null): void
     {
-        /** @var JdocmanualModel $model */
         $model = $this->getModel();
+        $model->setUseExceptions(true);
 
-        // Check the database has been populated.
-        $this->dbisgood = CheckdbHelper::isGood();
+        try {
+            // Check the database has been populated.
+            $this->dbisgood = CheckdbHelper::isGood();
 
-        $this->plugin_status = $model->checkplugin();
+            $this->plugin_status = $model->checkplugin();
 
-        if (!empty($this->dbisgood)) {
-            $this->manuals       = $model->getManuals();
-            $this->index_languages     = $model->getLanguages('index');
-            $this->page_languages     = $model->getLanguages('page');
+            if (!empty($this->dbisgood)) {
+                $this->manuals       = $model->getManuals();
+                $this->index_languages     = $model->getLanguages('index');
+                $this->page_languages     = $model->getLanguages('page');
 
-            $setuphelper = new SetupHelper();
-            list(
-                $this->manual,
-                $this->index_language_code,
-                $this->page_language_code,
-                $this->heading,
-                $this->filename
-            ) = $setuphelper->setup();
+                $setuphelper = new SetupHelper();
+                list(
+                    $this->manual,
+                    $this->index_language_code,
+                    $this->page_language_code,
+                   $this->heading,
+                    $this->filename
+                ) = $setuphelper->setup();
 
-            list ($this->display_title, $this->in_this_page, $this->page_content) =
-            $model->getPage(
-                $this->manual,
-                $this->page_language_code,
-                $this->heading,
-                $this->filename
-            );
+                list ($this->display_title, $this->in_this_page, $this->page_content) =
+                $model->getPage(
+                    $this->manual,
+                    $this->page_language_code,
+                    $this->heading,
+                    $this->filename
+                );
 
-            $this->menu = $model->getMenu(
-                $this->manual,
-                $this->index_language_code,
-                $this->heading,
-                $this->filename
-            );
+                $this->menu = $model->getMenu(
+                    $this->manual,
+                    $this->index_language_code,
+                    $this->heading,
+                    $this->filename
+                );
 
-            $this->source = $model->getSourceData($this->manual);
-
-            // Check for errors.
-            if (count($errors = $this->get('Errors'))) {
-                throw new GenericDataException(implode("\n", $errors), 500);
+                $this->source = $model->getSourceData($this->manual);
             }
+        } catch (\Exception $e) {
+            throw new GenericDataException($e->getMessage(), 500, $e);
         }
+
         $this->addToolbar();
+
         parent::display($tpl);
     }
 
@@ -190,14 +191,13 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function addToolbar(): void
     {
         $app = Factory::getApplication();
 
-        // Get the toolbar object instance
-        $toolbar = Toolbar::getInstance('toolbar');
+        $toolbar = $this->getDocument()->getToolbar();
 
         if (!empty($this->dbisgood)) {
             ToolbarHelper::title($this->source->title . ' (' . $this->page_language_code . ')', 'book');

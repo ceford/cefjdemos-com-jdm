@@ -6,6 +6,7 @@
  *
  * @copyright   Copyright (C) 2003 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Cli;
@@ -32,7 +33,7 @@ class Buildproxy
      * Path to local source of markdown files.
      *
      * @var     string
-     * @since   1.0.0
+     * @since   1.0
      */
     protected $gfmfiles_path;
 
@@ -40,7 +41,7 @@ class Buildproxy
      * Path to local source of markdown files.
      *
      * @var     string
-     * @since   1.0.0
+     * @since   1.0
      */
     protected $installation_subfolder;
 
@@ -50,7 +51,7 @@ class Buildproxy
      * Regex pattern to select first GFM H1 (#) string.
      *
      * @var     string;
-     * @since   1.0.0
+     * @since   1.0
      */
     protected $pattern1 = '/\n[#]([\w| ].*)/m';
 
@@ -58,7 +59,7 @@ class Buildproxy
      * Regex pattern to select Display title from GFM comment string.
      *
      * @var     string
-     * @since  1.0.0
+     * @since   1.0
      */
     protected $pattern2 = '/<!-- Filename:.*Display title:(.*)? -->/m';
 
@@ -66,7 +67,7 @@ class Buildproxy
      * Path fragment of manual to process.
      *
      * @var     string
-     * @since  1.0.0
+     * @since   1.0
      */
     protected $manualtodo;
 
@@ -74,7 +75,7 @@ class Buildproxy
      * Path fragment of language to process.
      *
      * @var     string
-     * @since  1.0.0
+     * @since   1.0
      */
     protected $languagetodo;
 
@@ -82,7 +83,7 @@ class Buildproxy
      * The top section of a Help page.
      *
      * @var     string
-     * @since  1.0.0
+     * @since   1.0
      */
     protected $top;
 
@@ -90,7 +91,7 @@ class Buildproxy
      * The bottom section of a Help page.
      *
      * @var     string
-     * @since  1.0.0
+     * @since   1.0
      */
     protected $bottom;
 
@@ -98,7 +99,7 @@ class Buildproxy
      * Content of menu index file.
      *
      * @var     string
-     * @since  1.0.0
+     * @since   1.0
      */
     protected $tmp;
 
@@ -106,7 +107,7 @@ class Buildproxy
      * Accumulate a summary to return to caller.
      *
      * @var     string
-     * @since  1.0.0
+     * @since   1.0
      */
     protected $summary = '';
 
@@ -120,7 +121,7 @@ class Buildproxy
      *
      * @return  $string     A message reporting the outcome.
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     public function go($manual, $language)
     {
@@ -150,7 +151,7 @@ class Buildproxy
      *
      * @return  $string     A message reporting the outcome.
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     protected function build()
     {
@@ -221,7 +222,7 @@ class Buildproxy
      *
      * @return  $int        Count of the number of files.
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     protected function html4lingo($manual)
     {
@@ -347,7 +348,7 @@ class Buildproxy
      *
      * @return  $html   The required html code.
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     protected function settop()
     {
@@ -374,7 +375,7 @@ EOF;
      *
      * @return  $html   The required html code.
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     protected function setbottom()
     {

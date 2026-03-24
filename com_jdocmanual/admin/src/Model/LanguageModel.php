@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Model;
@@ -32,7 +33,7 @@ class LanguageModel extends AdminModel
      *
      * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function canDelete($record)
     {
@@ -51,7 +52,7 @@ class LanguageModel extends AdminModel
      * @return  boolean     True if allowed to change the state of the record.
      *                      Defaults to the permission set in the component.
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function canEditState($record)
     {
@@ -74,7 +75,7 @@ class LanguageModel extends AdminModel
      *
      * @return  Form|boolean  A Form object on success, false on failure
      *
-     * @since   1.6
+     * @since   1.0
      */
     public function getForm($data = array(), $loadData = true)
     {
@@ -111,7 +112,7 @@ class LanguageModel extends AdminModel
      *
      * @return  mixed  The data for the form.
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function loadFormData()
     {
@@ -134,12 +135,12 @@ class LanguageModel extends AdminModel
      *
      * @return  boolean  True on success.
      *
-     * @since   4.0.0
+     * @since   1.0
      */
     public function publish(&$pks, $value = 1)
     {
         /* this is a very simple method to change the state of each item selected */
-        $db = $this->getDbo();
+        $db = $this->getDatabase();
 
         $query = $db->getQuery(true);
 
@@ -147,7 +148,14 @@ class LanguageModel extends AdminModel
         ->set($db->quoteName('state') . ' = :value')
         ->whereIn($db->quoteName('id'), $pks);
         $db->setQuery($query);
-        $db->execute();
+        try {
+            $db->execute();
+        } catch (\RuntimeException $e) {
+            $this->app->enqueueMessage($e->getMessage(), 'error');
+
+            return false;
+        }
+        return true;
     }
     /**
      * Method to save the form data.
@@ -156,7 +164,7 @@ class LanguageModel extends AdminModel
      *
      * @return  boolean  True on success.
      *
-     * @since   1.6
+     * @since   1.0
      */
     public function save($data)
     {

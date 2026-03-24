@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Controller;
@@ -41,7 +42,7 @@ class SourcesController extends AdminController
      *
      * @return  \Joomla\CMS\MVC\Model\BaseDatabaseModel  The model.
      *
-     * @since   1.6
+     * @since   1.0
      */
     public function getModel($name = 'Source', $prefix = 'Administrator', $config = ['ignore_request' => true])
     {
@@ -52,9 +53,9 @@ class SourcesController extends AdminController
      * Update the article html for the selected manual and language.
      * This function updates all of the articles (ToDo: selected article).
      *
-     * @return  $void
+     * @return  void
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     public function buildhtml()
     {
@@ -79,9 +80,9 @@ class SourcesController extends AdminController
     /**
      * Update the menus html for the selected manual.
      *
-     * @return  $void
+     * @return  void
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     public function buildmenus()
     {
@@ -100,9 +101,9 @@ class SourcesController extends AdminController
     /**
      * Update the proxy html for the help manual.
      *
-     * @return  $void
+     * @return  void
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     public function buildproxy()
     {
@@ -124,9 +125,9 @@ class SourcesController extends AdminController
     /**
      * Issue a git pull command for a specific manual and language
      *
-     * @return  $void
+     * @return  void
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     public function gitpull()
     {
@@ -152,9 +153,9 @@ class SourcesController extends AdminController
     /**
      * Unpublish articles that have been deleted from the source files.
      *
-     * @return  $void
+     * @return  void
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     public function unpublishdeleted()
     {

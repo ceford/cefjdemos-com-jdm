@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\View\Articlestash;
@@ -16,7 +17,6 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Button\BasicButton;
-use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Cefjdemos\Component\Jdocmanual\Administrator\Helper\Markdown2html;
 use Jfcherng\Diff\DiffHelper;
@@ -32,6 +32,16 @@ use Jfcherng\Diff\DiffHelper;
  */
 class HtmlView extends BaseHtmlView
 {
+
+    /**
+     * The diff between the old and new editions.
+     *
+     * @var string
+     */
+    protected $diff = '';
+
+    protected $english_diff = '';
+
     /**
      * The \JForm object
      *
@@ -60,8 +70,6 @@ class HtmlView extends BaseHtmlView
      */
     protected $preview;
 
-    protected $stash;
-
     /**
      * Display the view.
      *
@@ -71,55 +79,56 @@ class HtmlView extends BaseHtmlView
      */
     public function display($tpl = null)
     {
-        // Initialise variables.
-        $this->form = $this->get('Form');
-        $this->item = $this->get('Item');
-        $this->state = $this->get('State');
-        $app = Factory::getApplication();
+        $model = $this->getModel();
+        $model->setUseExceptions(true);
 
-        // Users/username/data/manuals/
-        $params = ComponentHelper::getParams('com_jdocmanual');
-        $basepath = $params->get('gfmfiles_path');
+        try {
+            $this->form     = $model->getForm();
+            $this->item     = $model->getItem();
+            $this->state    = $model->getState();
 
-        /**
-         * Fields to fill here:
-         * - original_english if this is not an English stash
-         * - markdown_text
-         * - english_diff if this is not an English stash
-         * - source
-         * - diff or empty message
-         * - preview
-         */
+            // Users/username/data/manuals/
+            $params = ComponentHelper::getParams('com_jdocmanual');
+            $basepath = $params->get('gfmfiles_path');
 
-        // Get the original English from item->manual/en/heading/filename. If it exists!
-        $original_english = $this->setOriginalEnglish($basepath);
+            /**
+             * Fields to fill here:
+             * - original_english if this is not an English stash
+             * - markdown_text
+             * - english_diff if this is not an English stash
+             * - source
+             * - diff or empty message
+             * - preview
+             */
 
-        // Should make the diff parameters into a class with static functions?
-        require_once(JPATH_ADMINISTRATOR . '/components/com_jdocmanual/src/Helper/diffoptions.php');
+            // Get the original English from item->manual/en/heading/filename. If it exists!
+            $original_english = $this->getMarkdown($basepath, 'en'); //$this->item->language);
+            $this->form->setValue('original_english', null, $original_english);
 
-        // If the language is English the Stash is either from the stash record or the original English.
-        if ($this->item->language === 'en') {
-            $this->setMarkdownEnglish($original_english);
-        } else {
-            $this->setMarkdown($basepath);
-        }
+            // Should make the diff parameters into a class with static functions?
+            require_once(JPATH_ADMINISTRATOR . '/components/com_jdocmanual/src/Helper/diffoptions.php');
 
-        // Fill the preview field.
-        if (!empty($this->form->getValue('markdown_text'))) {
-            $this->preview = Markdown2html::go($this->form->getValue('markdown_text'));
-        }
+            // If the language is English the Stash is either from the stash record or the original English.
+            if ($this->item->language === 'en') {
+                $this->setMarkdownEnglish($original_english);
+            } else {
+                $this->setMarkdown($basepath);
+            }
 
-       // Get a diff for the current and previous English versions.
-        $this->getEnglishDiff($basepath, $diffOptions, $rendererOptions);
+            // Fill the preview field.
+            if (!empty($this->form->getValue('markdown_text'))) {
+                $this->preview = Markdown2html::go($this->form->getValue('markdown_text'));
+            }
 
-        // Check for errors.
-        if (count($errors = $this->get('Errors'))) {
-            throw new GenericDataException(implode("\n", $errors), 500);
+           // Get a diff for the current and previous English versions.
+            $this->getEnglishDiff($basepath, $diffOptions, $rendererOptions);
+        } catch (\Exception $e) {
+            throw new GenericDataException($e->getMessage(), 500, $e);
         }
 
         $this->addToolbar();
 
-        return parent::display($tpl);
+        parent::display($tpl);
     }
 
     /**
@@ -127,7 +136,7 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function addToolbar()
     {
@@ -137,7 +146,7 @@ class HtmlView extends BaseHtmlView
 
         Factory::getApplication()->input->set('hidemainmenu', true);
 
-        $isNew = ($this->item->id == 0);
+        $isNew = empty($this->item->id);
 
         ToolbarHelper::title(
             $isNew ? Text::_('COM_JDOCMANUAL_ARTICLE_NEW') : Text::_('COM_JDOCMANUAL_ARTICLE_EDIT'),
@@ -153,7 +162,7 @@ class HtmlView extends BaseHtmlView
             ToolbarHelper::cancel('articlestash.cancel');
         }
 
-        $bar = Toolbar::getInstance();
+        $bar = $this->getDocument()->getToolbar();
 
         if (!$isNew) {
             $button = (new BasicButton('gfm-delete'))
@@ -214,8 +223,8 @@ class HtmlView extends BaseHtmlView
                 '/',
                 array(
                     $this->item->manual,
-                    'articles',
                     $this->item->language,
+                    'articles',
                     $this->item->heading,
                     $this->item->filename
                 )
@@ -308,25 +317,23 @@ class HtmlView extends BaseHtmlView
      *
      * @since   1.0
      */
-    protected function setOriginalEnglish($basepath)
+    protected function getMarkdown($basepath, $language)
     {
-        $english_markdown_file = $basepath . implode(
+        $markdown_file = $basepath . implode(
             '/',
             array(
                 $this->item->manual,
-                'en/articles',
-               $this->item->heading,
-               $this->item->filename
+                $language,
+                'articles',
+                $this->item->heading,
+                $this->item->filename
             )
         );
-        if (is_file($english_markdown_file)) {
-            $original_english = file_get_contents($english_markdown_file);
-        } else {
-            $original_english = '';
+        if (is_file($markdown_file)) {
+            return file_get_contents($markdown_file);
         }
-        $this->form->setValue('original_english', null, $original_english);
 
-        return $original_english;
+        return '';
     }
 
     /**
@@ -346,9 +353,6 @@ class HtmlView extends BaseHtmlView
         // git log -n 2 --pretty=format:%H  -- manuals/help/en/articles/articles.md
         // edf40a05aeffe81751fef2b9e5eea0780452c1da
         $file_path = $basepath . $this->item->manual . '/en/articles/' . $this->item->heading . '/' . $this->item->filename;
-
-        // Set a default value.
-        $this->english_diff = '';
 
         // Check that the item exists - it won't if this is a new article.
         if (!is_file($file_path)) {

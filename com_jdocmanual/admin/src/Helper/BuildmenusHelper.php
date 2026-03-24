@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Helper;
@@ -34,7 +35,7 @@ class BuildmenusHelper
      *
      * @return  string  The menu in html.
      *
-     * @since  1.0.0
+     * @since   1.0
      */
     public function buildmenus($manual, $menu)
     {
@@ -181,7 +182,7 @@ class BuildmenusHelper
      *
      * @return  string  The required html code.
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     protected function getArticleData($manual, $language, $heading)
     {
@@ -209,7 +210,7 @@ class BuildmenusHelper
      *
      * @return  array      An associative array of headings.
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     protected function setHeadings($manual, $language = 'en')
     {

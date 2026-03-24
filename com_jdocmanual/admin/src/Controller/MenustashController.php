@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Controller;
@@ -29,22 +30,22 @@ class MenustashController extends FormController
     /**
      * The prefix to use with controller messages.
      *
-     * @var    string
-     * @since  1.0
+     * @var     string
+     * @since   1.0
      */
     protected $text_prefix = 'COM_JDOCMANUAL_MENUSTASH';
 
     /**
      * Constructor.
      *
-     * @param   array                $config   An optional associative array of configuration settings.
-     * Recognized key values include 'name', 'default_task', 'model_path', and
-     * 'view_path' (this list is not meant to be comprehensive).
-     * @param   MVCFactoryInterface  $factory  The factory.
-     * @param   CMSApplication       $app      The Application for the dispatcher
-     * @param   Input                $input    Input
+     * @param   array               $config     An optional associative array of configuration settings.
+     *                                          Recognized key values include 'name', 'default_task', 'model_path', and
+     *                                          'view_path' (this list is not meant to be comprehensive).
+     * @param   MVCFactoryInterface $factory    The factory.
+     * @param   CMSApplication      $app        The Application for the dispatcher
+     * @param   Input               $input      Input
      *
-     * @since   3.0
+     * @since   1.0
      */
     public function __construct($config = array(), $factory = null, $app = null, $input = null)
     {
@@ -60,7 +61,7 @@ class MenustashController extends FormController
      *
      * @return void
      *
-     * @since 1.0
+     * @since   1.0
      */
     public function add()
     {
@@ -73,11 +74,10 @@ class MenustashController extends FormController
      *
      * @return void
      *
-     * @since 1.0
+     * @since   1.0
      */
     public function pullrequestcancel()
     {
-        $this->pullrequest = -1;
         $this->save();
     }
 
@@ -86,7 +86,7 @@ class MenustashController extends FormController
      *
      * @return void
      *
-     * @since 1.0
+     * @since   1.0
      */
     public function delete()
     {
@@ -108,11 +108,10 @@ class MenustashController extends FormController
      *
      * @return void
      *
-     * @since 1.0
+     * @since   1.0
      */
     public function pullrequest()
     {
-        $this->pullrequest = 1;
         $this->save();
     }
 
@@ -121,7 +120,7 @@ class MenustashController extends FormController
      *
      * @return void
      *
-     * @since 1.0
+     * @since   1.0
      */
     public function commit()
     {
@@ -137,7 +136,7 @@ class MenustashController extends FormController
      *
      * @return  boolean  True if successful, false otherwise.
      *
-     * @since   2.5
+     * @since   1.0
      */
     public function save($key = null, $urlVar = null)
     {
@@ -183,32 +182,18 @@ class MenustashController extends FormController
         // Populate the row id from the session.
         $data[$key] = $recordId;
 
-        // Validate the posted data.
-        // Sometimes the form needs some posted data, such as for plugins and modules.
-        $form = $model->getForm($data, false);
-
-        if (!$form) {
-            $this->app->enqueueMessage($model->getError(), 'error');
-
+        try {
+            $form = $model->getForm($data, false);
+        } catch (\RuntimeException $e) {
+            $this->app->enqueueMessage($e->getMessage(), 'error');
             return false;
         }
 
         // Test whether the data is valid.
-        $validData = $model->validate($form, $data);
-
-        // Check for validation errors.
-        if ($validData === false) {
-            // Get the validation messages.
-            $errors = $model->getErrors();
-
-            // Push up to three validation messages out to the user.
-            for ($i = 0, $n = count($errors); $i < $n && $i < 3; $i++) {
-                if ($errors[$i] instanceof \Exception) {
-                    $this->app->enqueueMessage($errors[$i]->getMessage(), 'warning');
-                } else {
-                    $this->app->enqueueMessage($errors[$i], 'warning');
-                }
-            }
+        try {
+            $validData = $model->validate($form, $data);
+        } catch (\RuntimeException $e) {
+            $this->app->enqueueMessage($e->getMessage(), 'error');
 
             // Save the data in the session.
             $this->app->setUserState($context . '.data', $data);
@@ -232,20 +217,20 @@ class MenustashController extends FormController
         }
 
         // Attempt to save the data.
-        if (!$model->save($validData)) {
+        try {
+            $model->save($validData);
+        } catch (\RuntimeException $e) {
+            $this->app->enqueueMessage($e->getMessage(), 'error');
+
             // Save the data in the session.
             $this->app->setUserState($context . '.data', $validData);
 
             // Redirect back to the edit screen.
-            $this->setMessage(
-                Text::sprintf('JLIB_APPLICATION_ERROR_SAVE_FAILED', $model->getError()),
-                'error'
-            );
             $this->setRedirect(
-                Route::_('index.php?option=' .
-                    $this->option .
-                    '&view=' . $this->view_item .
-                    $this->getRedirectToItemAppend($recordId, $key), false)
+                Route::_('index.php?option=' . $this->option . '&view=' . $this->view_item .
+                    $this->getRedirectToItemAppend($recordId, $key), false),
+                    Text::_('JERROR_SAVE_FAILED', $e->getMessage()),
+                    'error'
             );
 
             return false;

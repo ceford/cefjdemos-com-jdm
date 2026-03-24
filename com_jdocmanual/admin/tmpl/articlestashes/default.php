@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 use Joomla\CMS\Component\ComponentHelper;
@@ -50,7 +51,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
     <div class="row">
         <div class="col-md-12">
             <div id="j-main-container" class="j-main-container">
-                <?php echo LayoutHelper::render('joomla.searchtools.default', array('view' => $this)); ?>
+                <?php echo LayoutHelper::render('joomla.searchtools.default', ['view' => $this]); ?>
                 <?php if (empty($this->items)) : ?>
                     <div class="alert alert-info">
                         <span class="fa fa-info-circle" aria-hidden="true"></span>
@@ -132,31 +133,31 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                             ?>
                             <tr class="row<?php echo $i % 2; ?>">
                                 <td class="text-center text-nowrap">
-                            <?php if ($item->nstashes == 0) : ?>
-                                    <?php //echo $states[$item->state]; ?>
-                            <?php else : ?>
+                                <?php if ($item->nstashes == 0) : ?>
+                                    <span class="icon-publish" aria-hidden="true"></span>
+                                <?php else : ?>
                                     <?php echo Text::_('COM_JDOCMANUAL_ARTICLE_STASHES') . ' ' . $item->nstashes; ?>
                                     <?php if ($item->nprs > 0) : ?>
                                         <br>
                                         <?php echo Text::_('COM_JDOCMANUAL_ARTICLE_PRS') . ' ' . $item->nprs; ?>
                                     <?php endif; ?>
-                            <?php endif; ?>
+                                <?php endif; ?>
                                 </td>
                                 <td>
-                            <?php if (empty($item->stash_id)) {
-                                        $action = Text::_('COM_JDOCMANUAL_ARTICLE_NEW_STASH');
-                                        $sid = 0;
-                                        $soptions = "&language={$language}&eid={$item->id}&trid=";
-                                if (!empty($item->translation_id)) {
-                                    $soptions .= $item->translation_id;
-                                }
-                                        $style = 'btn-warning';
-                            } else {
-                                $action = Text::_('COM_JDOCMANUAL_ARTICLE_EDIT_STASH');
-                                $sid = $item->stash_id;
-                                $soptions = '';
-                                $style = 'btn-success';
-                            } ?>
+                                <?php if (empty($item->stash_id)) {
+                                    $action = Text::_('COM_JDOCMANUAL_ARTICLE_NEW_STASH');
+                                    $sid = 0;
+                                    $soptions = "&manual={$item->manual}&language={$language}&eid={$item->id}&trid=";
+                                    if (!empty($item->translation_id)) {
+                                        $soptions .= $item->translation_id;
+                                    }
+                                    $style = 'btn-warning';
+                                } else {
+                                    $action = Text::_('COM_JDOCMANUAL_ARTICLE_EDIT_STASH');
+                                    $sid = $item->stash_id;
+                                    $soptions = '';
+                                    $style = 'btn-success';
+                                } ?>
                                     <a href="<?php echo Route::_($stash_edit_route . $sid . $soptions); ?>"
                                     class="btn btn-sm <?php echo $style; ?>">
                                     <?php echo $action; ?>

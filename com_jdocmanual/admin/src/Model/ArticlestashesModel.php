@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Model;
@@ -29,7 +30,7 @@ class ArticlestashesModel extends ListModel
      *
      * @param   array  $config  An optional associative array of configuration settings.
      *
-     * @since   1.6
+     * @since   1.0
      */
     public function __construct($config = array())
     {
@@ -57,14 +58,14 @@ class ArticlestashesModel extends ListModel
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function populateState($ordering = 'a.heading, a.filename', $direction = 'asc')
     {
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
         $this->setState('filter.search', $search);
 
-        $manual = $this->getUserStateFromRequest($this->context . '.filter.manual', 'filter_manual', 'help');
+        $manual = $this->getUserStateFromRequest($this->context . '.filter.manual', 'filter_manual', $this->getDefaultManual());
         $this->setState('filter.manual', $manual);
 
         $language = $this->getUserStateFromRequest($this->context . '.filter.language', 'filter_language', 'en');
@@ -72,6 +73,25 @@ class ArticlestashesModel extends ListModel
 
         // List state information.
         parent::populateState($ordering, $direction);
+    }
+
+    /**
+     * Method to get a default manual
+     *
+     * @return string The first manual in the list of manuals
+     *
+     * @since 5.0
+     */
+    protected function getDefaultManual()
+    {
+        $db    = $this->getDatabase();
+        $query = $db->createQuery();
+        $query->select($db->quoteName('manual'))
+            ->from($db->quotename('#__jdm_manuals'))
+            ->where($db->quoteName('state') . ' = 1')
+            ->order($db->quoteName('ordering') . ' ASC');
+        $db->setQuery($query);
+        return $db->loadResult();
     }
 
     /**
@@ -85,7 +105,7 @@ class ArticlestashesModel extends ListModel
      *
      * @return  string  A store id.
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function getStoreId($id = '')
     {
@@ -103,7 +123,7 @@ class ArticlestashesModel extends ListModel
      *
      * @return  \Joomla\Database\DatabaseQuery
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function getListQuery()
     {
@@ -140,22 +160,23 @@ class ArticlestashesModel extends ListModel
         // count the number of stashes and pull requests for this row
         $query->select('(SELECT count(*) FROM ' .
             $db->quoteName('#__jdm_article_stashes') . ' AS c WHERE ' .
-            $db->quoteName('c.page_id') . ' = ' .
-            $db->quoteName('a.id') .
-            ' AND ' . $db->quoteName('a.language') . ' = ' .
-            $db->quote('en') . ') AS nstashes');
+            $db->quoteName('c.eid') . ' = ' . $db->quoteName('a.id') .
+            ' AND ' . $db->quoteName('c.language') . ' = ' . $db->quote($language) . ') AS nstashes');
         $query->select('(SELECT count(*) FROM ' .
             $db->quoteName('#__jdm_article_stashes') . ' AS c WHERE ' .
             $db->quoteName('c.page_id') . ' = ' . $db->quoteName('a.id') .
             ' AND ' . $db->quoteName('a.language') . ' = ' . $db->quote('en') .
             ' AND ' . $db->quoteName('c.pr') . '> 0) AS nprs');
+
         // Get the stash id if I have this page stashed.
-        $query->select('(SELECT ' . $db->quoteName('c.id') . ' FROM ' .
-            $db->quoteName('#__jdm_article_stashes') . ' AS c WHERE ' .
-            $db->quoteName('c.user_id') . ' = ' . $user->id .
-            ' AND ' . $db->quoteName('c.page_id') . ' = ' .
-            $db->quoteName('a.id') . ' AND ' . $db->quoteName('c.language') .
-            ' = ' . $db->quote($language) . ') AS stash_id');
+        $query->select('(SELECT ' . $db->quoteName('c.id') .
+            ' FROM ' . $db->quoteName('#__jdm_article_stashes') .
+            ' AS c WHERE ' . $db->quoteName('c.user_id') . ' = ' . $user->id .
+            ' AND ' . $db->quoteName('c.eid') . ' = ' . $db->quoteName('a.id') .
+            ' AND ' . $db->quoteName('c.manual') . ' = ' . $db->quoteName('a.manual') .
+            ' AND ' . $db->quoteName('c.heading') . ' = ' . $db->quoteName('a.heading') .
+            ' AND ' . $db->quoteName('c.filename') . ' = ' . $db->quoteName('a.filename') .
+            ' AND ' . $db->quoteName('c.language') . ' = ' . $db->quote($language) . ') AS stash_id');
 
         // Select by manual.
         $manual = $this->getState('filter.manual');
@@ -175,10 +196,12 @@ class ArticlestashesModel extends ListModel
         // For language other than en find whether a translation exists
         if ($language != 'en') {
             $query->leftjoin($db->quoteName('#__jdm_articles') .
-            ' AS d ON ' . $db->quoteName('a.id') .
-            ' = ' . $db->quoteName('d.id') .
-            ' AND ' . $db->quoteName('a.manual') .
+            ' AS d ON ' . $db->quoteName('a.manual') .
             ' = ' . $db->quoteName('d.manual') .
+            ' AND ' . $db->quoteName('a.heading') .
+            ' = ' . $db->quoteName('d.heading') .
+            ' AND ' . $db->quoteName('a.filename') .
+            ' = ' . $db->quoteName('d.filename') .
             ' AND ' . $db->quoteName('d.language') .
             ' = ' . $db->quote($language))
             ->select($db->quoteName('d.id') . ' AS translation_id');
@@ -199,7 +222,7 @@ class ArticlestashesModel extends ListModel
      *
      * @return  array  An array of query result objects.
      *
-     * @since  1.0.0
+     * @since   1.0
      */
     public function getNewpages()
     {
@@ -223,7 +246,7 @@ class ArticlestashesModel extends ListModel
      *
      * @return  array  An array of query result objects.
      *
-     * @since  1.0.0
+     * @since   1.0
      */
     public function getMystashes()
     {
@@ -262,7 +285,7 @@ class ArticlestashesModel extends ListModel
      *
      * @return  array  An array of query result objects.
      *
-     * @since  1.0.0
+     * @since   1.0
      */
     public function getPullrequests()
     {

@@ -1,9 +1,12 @@
 <?php
 
 /**
- * @package     Jdocmanual.Cli
- * @copyright   Copyright (C) 2023 Clifford E Ford. All rights reserved.
+ * @package     Jdocmanual
+ * @subpackage  Administrator
+ *
+ * @copyright   Copyright (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Cli;
@@ -27,21 +30,22 @@ class JdocmanualCommand extends AbstractCommand
     /**
      * The default command name
      *
-     * @var    string
-     * @since  4.0.0
+     * @var     string
+     * @since   4.0
      */
     protected static $defaultName = 'jdocmanual:action';
 
     /**
-     * @var InputInterface
-     * @since version
+     * @var     InputInterface
+     * @since   4.0
      */
     private $cliInput;
 
     /**
      * SymfonyStyle Object
-     * @var SymfonyStyle
-     * @since 4.0.0
+     *
+     * @var     SymfonyStyle
+     * @since   4.0
      */
     private $ioStyle;
 
@@ -50,11 +54,9 @@ class JdocmanualCommand extends AbstractCommand
      *
      * @param   InputInterface   $input   Console Input
      * @param   OutputInterface  $output  Console Output
+     * @since   4.0
      *
-     * @return void
-     *
-     * @since 4.0.0
-     *
+     * @return  void
      */
     private function configureIO(InputInterface $input, OutputInterface $output)
     {
@@ -67,7 +69,7 @@ class JdocmanualCommand extends AbstractCommand
      *
      * @return  void
      *
-     * @since   4.0.0
+     * @since   4.0
      */
     protected function configure(): void
     {
@@ -106,7 +108,7 @@ class JdocmanualCommand extends AbstractCommand
      *
      * @return  integer  The command exit code
      *
-     * @since   4.0.0
+     * @since   4.0
      */
     protected function doExecute(InputInterface $input, OutputInterface $output): int
     {

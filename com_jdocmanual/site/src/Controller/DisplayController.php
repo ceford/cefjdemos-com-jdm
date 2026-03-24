@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Site
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Site\Controller;
@@ -27,7 +28,7 @@ class DisplayController extends BaseController
      * The default view.
      *
      * @var    string
-     * @since  1.6
+     * @since   1.0
      */
     protected $default_view = 'manual';
 
@@ -45,7 +46,7 @@ class DisplayController extends BaseController
      *
      * @return  \Joomla\CMS\MVC\Model\BaseDatabaseModel|boolean  Model object on success; otherwise false on failure.
      *
-     * @since   3.0
+     * @since   1.0
      */
     public function getModel($name = '', $prefix = '', $config = [])
     {

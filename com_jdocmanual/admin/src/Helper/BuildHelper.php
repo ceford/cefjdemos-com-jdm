@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Cli
  *
- * @copyright   Copyright (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   Copyright (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
  namespace Cefjdemos\Component\Jdocmanual\Administrator\Helper;

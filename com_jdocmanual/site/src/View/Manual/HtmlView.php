@@ -4,14 +4,14 @@
  * @package     Jdocmanual
  * @subpackage  Site
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Site\View\Manual;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
@@ -28,7 +28,21 @@ use Cefjdemos\Component\Jdocmanual\Administrator\Helper\SetupHelper;
  */
 class HtmlView extends BaseHtmlView
 {
+    protected $index_languages;
+    protected $page_languages;
+
+    protected $heading;
+    protected $filename;
+    protected $display_title;
+    protected $diff;
+    protected $in_this_page;
+    protected $page_content;
+    protected $menu;
+    protected $source;
+
+
     protected $manual;
+    protected $manuals;
     protected $index_language_code;
     protected $page_language_code;
     protected $menu_page_id;
@@ -40,45 +54,46 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      * @throws  Exception
      */
     public function display($tpl = null): void
     {
         /** @var ManualModel $model */
-        $model               = $this->getModel();
-        $this->manuals       = $model->getManuals();
-        $this->index_languages     = $model->getLanguages('index');
-        $this->page_languages     = $model->getLanguages('page');
+        $model                  = $this->getModel();
+        $model->setUseExceptions(true);
 
-        $setuphelper = new SetupHelper();
-        list(
-            $this->manual,
-            $this->index_language_code,
-            $this->page_language_code,
-            $this->heading,
-            $this->filename
-        ) = $setuphelper->setup();
+        try {
+           $this->manuals          = $model->getManuals();
+            $this->index_languages  = $model->getLanguages('index');
+            $this->page_languages   = $model->getLanguages('page');
 
-        list ($this->display_title, $this->in_this_page, $this->page_content) =
-        $model->getPage(
-            $this->manual,
-            $this->page_language_code,
-            $this->heading,
-            $this->filename
-        );
+            $setuphelper = new SetupHelper();
+            list(
+                $this->manual,
+                $this->index_language_code,
+                $this->page_language_code,
+                $this->heading,
+                $this->filename
+            ) = $setuphelper->setup();
 
-        $this->menu = $model->getMenu(
-            $this->manual,
-            $this->index_language_code,
-            $this->heading,
-            $this->filename
-        );
-        $this->source = $model->getSourceData($this->manual);
+            list ($this->display_title, $this->in_this_page, $this->page_content) =
+            $model->getPage(
+                $this->manual,
+                $this->page_language_code,
+                $this->heading,
+                $this->filename
+            );
 
-        // Check for errors.
-        if (count($errors = $this->get('Errors'))) {
-            throw new GenericDataException(implode("\n", $errors), 500);
+            $this->menu = $model->getMenu(
+                $this->manual,
+                $this->index_language_code,
+                $this->heading,
+                $this->filename
+            );
+            $this->source = $model->getSourceData($this->manual);
+        } catch (\Exception $e) {
+            throw new GenericDataException($e->getMessage(), 500, $e);
         }
 
         parent::display($tpl);
@@ -88,7 +103,7 @@ class HtmlView extends BaseHtmlView
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function addToolbar(): void
     {
@@ -96,8 +111,7 @@ class HtmlView extends BaseHtmlView
 
         ToolbarHelper::title($this->source->title . ' (' . $this->page_language_code . ')', 'book');
 
-        // Get the toolbar object instance
-        $toolbar = Toolbar::getInstance('toolbar');
+        $toolbar = $this->getDocument()->getToolbar();
 
         $dropdown = $toolbar->dropdownButton('select-manual')
         ->text('COM_JDOCMANUAL_MANUAL_MANUAL_SELECT')

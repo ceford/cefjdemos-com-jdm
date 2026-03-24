@@ -2,6 +2,16 @@
     <changelog>
         <element>com_jdocmanual</element>
         <type>component</type>
+        <version>4.10.0</version>
+        <change>
+            <item>Code updates to remove most deprecations.</item>
+            <item>Add column to #__article_stashes table.</item>
+            <item>Bug fixes related to stashes.</item>
+        </change>
+    </changelog>
+    <changelog>
+        <element>com_jdocmanual</element>
+        <type>component</type>
         <version>4.9.1</version>
         <change>
             <item>Remove index.php from Javascript urls.</item>

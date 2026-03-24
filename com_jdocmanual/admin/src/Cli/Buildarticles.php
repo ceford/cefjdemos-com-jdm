@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Cli
  *
- * @copyright   Copyright (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   Copyright (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Cli;
@@ -95,7 +96,7 @@ class Buildarticles
      *
      * @return  string  A message reporting the outcome.
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     public function go($manual, $language, $force = false)
     {
@@ -506,7 +507,7 @@ class Buildarticles
      *
      * @return  $html     Markdown img links converted for this site.
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     private function fiximages($manual, $contents)
     {

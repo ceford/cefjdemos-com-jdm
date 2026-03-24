@@ -4,8 +4,9 @@
  * @package     Jdocmanual
  * @subpackage  Administrator
  *
- * @copyright   (C) 2023 Clifford E Ford. All rights reserved.
+ * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Model;
@@ -29,7 +30,7 @@ class LanguagesModel extends ListModel
      *
      * @param   array  $config  An optional associative array of configuration settings.
      *
-     * @since   1.6
+     * @since   1.0
      * @see     \Joomla\CMS\MVC\Controller\BaseController
      */
     public function __construct($config = array())
@@ -55,7 +56,7 @@ class LanguagesModel extends ListModel
      *
      * @return  void
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function populateState($ordering = 'a.code', $direction = 'asc')
     {
@@ -80,7 +81,7 @@ class LanguagesModel extends ListModel
      *
      * @return  string  A store id.
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function getStoreId($id = '')
     {
@@ -96,12 +97,12 @@ class LanguagesModel extends ListModel
      *
      * @return  \Joomla\Database\DatabaseQuery
      *
-     * @since   1.6
+     * @since   1.0
      */
     protected function getListQuery()
     {
         // Create a new query object.
-        $db    = $this->getDbo();
+        $db = $this->getDatabase();
         $query = $db->getQuery(true);
 
         // Select the required fields from the table.

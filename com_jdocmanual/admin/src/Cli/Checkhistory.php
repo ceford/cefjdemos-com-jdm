@@ -6,6 +6,7 @@
  *
  * @copyright   Copyright (C) 2003 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @link        https://jdocmanual.org/
  */
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Cli;
@@ -33,7 +34,7 @@ class Checkhistory
      * Path fragment of manual to process.
      *
      * @var     string
-     * @since  1.0.0
+     * @since   1.0
      */
     protected $manualtodo;
 
@@ -41,7 +42,7 @@ class Checkhistory
      * Path fragment of language to process.
      *
      * @var     string
-     * @since  1.0.0
+     * @since   1.0
      */
     protected $languagetodo;
 
@@ -53,7 +54,7 @@ class Checkhistory
      *
      * @return  $string     A message reporting the outcome.
      *
-     * @since   1.0.0
+     * @since   1.0
      */
     public function go($manual, $language)
     {
