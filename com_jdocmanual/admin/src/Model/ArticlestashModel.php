@@ -50,10 +50,6 @@ class ArticlestashModel extends AdminModel
             'load_data' => $loadData)
         );
 
-        if (empty($form)) {
-            throw new \RuntimeException(Text::_('COM_JDOCMANUAL_ARTICLESTASH_MODEL_BAD_FORM'));
-        }
-
         return $form;
     }
 
@@ -235,10 +231,8 @@ class ArticlestashModel extends AdminModel
                 unset($data['rules']);
             }
         }
-        if (empty($data['id'])) {
-            if ($this->isduplicate($data)) {
-                throw new \RuntimeException(Text::_('COM_JDOCMANUAL_ARTICLESTASH_MODEL_DUPLICATE'));
-            }
+        if (empty($data['id']) && $this->isduplicate($data)) {
+            return false;
         }
 
         return parent::validate($form, $data, $group);
@@ -263,27 +257,20 @@ class ArticlestashModel extends AdminModel
         $pk = (isset($data[$key])) ? $data[$key] : (int) $this->getState($this->getName() . '.id');
         $isNew = true;
 
-        // Allow an exception to be thrown.
-        try {
-            // Load the row if saving an existing record.
-            if ($pk > 0) {
-                $table->load($pk);
-                $isNew = false;
-            }
-
-            // Bind the data.
-            $table->bind($data);
-
-            // Store the data.
-            $table->store();
-
-            // Clean the cache.
-            $this->cleanCache();
-        } catch (\Exception $e) {
-            $this->app->enqueueMessage($e->getMessage(), 'error');
-
-            return false;
+        // Load the row if saving an existing record.
+        if ($pk > 0) {
+            $table->load($pk);
+            $isNew = false;
         }
+
+        // Bind the data.
+        $table->bind($data);
+
+        // Store the data.
+        $table->store();
+
+        // Clean the cache.
+        $this->cleanCache();
 
         if (isset($table->$key)) {
             $this->setState($this->getName() . '.id', $table->$key);
@@ -336,26 +323,5 @@ class ArticlestashModel extends AdminModel
         // ToDo
 
         return false;
-    }
-
-    /**
-     * Method to get a table object, load it if necessary.
-     *
-     * @param   string  $name     The table name. Optional.
-     * @param   string  $prefix   The class prefix. Optional.
-     * @param   array   $options  Configuration array for model. Optional.
-     *
-     * @return  Table  A Table object
-     *
-     * @since   1.0
-     * @throws  \Exception
-     */
-    public function getTable($name = 'Articlestash', $prefix = 'Table', $options = array())
-    {
-        if ($table = $this->_createTable($name, $prefix, $options)) {
-            return $table;
-        }
-
-        throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
     }
 }

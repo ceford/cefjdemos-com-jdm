@@ -153,6 +153,8 @@ class MenustashModel extends AdminModel
         if (empty($data['id'])) {
             if ($this->isduplicate($data)) {
                 // do nat save a new duplicate
+                $this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_MENUSTASH_ERROR_DUPLICATE'), 'error');
+
                 return false;
             }
         }
@@ -245,34 +247,11 @@ class MenustashModel extends AdminModel
         $id = $db->loadResult();
 
         if (!empty($id)) {
-            $this->app->enqueueMessage(Text::_('COM_JDOCMANUAL_MENUS_ERROR_DUPLICATE'), 'error');
-
             return true;
         }
         // check also for a valid heading and filenemae.
         // ToDo
 
         return false;
-    }
-
-    /**
-     * Method to get a table object, load it if necessary.
-     *
-     * @param   string  $name     The table name. Optional.
-     * @param   string  $prefix   The class prefix. Optional.
-     * @param   array   $options  Configuration array for model. Optional.
-     *
-     * @return  Table  A Table object
-     *
-     * @since   1.0
-     * @throws  \Exception
-     */
-    public function getTable($name = 'Menustash', $prefix = 'Table', $options = array())
-    {
-        if ($table = $this->_createTable($name, $prefix, $options)) {
-            return $table;
-        }
-
-        throw new \Exception(Text::sprintf('JLIB_APPLICATION_ERROR_TABLE_NAME_NOT_SUPPORTED', $name), 0);
     }
 }
