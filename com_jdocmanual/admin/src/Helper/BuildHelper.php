@@ -47,9 +47,11 @@ class BuildHelper
     public static function getActivelanguages($db)
     {
         $query = $db->getQuery(true);
-        $query->select($db->quoteName('code'))
-        ->from($db->quoteName('#__jdm_languages'))
-        ->where($db->quoteName('state') . ' = 1')
+        $query->select($db->quoteName('sef') . ' AS ' . $db->quote('code'))
+        ->from($db->quoteName('#__languages') . ' AS a')
+        ->leftjoin($db->quoteName('#__jdm_languages') . ' AS b ON ' . $db->quoteName('a.lang_id') . ' = ' . $db->quoteName('b.lang_id'))
+        ->where($db->quoteName('published') . ' = 1')
+        ->where($db->quoteName('b.state') . ' = 1')
         ->order($db->quoteName('code') . ' ASC');
         $db->setQuery($query);
         return $db->loadColumn();

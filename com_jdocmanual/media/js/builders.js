@@ -8,7 +8,7 @@ let updateHTML = function (event) {
         // Set an alert message using the system message container.
         const elem = document.getElementById('system-message-container');
         elem.innerHTML = '<div class="alert alert-info text-center">Please Wait!</div>';
-        let url = '?option=com_jdocmanual&task=sources.buildhtml&manual=' + this.id + '&language=' + this.value;
+        let url = '?option=com_jdocmanual&task=manuals.buildhtml&manual=' + this.id + '&language=' + this.value;
         location = url;
     }
     return false;
@@ -21,7 +21,7 @@ for (let i = 0; i < links.length; i += 1) {
 
 let gitPull = function (event) {
     event.preventDefault();
-    let url = '?option=com_jdocmanual&task=sources.gitpull&manual=' + this.id + '&language=' + this.value;
+    let url = '?option=com_jdocmanual&task=manuals.gitpull&manual=' + this.id + '&language=' + this.value;
     location = url;
 }
 

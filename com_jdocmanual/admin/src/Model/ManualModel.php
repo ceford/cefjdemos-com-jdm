@@ -11,245 +11,165 @@
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Model;
 
-use Joomla\CMS\MVC\Model\ListModel;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Form\Form;
+use Joomla\CMS\MVC\Model\AdminModel;
 use Joomla\Database\ParameterType;
-use Cefjdemos\Component\Jdocmanual\Administrator\Helper\InthispageHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
 // phpcs:enable PSR1.Files.SideEffects
 
-/**
- * First page start. Do some checks, get the Menu and Manual and Language lists.
+/** * Item Model for a manual source.
  *
- * @since  1.0
- */
-class ManualModel extends ListModel
-{
-    /**
-     * Check that the jdocmanual plugin has been enabled.
+ * @since  1.6
+ */class ManualModel extends AdminModel
+{    /**
+     * Method to test whether a record can be deleted.
      *
-     * @return int The enabled value, 0 or 1.
-     */
-    public function checkplugin()
-    {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-        $query->select($db->quoteName(array('extension_id', 'enabled')))
-        ->from($db->quoteName('#__extensions'))
-        ->where($db->quoteName('name') . ' = ' . $db->quote('plg_system_jdocmanualcli'));
-        $db->setQuery($query);
-        $row = $db->loadObject();
-        if (empty($row)) {
-            return 0;
-        }
-        if (empty($row->enabled)) {
-            return 1;
-        }
-        return 2;
-    }
-
-    /**
-     * Get the first article on page load.
+     * @param   object  $record  A record object.
      *
-     * @param string $manual        The name of the manual.
-     * @param string $language      The name of the language.
-     * @param string $data_path     The name of the data_path.
-     *
-     * @return  array  An array of display items.
+     * @return  boolean  True if allowed to delete the record. Defaults to the permission set in the component.
      *
      * @since   1.0
      */
-    public function getPage($manual, $language, $heading, $filename)
+    protected function canDelete($record)
     {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-
-        $query->select($db->quoteName(array('display_title','html','order_next','order_previous')))
-        ->from($db->quoteName('#__jdm_articles'))
-        ->where($db->quoteName('manual') . ' = :manual')
-        ->where($db->quoteName('language') . ' = :language')
-        ->where($db->quoteName('heading') . ' = :heading')
-        ->where($db->quoteName('filename') . ' = :filename')
-        ->bind(':manual', $manual, ParameterType::STRING)
-        ->bind(':language', $language, ParameterType::STRING)
-        ->bind(':heading', $heading, ParameterType::STRING)
-        ->bind(':filename', $filename, ParameterType::STRING);
-        $db->setQuery($query);
-        $row = $db->loadObject();
-
-        if (empty($row) && $language != 'en') {
-            // Try again with English
-            $query = $db->getQuery(true);
-            $language = 'en';
-
-            $query->select($db->quoteName(array('display_title','html','order_next','order_previous')))
-            ->from($db->quoteName('#__jdm_articles'))
-            ->where($db->quoteName('manual') . ' = :manual')
-            ->where($db->quoteName('language') . ' = :language')
-            ->where($db->quoteName('heading') . ' = :heading')
-            ->where($db->quoteName('filename') . ' = :filename')
-            ->bind(':manual', $manual, ParameterType::STRING)
-            ->bind(':language', $language, ParameterType::STRING)
-            ->bind(':heading', $heading, ParameterType::STRING)
-            ->bind(':filename', $filename, ParameterType::STRING);
-            $db->setQuery($query);
-            $row = $db->loadObject();
-        }
-        if (empty($row)) {
-            return array('placeholder', '', 'Please select a document');
+        if (!empty($record->id)) {
+            $user  = $this->getCurrentUser();
+            return $user->authorise('core.delete', 'com_jdocmanual.source.' . (int) $record->id);
         }
 
-        if (empty($row->html)) {
-            return array('placeholder', '', 'The html field has not been populated. Select the GFM Files menu.');
-        }
-
-        if ($manual === 'magazine') {
-            $host = $_SERVER['HTTP_HOST'];  // e.g., "localhost" or "my.publicsite.org"
-            if ($host !== 'localhost') {
-                $row->html = InthispageHelper::trim2review($row->html);
-            }
-        }
-
-        // First page load needs the ToC processed here.
-        list ($in_this_page, $content) = InthispageHelper::doToc($row->html);
-
-        // Add the next and previous links to $content
-        $order = InthispageHelper::getPreviousNext($row->order_previous, $row->order_next);
-
-        $content .= $order;
-
-        return array($row->display_title, $in_this_page, $content);
+        return false;
     }
 
     /**
-     * Populate the index of pages that appears in the left column
+     * Method to test whether a record can have its state edited.
      *
-     * @param string    $manual             The manual code.
-     * @param string    $index_language     The menu language code.
-     * @param string    $menu_page_id       The id of the currently open article.
+     * @param   object  $record  A record object.
      *
-     * @return string   The menu html.
-     */
-    public function getMenu($manual, $index_language, $heading, $filename)
-    {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-
-        $query->select($db->quoteName('menu'))
-        ->from($db->quoteName('#__jdm_menus'))
-        ->where($db->quoteName('state') . ' = 1')
-        ->where($db->quoteName('manual') . ' = :manual')
-        ->where($db->quoteName('language') . ' = :language')
-        ->bind(':manual', $manual, ParameterType::STRING)
-        ->bind(':language', $index_language, ParameterType::STRING)
-        ->order($db->quoteName('id') . ' desc');
-        $db->setQuery($query);
-        $menu = $db->loadObject();
-
-        // If not correctly setup - no menus create.
-        if (empty($menu) && $index_language == 'en') {
-            return;
-        }
-
-        if (empty($menu) && $index_language != 'en') {
-            // try again with English
-            $query = $db->getQuery(true);
-            $query->select($db->quoteName('menu'))
-            ->from($db->quoteName('#__jdm_menus'))
-            ->where($db->quoteName('state') . ' = 1')
-            ->where($db->quoteName('manual') . ' = :manual')
-            ->where($db->quoteName('language') . ' = ' . $db->quote('en'))
-            ->bind(':manual', $manual, ParameterType::STRING)
-            ->order($db->quoteName('id') . ' desc');
-            $db->setQuery($query);
-            $menu = $db->loadObject();
-        }
-        return $menu;
-
-        // If there is an id, set the containing <details> element to open=""
-        // Get all of the <details> elements.
-        $pattern = '/<details.*?<\/details>/ms';
-        preg_match_all($pattern, $menu->menu, $matches);
-
-        // Find the element that is active.
-        $needle = '&id=' . $menu_page_id . '"';
-        $menu->menu = '';
-        foreach ($matches[0] as $match) {
-            if (strrpos($match, $needle)) {
-                $match = str_replace('<details ', '<details open="" ', $match);
-            }
-            $menu->menu .= $match . "\n";
-        }
-
-        // Add a class to the open li
-        $menu->menu = str_replace('<li id="article-' . $menu_page_id .
-            '"', '<li id="article-' . $menu_page_id . '" class="article-active"', $menu->menu);
-
-        return $menu;
-    }
-
-    /**
-     * Get a list of manuals.
-     *
-     * @return  array  An array of query result objects.
+     * @return  boolean     True if allowed to change the state of the record.
+     *                      Defaults to the permission set in the component.
      *
      * @since   1.0
      */
-    public function getManuals()
+    protected function canEditState($record)
     {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-        $query->select('*')
-        ->from($db->quoteName('#__jdm_manuals'))
-        ->where($db->quoteName('state') . ' = 1')
-        ->order($db->quoteName('ordering'));
-        $db->setQuery($query);
-        return $db->loadObjectList();
+        $user  = $this->getCurrentUser();
+
+        // Check for existing article.
+        if (!empty($record->id)) {
+            return $user->authorise('core.edit.state', 'com_jdocmanual.source.' . (int) $record->id);
+        }
+
+        // Default to component settings if neither article nor category known.
+        return parent::canEditState($record);
     }
 
     /**
-     * Get a list of language.
+     * Method to get the record form.
      *
-     * @param   string  $indexorpage  Which list: index or page.
+     * @param   array    $data      Data for the form.
+     * @param   boolean  $loadData  True if the form is to load its own data (default case), false if not.
      *
-     * @return  array  An array of query result objects.
+     * @return  Form|boolean  A Form object on success, false on failure
      *
      * @since   1.0
      */
-    public function getLanguages($indexorpage)
+    public function getForm($data = array(), $loadData = true)
     {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-        $query->select($db->quoteName(array('id', 'code', 'locale', 'title')))
-        ->from($db->quoteName('#__jdm_languages'))
-        ->where($db->quoteName('state') . ' = 1')
-        ->where($db->quoteName($indexorpage . '_language') . ' = 1')
-        ->order($db->quoteName('code'));
-        $db->setQuery($query);
-        return $db->loadObjectList();
+        // Get the form.
+        $form = $this->loadForm(
+            'com_jdocmanual.source',
+            'source',
+            array(
+                'control' => 'jform',
+                'load_data' => $loadData
+            )
+        );
+
+        if (empty($form)) {
+            return false;
+        }
+
+        return $form;
+    }
+    /**
+     * Method to get a single record.
+     *
+     * @param   integer  $pk  The id of the primary key.
+     *
+     * @return  mixed  Object on success, false on failure.
+     */
+    public function getItem($pk = null)
+    {
+        return parent::getItem($pk);
     }
 
     /**
-     * Get a Manual data source.
+     * Method to get the data that should be injected in the form.
      *
-     * @param   int  $id  The id of the data source.
-     *
-     * @return  array  An array of query result objects.
+     * @return  mixed  The data for the form.
      *
      * @since   1.0
      */
-    public function getSourceData($id)
+    protected function loadFormData()
     {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true);
-        $query->select($db->quoteName('title'))
-            ->from($db->quoteName('#__jdm_manuals'))
-            ->where($db->quoteName('manual') . ' = :manual')
-            ->bind(':manual', $id, ParameterType::STRING);
-        $db->setQuery($query);
-        $data = $db->loadObject();
+        // Check the session for previously entered form data.
+        $app = Factory::getApplication();
+        $data = $app->getUserState('com_jdocmanual.edit.source.data', array());
+
+        if (empty($data)) {
+            $data = $this->getItem();
+        }
 
         return $data;
+    }
+
+    /**
+     * Method to change the published state of one or more records.
+     *
+     * @param   array    &$pks   A list of the primary keys to change.
+     * @param   integer  $value  The value of the published state.
+     *
+     * @return  boolean  True on success.
+     *
+     * @since   4.0
+     */
+    public function publish(&$pks, $value = 1)
+    {
+        $db    = $this->getDatabase();
+
+        $query = $db->getQuery(true);
+
+        $query->update($db->quoteName('#__jdm_manuals'))
+        ->set($db->quoteName('state') . ' = :value');
+        $query->whereIn($db->quoteName('id'), $pks)
+        ->bind(':value', $value, ParameterType::INTEGER);
+        $db->setQuery($query);
+        try {
+            $db->execute();
+        } catch (\RuntimeException $e) {
+            $this->app->enqueueMessage($e->getMessage(), 'error');
+
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Method to save the form data.
+     *
+     * @param   array  $data  The form data.
+     *
+     * @return  boolean  True on success.
+     *
+     * @since   1.0
+     */
+    public function save($data)
+    {
+        $tmp = implode(',', (array) $data['categories']);
+        $data['categories'] = $tmp;
+        return parent::save($data);
     }
 }

@@ -37,9 +37,14 @@ class LanguagesModel extends ListModel
     {
         if (empty($config['filter_fields'])) {
             $config['filter_fields'] = array(
-                    'id', 'a.id',
+                    'published', 'a.published',
+                    'lang_id', 'a.lang_id',
+                    'lang_code', 'a.lang_code',
                     'title', 'a.title',
-                    'state', 'a.state',
+                    'title_native', 'a.title_native',
+                    'sef', 'a.sef',
+                    'image', 'a.image',
+                    'published', 'a.published',
             );
         }
 
@@ -58,7 +63,7 @@ class LanguagesModel extends ListModel
      *
      * @since   1.0
      */
-    protected function populateState($ordering = 'a.code', $direction = 'asc')
+    protected function populateState($ordering = 'a.ordering', $direction = 'asc')
     {
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
         $this->setState('filter.search', $search);
@@ -103,7 +108,7 @@ class LanguagesModel extends ListModel
     {
         // Create a new query object.
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Select the required fields from the table.
         $query->select(
@@ -112,16 +117,18 @@ class LanguagesModel extends ListModel
                 'a.*'
             )
         );
-        $query->from($db->quoteName('#__jdm_languages') . ' AS a');
+        $query->select($db->quoteName('b.state') . 'AS ' . $db->quote('jdm_language_state'));
+        $query->from($db->quoteName('#__languages') . ' AS a');
+        $query->leftjoin($db->quoteName('#__jdm_languages') . ' AS b ON a.' . $db->quotename('lang_id') . ' = b.' . $db->quotename('lang_id'));
 
         // Filter by published state
         $published = (string) $this->getState('filter.published');
 
         if (is_numeric($published)) {
-            $query->where($db->quoteName('a.state') . ' = :published');
+            $query->where($db->quoteName('a.published') . ' = :published');
             $query->bind(':published', $published, ParameterType::INTEGER);
         } elseif ($published === '') {
-            $query->where('(' . $db->quoteName('a.state') . ' = 0 OR ' . $db->quoteName('a.state') . ' = 1)');
+            $query->where('(' . $db->quoteName('a.published') . ' = 0 OR ' . $db->quoteName('a.published') . ' = 1)');
         }
 
         // Filter by search in title.
@@ -129,7 +136,7 @@ class LanguagesModel extends ListModel
 
         if (!empty($search)) {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
-            $query->where('(a.title LIKE ' . $search . ')');
+            $query->where('(a.title LIKE ' . $search . ' OR a.title_native LIKE ' . $search . ' OR a.lang_code LIKE ' . $search . ')');
         }
 
         // Add the list ordering clause.

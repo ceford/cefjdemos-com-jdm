@@ -23,7 +23,7 @@ use Joomla\Database\DatabaseDriver;
  *
  * @since  1.6
  */
-class SourceTable extends Table
+class ManualTable extends Table
 {
     /**
      * Constructor

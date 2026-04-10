@@ -9,7 +9,7 @@
  * @link        https://jdocmanual.org/
  */
 
-namespace Cefjdemos\Component\Jdocmanual\Administrator\View\Sources;
+namespace Cefjdemos\Component\Jdocmanual\Administrator\View\Manuals;
 
 use Exception;
 use Joomla\CMS\Component\ComponentHelper;
@@ -150,14 +150,14 @@ class HtmlView extends BaseHtmlView
 
         $toolbar = $this->getDocument()->getToolbar();
 
-        ToolbarHelper::title(Text::_('COM_JDOCMANUAL_SOURCES'), 'sources jdocmanual');
+        ToolbarHelper::title(Text::_('COM_JDOCMANUAL_MANUALS'), 'manuals jdocmanual');
 
-        $toolbar->addNew('source.add');
+        $toolbar->addNew('manual.add');
 
-        $toolbar->standardButton('sources-unpublish-deleted')
+        $toolbar->standardButton('manuals-unpublish-deleted')
         ->icon('fa fa-database')
-        ->text('COM_JDOCMANUAL_SOURCES_UNPUBLISH_DELETED')
-        ->task('sources.unpublishdeleted')
+        ->text('COM_JDOCMANUAL_MANUALS_UNPUBLISH_DELETED')
+        ->task('manuals.unpublishdeleted')
         ->onclick('return false')
         ->listCheck(false);
 
@@ -166,7 +166,7 @@ class HtmlView extends BaseHtmlView
         }
 
         if ($tmpl !== 'component') {
-            ToolbarHelper::help('sources', true);
+            ToolbarHelper::help('manuals', true);
         }
     }
 

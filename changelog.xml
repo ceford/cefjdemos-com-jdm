@@ -2,6 +2,14 @@
     <changelog>
         <element>com_jdocmanual</element>
         <type>component</type>
+        <version>5.0.0</version>
+        <change>
+            <item>Totally new architecture!</item>
+        </change>
+    </changelog>
+    <changelog>
+        <element>com_jdocmanual</element>
+        <type>component</type>
         <version>4.10.0</version>
         <change>
             <item>Code updates to remove most deprecations.</item>

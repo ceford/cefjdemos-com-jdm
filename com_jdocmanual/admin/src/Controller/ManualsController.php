@@ -15,10 +15,11 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Controller\AdminController;
 use Joomla\CMS\Router\Route;
+use Joomla\Database\ParameterType;
 use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildarticles;
 use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildmenus;
 use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildproxy;
-use Cefjdemos\Component\Jdocmanual\Administrator\Helper\SourcesHelper;
+use Cefjdemos\Component\Jdocmanual\Administrator\Helper\ManualsHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -29,9 +30,9 @@ use Cefjdemos\Component\Jdocmanual\Administrator\Helper\SourcesHelper;
  *
  * @since  1.6
  */
-class SourcesController extends AdminController
+class ManualsController extends AdminController
 {
-    protected $text_prefix = 'COM_JDOCMANUAL_SOURCES';
+    protected $text_prefix = 'COM_JDOCMANUAL_MANUALS';
 
     /**
      * Method to get a model object, loading it if required.
@@ -47,6 +48,51 @@ class SourcesController extends AdminController
     public function getModel($name = 'Source', $prefix = 'Administrator', $config = ['ignore_request' => true])
     {
         return parent::getModel($name, $prefix, $config);
+    }
+
+    /**
+     * Method to toggle the state of a source in the manuals table
+     * 
+     * @return A json object containing result of toggle.
+     */
+    public function toggle()
+    {
+        $this->checkToken('post');
+
+        $app = Factory::getApplication();
+        $manual_id = $app->input->get('manual_id', 0, 'int');
+
+        // Returning json - should provide an error feedback.
+        If (empty($manual_id)) {
+            exit(0);
+        }
+        $db = Factory::getContainer()->get('DatabaseDriver');
+
+        // Get the id value of the lang_id if it exists
+        $query = $db->createQuery();
+        $query->select($db->quoteName('state'))
+            ->from($db->quoteName('#__jdm_manuals'))
+            ->where($db->quoteName('id') . ' = :manual_id')
+            ->bind(':manual_id', $manual_id, ParameterType::INTEGER);
+        $db->setQuery($query);
+        $state = $db->loadResult();
+
+        $query = $db->createQuery();
+        $query->update($db->quoteName('#__jdm_manuals'))
+            ->where($db->quoteName('id') . ' = :manual_id')
+            ->bind(':manual_id', $manual_id, ParameterType::INTEGER);
+        if (empty($state)) {
+            $query->set($db->quoteName('state') . ' = 1');
+            $result = 'Yes';
+        } else {
+            $query->set($db->quoteName('state') . ' = 0');
+            $result = 'No';
+        }
+        $db->setQuery($query);
+        $db->execute();
+        
+        $json = json_encode('{"result": "' . $result . '"}');
+        exit($json);
     }
 
     /**
@@ -74,7 +120,7 @@ class SourcesController extends AdminController
                 $this->buildproxy();
             }
         }
-        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=sources', false));
+        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=manuals', false));
     }
 
     /**
@@ -95,7 +141,7 @@ class SourcesController extends AdminController
             $summary .= $bm->go($manual, $language);
             $this->app->enqueueMessage(nl2br($summary, true));
         }
-        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=sources', false));
+        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=manuals', false));
     }
 
     /**
@@ -119,7 +165,7 @@ class SourcesController extends AdminController
             $summary .= 'Select the <strong>help</strong> manual to build the proxy server';
         }
         $this->app->enqueueMessage(nl2br($summary, true));
-        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=sources', false));
+        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=manuals', false));
     }
 
     /**
@@ -147,7 +193,7 @@ class SourcesController extends AdminController
             $summary .= implode("\n", $result);
         }
         $this->app->enqueueMessage(nl2br($summary, true));
-        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=sources', false));
+        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=manuals', false));
     }
 
     /**
@@ -159,11 +205,11 @@ class SourcesController extends AdminController
      */
     public function unpublishdeleted()
     {
-        $sh = new SourcesHelper;
+        $sh = new ManualsHelper;
 
         $summary = $sh->unpublishDeleted();
 
         $this->app->enqueueMessage(nl2br($summary, true));
-        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=sources', false));
+        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=manuals', false));
     }
 }

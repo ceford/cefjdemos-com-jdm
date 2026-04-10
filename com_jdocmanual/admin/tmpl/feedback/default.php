@@ -35,7 +35,7 @@ $listDirn   = $this->escape($this->state->get('list.direction'));
 ?>
 
 <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'details', 'recall' => true)); ?>
-<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'sources', Text::_('COM_JDOCMANUAL_SOURCES_TAB_SOURCES')); ?>
+<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'manuals', Text::_('COM_JDOCMANUAL_MANUALS_TAB_MANUALS')); ?>
 
 <form action="<?php echo Route::_('index.php?option=com_jdocmanual&view=feedback'); ?>"
     method="post" name="adminForm" id="adminForm">

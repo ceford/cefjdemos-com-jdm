@@ -109,9 +109,9 @@ class SetupHelper
             $lc = $app->input->get('language', '', 'string');
             // Get the current language code.
             $query = $db->getQuery(true);
-            $query->select($db->quoteName('code'))
-                ->from($db->quotename('#__jdm_languages'))
-                ->where($db->quoteName('locale') . ' = ' . $db->quote($lc));
+            $query->select($db->quoteName('sef') . ' AS ' . $db->quote('code'))
+                ->from($db->quotename('#__languages'))
+                ->where($db->quoteName('lang_code') . ' = ' . $db->quote($lc));
             $db->setQuery($query);
             $page_language_code = $db->loadResult();
         }

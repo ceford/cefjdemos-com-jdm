@@ -26,7 +26,7 @@ use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildproxy;
  *
  * @since  1.6
  */
-class SourceController extends FormController
+class ManualController extends FormController
 {
     protected $text_prefix = 'COM_JDOCMANUAL_SOURCE';
 }

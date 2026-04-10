@@ -130,7 +130,7 @@ page.
 ```
 
 * If your website is in a sub-directory then enter the sub-directory name
-  with a leading slash, for example /jdm4. Otherwise leave this field empty.
+  with a leading slash, for example /jdm5. Otherwise leave this field empty.
 * If you are using clones of the original git sources and would like to pull
   updates from time time you cn set **Enable Pull** to *Yes*. This is used
   in the *Sources* page of the component menu.

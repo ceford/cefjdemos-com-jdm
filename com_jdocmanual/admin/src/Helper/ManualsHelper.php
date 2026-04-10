@@ -19,12 +19,12 @@ use Joomla\CMS\Component\ComponentHelper;
 // phpcs:enable PSR1.Files.SideEffects
 
 /**
- * Utilities for managing sources.
+ * Utilities for managing manual sources.
  */
-class SourcesHelper
+class ManualsHelper
 {
     /**
-     * Unpublish articles that have been deleted from the sources but are still in the database.
+     * Unpublish articles that have been deleted from the manual sources but are still in the database.
      *
      * @param $db       A database connection.
      *

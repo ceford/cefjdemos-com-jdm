@@ -181,7 +181,7 @@ class Buildproxy
         File::copy($src . 'index.php', $dst . 'index.php');
 
         // Check for name changes in the source help files
-        $this->check_sources();
+        $this->check_manuals();
 
         return;
     }
@@ -190,11 +190,11 @@ class Buildproxy
      * The help pages list in the admin Help section come from toc.json
      * There have been name changes so check that they
      */
-    protected function check_sources() {
+    protected function check_manuals() {
         // Read in the list of help pages
-        $sources_file = JPATH_SITE . '/administrator/help/en-GB/toc.json';
-        $jdoc_sources = file_get_contents($sources_file);
-        $files = json_decode($jdoc_sources, true);
+        $manuals_file = JPATH_SITE . '/administrator/help/en-GB/toc.json';
+        $jdoc_manuals = file_get_contents($manuals_file);
+        $files = json_decode($jdoc_manuals, true);
         $db = $this->db;
 
         // Check that is is in the database

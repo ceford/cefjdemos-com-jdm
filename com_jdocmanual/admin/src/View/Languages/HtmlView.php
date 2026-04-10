@@ -62,7 +62,7 @@ class HtmlView extends BaseHtmlView
      * @var    array
      * @since   1.0
      */
-    protected $items = [];
+    protected $rows = [];
 
     /**
      * The pagination object
@@ -135,14 +135,12 @@ class HtmlView extends BaseHtmlView
 
         ToolbarHelper::title(Text::_('COM_JDOCMANUAL_LANGUAGES'), 'languages jdocmanual');
 
-        $toolbar->addNew('language.add');
-
         if ($user->authorise('core.admin', 'com_jdocmanual') || $user->authorise('core.options', 'com_jdocmanual')) {
             $toolbar->preferences('com_jdocmanual');
         }
 
         if ($tmpl !== 'component') {
-            ToolbarHelper::help('sources', true);
+            ToolbarHelper::help('manuals', true);
         }
     }
 }

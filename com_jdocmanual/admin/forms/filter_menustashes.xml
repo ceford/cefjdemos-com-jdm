@@ -31,8 +31,8 @@
 			name="search"
 			type="text"
 			inputmode="search"
-			label="COM_JDOCMANUAL_SOURCES_FILTER_SEARCH_LABEL"
-			description="COM_JDOCMANUAL_SOURCES_FILTER_SEARCH_DESC"
+			label="COM_JDOCMANUAL_MANUALS_FILTER_SEARCH_LABEL"
+			description="COM_JDOCMANUAL_MANUALS_FILTER_SEARCH_DESC"
 			hint="JSEARCH_FILTER"
 		/>
 	</fields>

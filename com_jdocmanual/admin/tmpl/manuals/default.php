@@ -29,14 +29,15 @@ $params = ComponentHelper::getParams('com_jdocmanual');
 $wa = $this->document->getWebAssetManager();
 $wa->useStyle('com_jdocmanual.jdocmanual')
 ->useScript('com_jdocmanual.jdocmanual')
-->useScript('com_jdocmanual.builders');
+->useScript('com_jdocmanual.builders')
+->useScript('com_jdocmanual.manuals');
 
 $listOrder  = $this->escape($this->state->get('list.ordering'));
 $listDirn   = $this->escape($this->state->get('list.direction'));
 $saveOrder = $listOrder == 'a.ordering';
 
 if ($saveOrder && !empty($this->items)) {
-    $saveOrderingUrl = 'index.php?option=com_jdocmanual&task=sources.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
+    $saveOrderingUrl = 'index.php?option=com_jdocmanual&task=manuals.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
     HTMLHelper::_('draggablelist.draggable');
 }
 
@@ -47,16 +48,16 @@ $states = array (
         '-2' => Text::_('JTRASHED')
 );
 
-$source_edit_route = 'index.php?option=com_jdocmanual&task=source.edit&id=';
+$source_edit_route = 'index.php?option=com_jdocmanual&task=manual.edit&id=';
 
 $isGitpullEnabled = $this->isGitpullEnabled();
 
 ?>
 
 <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'details', 'recall' => true)); ?>
-<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'sources', Text::_('COM_JDOCMANUAL_SOURCES_TAB_SOURCES')); ?>
+<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'manuals', Text::_('COM_JDOCMANUAL_MANUALS_TAB_MANUALS')); ?>
 
-<form action="<?php echo Route::_('index.php?option=com_jdocmanual&view=sources'); ?>"
+<form action="<?php echo Route::_('index.php?option=com_jdocmanual&view=manuals'); ?>"
     method="post" name="adminForm" id="adminForm">
     <div class="row">
         <div class="col-md-12">
@@ -78,10 +79,10 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                 <th scope="col" class="w-1 text-center d-none d-md-table-cell">
                                     <?php echo HTMLHelper::_('searchtools.sort', '', 'a.ordering', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-sort'); ?>
                                 </th>
-                                <th scope="col">
+                                <th scope="col" class="text-center">
                                     <?php echo HTMLHelper::_(
                                         'searchtools.sort',
-                                        'JSTATUS',
+                                        'JPUBLISHED',
                                         'a.state',
                                         $listDirn,
                                         $listOrder
@@ -99,7 +100,7 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                 <th scope="col">
                                     <?php echo HTMLHelper::_(
                                         'searchtools.sort',
-                                        'COM_JDOCMANUAL_SOURCES_FOLDER',
+                                        'COM_JDOCMANUAL_MANUALS_FOLDER',
                                         'a.manual',
                                         $listDirn,
                                         $listOrder
@@ -130,7 +131,8 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                             <?php
                             $n = count($this->items);
                             foreach ($this->items as $i => $item) :
-                                ?>
+                                if (empty($item->state)) { $hide_selectors_css = ' d-none'; } else {$hide_selectors_css = ''; }
+                            ?>
                             <tr class="row<?php echo $i % 2; ?>" data-draggable-group="0"
                                 data-item-id="<?php echo $item->id; ?>" data-parents=""
                                 data-level="0">
@@ -152,27 +154,45 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                         value="<?php echo $item->id; ?>" class="width-20 text-area-order hidden">
                                     <?php endif; ?>
                                 </td>
-                                <td class="class="article-status"">
-                                <?php echo $states[$item->state]; ?>
+                                <td class="article-status text-center">
+                                    <?php if (!empty($item->state)) : ?>
+                                        <span id="jdm-manual-<?php echo $item->id; ?>"
+                                            data-manual-id="<?php echo $item->id; ?>"
+                                            data-manual-name="<?php echo $item->manual; ?>"
+                                            class="tbody-icon jgrid" 
+                                            aria-labelledby="toggle-<?php echo $item->id; ?>-desc">
+                                            <span class="icon-publish" aria-hidden="true"></span>
+                                        </span>
+                                        <div role="tooltip" id="toggle-<?php echo $item->id; ?>-desc"><?php echo Text::_('JGLOBAL_CLICK_TO_TOGGLE_STATE'); ?></div>
+                                    <?php  else : ?>
+                                        <span id="jdm-manual-<?php echo $item->id; ?>" 
+                                            data-manual-id="<?php echo $item->id; ?>" 
+                                            data-manual-name="<?php echo $item->manual; ?>"
+                                            class="tbody-icon jgrid" 
+                                            aria-labelledby="toggle-<?php echo $item->id; ?>-desc">
+                                            <span class="icon-unpublish" aria-hidden="true"></span>
+                                        </span>
+                                        <div role="tooltip" id="toggle-<?php echo $item->id; ?>-desc"><?php echo Text::_('JGLOBAL_CLICK_TO_TOGGLE_STATE'); ?></div>
+                                    <?php endif; ?>
                                 </td>
                                 <td scope="row" class="has-context">
                                     <a href="<?php echo Route::_($source_edit_route . $item->id); ?>">
                                     <?php echo $this->escape($item->title); ?>
                                     </a>
                                 </td>
-                                <td class="d-none d-md-table-cell">
-                                <?php echo $item->manual; ?>
+                                <td class="d-md-table-cell">
+                                    <?php echo $item->manual; ?>
                                 </td>
                                 <td>
-                                <?php if (!empty($item->state)) : ?>
+                                    <span class="data-build-name-<?php echo $item->manual . $hide_selectors_css; ?>">
                                     <?php echo $this->getLanguageFormHTML($item->manual, 'buildhtml'); ?>
-                                <?php endif; ?>
+                                    </span>
                                 </td>
                                 <?php if ($isGitpullEnabled) : ?>
                                 <td>
-                                    <?php if (!empty($item->state)) : ?>
+                                        <span class="data-fetch-name-<?php echo $item->manual . $hide_selectors_css; ?>">
                                         <?php echo $this->getLanguageFormHTML($item->manual, 'gitpull'); ?>
-                                    <?php endif; ?>
+                                        </span>
                                 </td>
                                 <?php endif; ?>
                                 <td class="d-none d-md-table-cell">
@@ -197,7 +217,7 @@ $isGitpullEnabled = $this->isGitpullEnabled();
 </form>
 <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'newpages', Text::_('COM_JDOCMANUAL_SOURCES_TAB_NOTES')); ?>
+<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'newpages', Text::_('COM_JDOCMANUAL_MANUALS_TAB_NOTES')); ?>
     <?php include __DIR__ . '../../manual/notes.php'; ?>
 <?php echo HTMLHelper::_('uitab.endTab'); ?>
 

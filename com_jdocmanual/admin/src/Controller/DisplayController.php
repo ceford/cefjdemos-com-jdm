@@ -38,7 +38,7 @@ class DisplayController extends BaseController
      * @var     string
      * @since   1.0
      */
-    protected $default_view = 'manual';
+    protected $default_view = 'manuals';
 
    /**
      * Get the article from the database and return title and content.

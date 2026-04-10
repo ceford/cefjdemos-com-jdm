@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <form>
 
-	<fieldset name="source" label="COM_JDOCMANUAL_SOURCE_TAB">
+	<fieldset name="manual" label="COM_JDOCMANUAL_MANUAL_TAB">
 
 		<field
 			name="title"

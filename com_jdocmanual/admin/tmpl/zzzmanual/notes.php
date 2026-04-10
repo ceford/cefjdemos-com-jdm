@@ -42,7 +42,7 @@ $plugin_status = array(
 <li>Your path: <?php echo $data_path; ?>.</li>
 <li>Your plugin: <?php echo $plugin_status[$this->plugin_status]; ?>.</li>
 <?php if (!empty($gfmfiles_path) && !$this->dbisgood) : ?>
-<li>Database has no content! Go to Sources to enable and build content (select the <strong>Sources</strong> tab).</li>
+<li>Database has no content! Go to Manuals to enable and build content (select the <strong>Manuals</strong> tab).</li>
 <?php endif; ?>
 
 </ul>

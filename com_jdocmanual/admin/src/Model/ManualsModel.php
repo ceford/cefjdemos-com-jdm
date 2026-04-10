@@ -24,7 +24,7 @@ use Cefjdemos\Component\Jdocmanual\Administrator\Helper\BuildHelper;
  *
  * @since  1.0
  */
-class SourcesModel extends ListModel
+class ManualsModel extends ListModel
 {
     /**
      * Constructor.
