@@ -1,7 +1,7 @@
 
 
 /**
- * After page load set the active menu and open its accordion panel.
+ * After page load listen for a change of published state
  */
 document.addEventListener('DOMContentLoaded', function () {
     let links = document.querySelectorAll('[id^="jdm-manual-"]');
@@ -9,6 +9,32 @@ document.addEventListener('DOMContentLoaded', function () {
         links[i].addEventListener('click', toggleManual, false);
     }
 });
+
+/**
+ * Select a default Home manual
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    let links = document.querySelectorAll('[id^="jdm-default-"]');
+    for (let i = 0; i < links.length; i += 1) {
+        links[i].addEventListener('click', setDefault, false);
+    }
+});
+
+/**
+ * Toggle yes/no whether to use an installed language in JDM
+ */
+function setDefault()
+{
+    const token = Joomla.getOptions('csrf.token', '');
+
+    // The id of the Manual
+    const manual_id = this.getAttribute('data-manual-id')
+
+    const url = '?option=com_jdocmanual&task=manuals.setdefault&manual_id=' + manual_id;
+
+    window.location.replace(url);
+}
+
 
 /**
  * Toggle yes/no whether to use an installed language in JDM

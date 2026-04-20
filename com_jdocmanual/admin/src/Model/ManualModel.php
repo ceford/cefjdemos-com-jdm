@@ -37,7 +37,7 @@ use Joomla\Database\ParameterType;
     {
         if (!empty($record->id)) {
             $user  = $this->getCurrentUser();
-            return $user->authorise('core.delete', 'com_jdocmanual.source.' . (int) $record->id);
+            return $user->authorise('core.delete', 'com_jdocmanual.manual.' . (int) $record->id);
         }
 
         return false;
@@ -59,7 +59,7 @@ use Joomla\Database\ParameterType;
 
         // Check for existing article.
         if (!empty($record->id)) {
-            return $user->authorise('core.edit.state', 'com_jdocmanual.source.' . (int) $record->id);
+            return $user->authorise('core.edit.state', 'com_jdocmanual.manual.' . (int) $record->id);
         }
 
         // Default to component settings if neither article nor category known.
@@ -80,8 +80,8 @@ use Joomla\Database\ParameterType;
     {
         // Get the form.
         $form = $this->loadForm(
-            'com_jdocmanual.source',
-            'source',
+            'com_jdocmanual.manual',
+            'manual',
             array(
                 'control' => 'jform',
                 'load_data' => $loadData
@@ -117,7 +117,7 @@ use Joomla\Database\ParameterType;
     {
         // Check the session for previously entered form data.
         $app = Factory::getApplication();
-        $data = $app->getUserState('com_jdocmanual.edit.source.data', array());
+        $data = $app->getUserState('com_jdocmanual.edit.manual.data', array());
 
         if (empty($data)) {
             $data = $this->getItem();
@@ -140,7 +140,7 @@ use Joomla\Database\ParameterType;
     {
         $db    = $this->getDatabase();
 
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         $query->update($db->quoteName('#__jdm_manuals'))
         ->set($db->quoteName('state') . ' = :value');

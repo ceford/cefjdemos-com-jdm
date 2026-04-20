@@ -87,9 +87,6 @@ class Thumbs
                     $srcSets->avif->srcset[$options->validSizes[$i]] = str_replace(' ', '%20', $fileSrc) . '.avif' . '?version=' . $hash . ' ' . $options->validSizes[$i] . 'w';
                 }
 
-                \imagedestroy($sourceImage);
-                \imagedestroy($destImage);
-
                 $sourceImage = null;
                 $destImage = null;
 

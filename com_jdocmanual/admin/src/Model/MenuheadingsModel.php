@@ -41,7 +41,7 @@ class MenuheadingsModel extends ListModel
                     'manual', 'a.manual',
                     'language', 'a.language',
                     'heading', 'a.heading',
-                    'display_title', 'a.display_title',
+                    'title', 'a.title',
             );
         }
 
@@ -116,7 +116,7 @@ class MenuheadingsModel extends ListModel
     protected function getListQuery()
     {
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Select the required fields from the table.
         $query->select(
@@ -146,12 +146,12 @@ class MenuheadingsModel extends ListModel
             ' AND ' . $db->quoteName('language') . ' = ' . $db->quote($language) .
             ' AND ' . $db->quoteName('c.heading') . ' = ' . $db->quoteName('a.heading') .
             ') AS translation_id');
-            $query->select('(SELECT ' . $db->quoteName('c.display_title') .
+            $query->select('(SELECT ' . $db->quoteName('c.title') .
             ' FROM ' . $db->quoteName('#__jdm_menu_headings') . ' AS c WHERE ' .
             $db->quoteName('c.manual') . ' = ' . $db->quote($manual) .
             ' AND ' . $db->quoteName('language') . ' = ' . $db->quote($language) .
             ' AND ' . $db->quoteName('c.heading') . ' = ' . $db->quoteName('a.heading') .
-            ') AS translation_display_title');
+            ') AS translation_title');
         }
 
         // Filter by published state

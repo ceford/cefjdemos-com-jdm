@@ -73,7 +73,7 @@ class MenustashModel extends AdminModel
         $db = $this->getDatabase();
         // If a stash record exists use the stash record.
         if (!empty($pk)) {
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->select('*')
                 ->from($db->quoteName('#__jdm_menu_stashes'))
                 ->where($db->quoteName('id') . ' = :id')
@@ -101,7 +101,7 @@ class MenustashModel extends AdminModel
         $db = $this->getDatabase();
 
         // Load a stash record if one exists
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select($db->quoteName(array('b.id', 'b.markdown_text')))
             ->from($db->quoteName('#__jdm_article_stashes AS b'))
             ->where($db->quoteName('user_id') . ' = :user_id')
@@ -228,7 +228,7 @@ class MenustashModel extends AdminModel
         $user  = $this->getCurrentUser();
         // check for a duplicate
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select($db->quoteName('id'))
             ->from($db->quoteName('#__jdm_article_stashes'))
             ->where($db->quoteName('user_id') . ' = :user_id')

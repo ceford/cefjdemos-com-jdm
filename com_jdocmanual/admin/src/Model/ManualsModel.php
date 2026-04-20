@@ -105,7 +105,7 @@ class ManualsModel extends ListModel
     protected function getListQuery()
     {
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Select the required fields from the table.
         $query->select(
@@ -150,7 +150,7 @@ class ManualsModel extends ListModel
     public function checkplugin()
     {
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select($db->quoteName(array('extension_id', 'enabled')))
         ->from($db->quoteName('#__extensions'))
         ->where($db->quoteName('name') . ' = ' . $db->quote('plg_system_jdocmanualcli'));

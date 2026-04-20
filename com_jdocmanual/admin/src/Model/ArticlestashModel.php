@@ -68,7 +68,7 @@ class ArticlestashModel extends AdminModel
         $db = $this->getDatabase();
         // If a stash record exists use the stash record.
         if (!empty($pk)) {
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->select('*')
                 ->from($db->quoteName('#__jdm_article_stashes'))
                 ->where($db->quoteName('id') . ' = :id')
@@ -90,7 +90,7 @@ class ArticlestashModel extends AdminModel
 
         // If the language is en and the eid is set use it
         if ($language == 'en' & !empty($eid)) {
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->select($db->quoteName('a.id') . ' AS page_id')
             ->select(
                 $db->quoteName(
@@ -101,7 +101,7 @@ class ArticlestashModel extends AdminModel
                         'a.language',
                         'a.heading',
                         'a.filename',
-                        'a.display_title'
+                        'a.title'
                     )
                 )
             )
@@ -118,7 +118,7 @@ class ArticlestashModel extends AdminModel
 
         // If a translation exists use it.
         if (!empty($trid)) {
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->select($db->quoteName('a.id') . ' AS page_id')
             ->select(
                 $db->quoteName(
@@ -129,7 +129,7 @@ class ArticlestashModel extends AdminModel
                         'a.language',
                         'a.heading',
                         'a.filename',
-                        'a.display_title'
+                        'a.title'
                     )
                 )
             )
@@ -146,7 +146,7 @@ class ArticlestashModel extends AdminModel
 
         // Otherwise use the English original.
         if (!empty($eid)) {
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->select($db->quoteName('a.id') . ' AS page_id')
             ->select(
                 $db->quoteName(
@@ -157,7 +157,7 @@ class ArticlestashModel extends AdminModel
                         'a.language',
                         'a.heading',
                         'a.filename',
-                        'a.display_title'
+                        'a.title'
                     )
                 )
             )
@@ -183,7 +183,7 @@ class ArticlestashModel extends AdminModel
         $item->source_url = '';
         $item->heading = '';
         $item->filename = '';
-        $item->display_title = '';
+        $item->title = '';
         $item->id = 0;
         $item->eid = 0;
         return $item;
@@ -295,7 +295,7 @@ class ArticlestashModel extends AdminModel
         $user  = $this->getCurrentUser();
         $db    = $this->getDatabase();
 
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select($db->quoteName('id'))
             ->from($db->quoteName('#__jdm_article_stashes'))
             ->where($db->quoteName('user_id') . ' = :user_id')

@@ -13,7 +13,6 @@ function setCookie(name, value, days)
     let path = "; path=" + root;
 
     const samesite = "; samesite=None; secure=true";
-    let baseFull = paths.baseFull; // "http:\/\/localhost\/j4ops\/"
 
     if (days) {
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -48,7 +47,7 @@ function getCookie(name)
  */
 function eraseCookie(name)
 {
-    setCookie(name,'',0);
+    setCookie(name, '', 0);
 }
 
 /**
@@ -76,18 +75,22 @@ if (toggle) {
 
 let getPage = function (event) {
     event.preventDefault();
-  // get the current manual
-    let jdmcur = getCookie('jdmcur');
-  // Set a default current manual.
+
+    // get the current manual
+    let jdm5cur = decodeURI(getCookie('jdm5cur'));
+    
+    // Set a default current manual.
     let curmanual = 'user';
-    if (jdmcur) {
-        curmanual = jdmcur.split('-')[0];
+    if (jdm5cur) {
+        curmanual = jdm5cur.split('/')[0];
     }
-  // this contains the full url of the link
+    
+    // this contains the full url of the link
     let url = new URL(this);
     let paramsString = url.search;
     let searchParams = new URLSearchParams(paramsString);
-  // First check for change of index or page language
+    
+    // First check for change of index or page language
     if (searchParams.get('index_language_code')) {
         location = url;
         return;
@@ -96,35 +99,31 @@ let getPage = function (event) {
         location = url;
         return;
     }
-  // the manual maybe in article=user/ or in manual=user
+
+    // the manual maybe in article=user/ or in manual=user
     let manual = searchParams.get('manual');
-    let heading = '';
-    let filename = '';
+    let path = '';
     if (!manual) {
         let article = searchParams.get('article');
         if (article) {
-            sp = article.split('/');
-            manual = sp[0];
-            heading = sp[1];
-            filename = sp[2].split('.')[0] + '.md';
+            // The first part of split is the manual
+            sp = article.split('/')
+            manual = sp.shift();
+            path = sp.join('/');
         }
     } else {
-        heading = searchParams.get('heading');
-        filename = searchParams.get('filename');
+        path = searchParams.get('path');
     }
-  // if there is a change of manual
-    if (curmanual !== manual || heading === null || filename === null) {
-      // Is this a Site or Administrator instance?
-        if (url.href.indexOf('/administrator/') > 0) {
-            // Replace /jdocmanual with option=jdocmanual
-            url.href = url.href.replace('/administrator/jdocmanual?', '/administrator/?option=com_jdocmanual&view=manual&');
-        }
+
+    // if there is a change of manual
+    if (curmanual !== manual || path === null) {
+        // Is this a Site or Administrator instance?
         location = url;
         return;
     }
-    setPanelContent(manual, heading, filename);
-  // add the highlight class for the selected index item
-  //this.parentElement.classList.add("article-active");
+    setPanelContent(manual, path);
+    // add the highlight class for the selected index item
+    //this.parentElement.classList.add("article-active");
     setlinks();
 };
 
@@ -144,7 +143,7 @@ function setlinks()
 /**
  * Fetch the selected page from source.
  */
-async function setPanelContent(manual, heading, filename)
+async function setPanelContent(manual, path)
 {
     let document_title = document.getElementById('document-title');
     if (!document_title) {
@@ -175,17 +174,16 @@ async function setPanelContent(manual, heading, filename)
     </div>`;
     let toc_panel = document.getElementById('toc-panel');
 
-  // get token from javascript loaded in the page
+    // get token from javascript loaded in the page
     const token = Joomla.getOptions('csrf.token', '');
-    let url = '?option=com_jdocmanual&task=content.fillpanel';
+    let url = '?option=com_jdocmanual&task=manuals.fillpanel';
     let data = new URLSearchParams();
 
-    let new_cookie = heading + '--' + filename;
-    setCookie('jdm' + manual, new_cookie, 10);
+    let new_cookie = path;
+    setCookie('jdm5' + manual, encodeURI(new_cookie), 10);
 
     data.append('manual', manual);
-    data.append('heading', heading);
-    data.append('filename', filename);
+    data.append('path', path);
     data.append(token, 1);
     const options = {
         body: data,
@@ -196,15 +194,14 @@ async function setPanelContent(manual, heading, filename)
         document_panel.innerHTML = response.status;
         throw new Error(Joomla.Text._('COM_MYCOMPONENT_JS_ERROR_STATUS'));
     } else {
-        let result = await response.text();
-        let obj = JSON.parse(result);
-        toc_panel.innerHTML = obj[0];
-        document_panel.innerHTML = obj[1];
-        document_title.innerHTML = obj[2];
+        let result = await response.json();
+        document_title.innerHTML = result[0];
+        toc_panel.innerHTML = result[1];
+        document_panel.innerHTML = result[2];
         setlinks();
-        menuHighlight(heading, filename);
+        menuHighlight(path);
         let language = document.getElementById("language").value;
-        setFeedback(manual, language, heading, filename);
+        setFeedback(manual, language, path);
     }
 }
 
@@ -231,10 +228,9 @@ function setIndexLocation()
     }
 }
 
-function menuHighlight(heading, filename)
+function menuHighlight(path)
 {
-    filename = filename.replace('.md', '');
-    let link = document.querySelector('a[href*="/' + heading + '/' + filename + '"]');
+    let link = document.querySelector('a[href*="/' + path + '"]');
     if (link) {
         // Set the list item class for the article, the parent of the link.
         link.parentElement.classList.add("article-active");
@@ -267,10 +263,10 @@ function menuHighlight(heading, filename)
         const highlight = url.searchParams.get('highlight');
 
         // Change the browser bar URL
-        let jdmcur = getCookie('jdmcur');
-        if (jdmcur) {
-            // user-en-en
-            let parts = jdmcur.split('-');
+        let jdm5cur = decodeURI(getCookie('jdm5cur'));
+        if (jdm5cur) {
+            // user/en/en
+            let parts = jdm5cur.split('/');
             let lang = parts[2];
             let href = link.href.replace('jdocmanual?', lang + '/jdocmanual?');
             if (highlight) {
@@ -289,14 +285,13 @@ function menuHighlight(heading, filename)
 /**
  * Set data in the feedback form.
  */
-function setFeedback(manual, language, heading, filename)
+function setFeedback(manual, language, path)
 {
     // Check this is the Manual page
     if (document.getElementById("manual")) {
         document.getElementById("manual").value = manual;
         document.getElementById("language").value = language;
-        document.getElementById("heading").value = heading;
-        document.getElementById("filename").value = filename;
+        document.getElementById("path").value = path;
         document.getElementById("comment").value = '';
     }
 }
@@ -305,17 +300,18 @@ function setFeedback(manual, language, heading, filename)
  * After page load set the active menu and open its accordion panel.
  */
 document.addEventListener('DOMContentLoaded', function (event) {
-  // Get the heading and filename from the cookies.
-    let jdmcur = getCookie('jdmcur');
-    if (jdmcur) {
-      // user-en-en
-        let parts = jdmcur.split('-');
+  // Get the path from the cookies.
+    let cookie = getCookie('jdm5cur');
+    let jdm5cur = cookie;
+    if (jdm5cur) {
+        // user/en/en
+        let parts = jdm5cur.split('/');
         let manual = parts[0];
-      // handf = heading and filename
-        let handf = getCookie('jdm' + manual).split('--');
-        menuHighlight(handf[0], handf[1]);
+        // handf = path
+        let path = getCookie('jdm5' + manual);
+        menuHighlight(path);
         setIndexLocation();
-        setFeedback(manual, parts[2], handf[0], handf[1]);
+        setFeedback(manual, parts[2], path);
     }
 });
 
@@ -362,8 +358,7 @@ async function sendFeedback(likeitornot)
     let url = '?option=com_jdocmanual&task=feedback.likeitornot';
     let manual = document.getElementById("manual").getAttribute('value');
     let language = document.getElementById("language").getAttribute('value');
-    let heading = document.getElementById("heading").getAttribute('value');
-    let filename = document.getElementById("filename").getAttribute('value');
+    let path = document.getElementById("path").getAttribute('value');
     let comment = document.getElementById("comment");
     let comment_label = document.getElementById("comment_label");
     let modalSave = document.querySelector("#modal-save");
@@ -373,8 +368,7 @@ async function sendFeedback(likeitornot)
     data.append(`likeitornot`, likeitornot);
     data.append(`manual`, manual);
     data.append(`language`, language);
-    data.append(`heading`, heading);
-    data.append(`filename`, filename);
+    data.append(`path`, path);
     data.append(`comment`, comment.value);
     data.append(token, 1);
     const options = {

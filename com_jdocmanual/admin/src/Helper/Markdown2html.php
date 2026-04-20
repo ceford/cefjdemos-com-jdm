@@ -95,7 +95,7 @@ class Markdown2html
     {
         $db = Factory::getContainer()->get('DatabaseDriver');
 
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         // If id is 0 this must be a new document.
         if (empty($data['page_id'])) {
             $query->insert($db->quoteName('#__jdm_articles'))
@@ -104,13 +104,13 @@ class Markdown2html
             ->set($db->quoteName('language') . ' = :language')
             ->set($db->quoteName('heading') . ' = :heading')
             ->set($db->quoteName('filename') . ' = :filename')
-            ->set($db->quoteName('display_title') . ' = :display_title')
+            ->set($db->quoteName('title') . ' = :title')
             ->bind(':source_url', $data['source_url'], ParameterType::STRING)
             ->bind(':manual', $data['manual'], ParameterType::STRING)
             ->bind(':language', $data['language'], ParameterType::STRING)
             ->bind(':heading', $data['heading'], ParameterType::STRING)
             ->bind(':filename', $data['filename'], ParameterType::STRING)
-            ->bind(':display_title', $data['display_title'], ParameterType::STRING);
+            ->bind(':title', $data['title'], ParameterType::STRING);
         } else {
             $query->update($db->quoteName('#__jdm_articles'))
             ->where($db->quoteName('id') . ' = :id')

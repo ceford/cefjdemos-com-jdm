@@ -129,7 +129,7 @@ class ArticlestashesModel extends ListModel
     {
         $user  = $this->getCurrentUser();
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Select the required fields from the table.
         $query->select(
@@ -141,7 +141,7 @@ class ArticlestashesModel extends ListModel
                     'a.language',
                     'a.heading',
                     'a.filename',
-                    'a.display_title',
+                    'a.title',
                     'a.state'
                 ]
             )
@@ -189,7 +189,7 @@ class ArticlestashesModel extends ListModel
 
         if (!empty($search)) {
             $search = $db->quote('%' . str_replace(' ', '%', $db->escape(trim($search), true) . '%'));
-            $query->where('(' . $db->quoteName('a.display_title') . ' LIKE ' . $search . ' OR ' .
+            $query->where('(' . $db->quoteName('a.title') . ' LIKE ' . $search . ' OR ' .
             $db->quoteName('a.filename') . ' LIKE ' . $search . ')');
         }
 
@@ -230,7 +230,7 @@ class ArticlestashesModel extends ListModel
         $db    = $this->getDatabase();
         $manual = $this->getState('filter.manual');
 
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('*')
         ->from($db->quoteName('#__jdm_article_stashes'))
         ->where($db->quoteName('user_id') . ' = ' . $user->id)
@@ -252,7 +252,7 @@ class ArticlestashesModel extends ListModel
     {
         $user  = $this->getCurrentUser();
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select(
             $db->quoteName(
                 array
@@ -260,7 +260,7 @@ class ArticlestashesModel extends ListModel
                     'a.id',
                     'a.user_id',
                     'a.page_id',
-                    'a.display_title',
+                    'a.title',
                     'a.manual',
                     'a.language',
                     'a.heading',
@@ -290,7 +290,7 @@ class ArticlestashesModel extends ListModel
     public function getPullrequests()
     {
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select(
             $db->quoteName(
                 array(
@@ -301,7 +301,7 @@ class ArticlestashesModel extends ListModel
                     'a.language',
                     'a.heading',
                     'a.filename',
-                    'a.display_title',
+                    'a.title',
                     'a.pr',
                     'b.name'
                 )

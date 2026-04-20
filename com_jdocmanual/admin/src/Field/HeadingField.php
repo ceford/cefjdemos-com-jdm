@@ -42,7 +42,7 @@ class HeadingField extends ListField
             // Get the list of headings for this manual.
             $manual = $this->form->getValue('manual');
             $db = $this->getDatabase();
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->select('*')
             ->from($db->quoteName('#__jdm_menu_headings'))
             ->where($db->quoteName('manual') . ' = :manual')

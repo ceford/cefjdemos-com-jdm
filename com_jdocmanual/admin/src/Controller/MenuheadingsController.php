@@ -39,7 +39,7 @@ class MenuheadingsController extends AdminController
     protected $text_prefix = 'COM_JDOCMANUAL_ARTICLES_STASHES';
 
     /**
-     * Update a heading display_title with Javascript call from Menu Headings list
+     * Update a heading title with Javascript call from Menu Headings list
      *
      * @return  string   A message for the calling JavaScript
      *
@@ -52,7 +52,7 @@ class MenuheadingsController extends AdminController
         $db = Factory::getContainer()->get('DatabaseDriver');
 
         $field = $app->input->get('field', '', 'string');
-        $display_title = $app->input->get('value', '', 'string');
+        $title = $app->input->get('value', '', 'string');
         $item_id = $app->input->get('item_id', 0, 'int');
         if (empty($item_id)) {
             // If the item it is 0 this must be a new item and there should be an original id.
@@ -67,7 +67,7 @@ class MenuheadingsController extends AdminController
             }
 
             // Get data from the original id.
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->select($db->quoteName(array('manual', 'heading')))
             ->from($db->quoteName('#__jdm_menu_headings'))
             ->where('id = :id')
@@ -76,26 +76,26 @@ class MenuheadingsController extends AdminController
             $row = $db->loadObject();
 
             // Make a new entry.
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->insert($db->quoteName('#__jdm_menu_headings'))
             ->set($db->quoteName('manual') . ' = :manual')
             ->set($db->quoteName('language') . ' = :language')
             ->set($db->quoteName('heading') . ' = :heading')
-            ->set($db->quoteName('display_title') . ' = :display_title')
+            ->set($db->quoteName('title') . ' = :title')
             ->bind(':manual', $row->manual, ParameterType::STRING)
             ->bind(':language', $language, ParameterType::STRING)
             ->bind(':heading', $row->heading, ParameterType::STRING)
-            ->bind(':display_title', $display_title, ParameterType::STRING);
+            ->bind(':title', $title, ParameterType::STRING);
             $db->setQuery($query);
             $result = $db->execute();
             $last_insert = $db->insertid();
             exit('OK 2:' . $last_insert);
         }
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->update($db->quoteName('#__jdm_menu_headings'))
-        ->set($db->quoteName('display_title') . ' = :display_title')
+        ->set($db->quoteName('title') . ' = :title')
         ->where('id = :id')
-        ->bind(':display_title', $display_title, ParameterType::STRING)
+        ->bind(':title', $title, ParameterType::STRING)
         ->bind(':id', $item_id, ParameterType::INTEGER);
         $db->setQuery($query);
         $result = $db->execute();
@@ -155,7 +155,7 @@ class MenuheadingsController extends AdminController
             return;
         }
 
-        $columns = $db->quoteName(array('manual', 'language', 'heading', 'display_title'));
+        $columns = $db->quoteName(array('manual', 'language', 'heading', 'title'));
 
         foreach ($manuals as $manual) {
             if (!is_dir($gfmfiles_path . $manual)) {
@@ -173,7 +173,7 @@ class MenuheadingsController extends AdminController
                 if (!is_dir($gfmfiles_path . $manual . '/' . $language)) {
                     continue;
                 }
-                $query = $db->getQuery(true);
+                $query = $db->createQuery();
                 $query->insert($db->quoteName('#__jdm_menu_headings'));
 
                 // Read in the menu-headings.ini file
@@ -226,8 +226,8 @@ class MenuheadingsController extends AdminController
             $this->app->enqueueMessage("Result: no action! Either Manual or Language were not set.", 'warning');
         } else {
             $db = Factory::getContainer()->get('DatabaseDriver');
-            $query = $db->getQuery(true);
-            $query->select($db->quoteName(array('heading', 'display_title')))
+            $query = $db->createQuery();
+            $query->select($db->quoteName(array('heading', 'title')))
             ->from($db->quoteName('#__jdm_menu_headings'))
             ->where($db->quoteName('manual') . ' = :manual')
             ->where($db->quoteName('language') . ' = :language')
@@ -241,7 +241,7 @@ class MenuheadingsController extends AdminController
             $contents = '';
             $count = 0;
             foreach ($rows as $row) {
-                $contents .= "{$row->heading}={$row->display_title}\n";
+                $contents .= "{$row->heading}={$row->title}\n";
                 $count += 1;
             }
             $path = $gfmfiles_path . "{$manual}/{$language}/articles/menu-headings.ini";

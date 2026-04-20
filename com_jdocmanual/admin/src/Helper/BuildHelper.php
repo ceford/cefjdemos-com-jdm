@@ -29,7 +29,7 @@ class BuildHelper
      */
     public static function getActiveManuals($db)
     {
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select($db->quoteName('manual'))
         ->from($db->quoteName('#__jdm_manuals'))
         ->where($db->quoteName('state') . ' = 1');
@@ -38,21 +38,21 @@ class BuildHelper
     }
 
     /**
-     * Get a list of published languages
+     * Get a list of published and JDM enabled languages
      *
      * @param $db       A database connection.
      *
-     * @return  $array  A list of published languages.
+     * @return  $array  A list of languages.
      */
     public static function getActivelanguages($db)
     {
-        $query = $db->getQuery(true);
-        $query->select($db->quoteName('sef') . ' AS ' . $db->quote('code'))
+        $query = $db->createQuery();
+        $query->select($db->quoteName('sef'))
         ->from($db->quoteName('#__languages') . ' AS a')
         ->leftjoin($db->quoteName('#__jdm_languages') . ' AS b ON ' . $db->quoteName('a.lang_id') . ' = ' . $db->quoteName('b.lang_id'))
         ->where($db->quoteName('published') . ' = 1')
         ->where($db->quoteName('b.state') . ' = 1')
-        ->order($db->quoteName('code') . ' ASC');
+        ->order($db->quoteName('sef') . ' ASC');
         $db->setQuery($query);
         return $db->loadColumn();
     }

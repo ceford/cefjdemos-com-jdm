@@ -125,7 +125,7 @@ class ManualsHelper
     {
         $db = Factory::getContainer()->get('DatabaseDriver');
 
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select($db->quoteName(array('id', 'manual', 'language', 'heading', 'filename')))
             ->from($db->quoteName('#__jdm_articles'))
             ->where($db->quoteName('state') . ' = 1');
@@ -157,7 +157,7 @@ class ManualsHelper
         $dudlist = implode(', ', $duds);
 
         if (!empty($dudlist)) {
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->update($db->quoteName('#__jdm_articles'))
                 ->set($db->quoteName('state') . ' = 0')
                 ->where($db->quoteName('id') . ' IN (' . $dudlist . ')');

@@ -4,7 +4,7 @@
 
 let pageid = document.getElementById('jform_page_id').value;
 if (pageid === '0') {
-    let displaytitle = document.getElementById('jform_display_title');
+    let displaytitle = document.getElementById('jform_title');
     displaytitle.readOnly = false;
     let sourceurl = document.getElementById('jform_source_url');
     let manual = document.getElementById('jform_manual');

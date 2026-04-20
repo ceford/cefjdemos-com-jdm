@@ -87,7 +87,7 @@ $articlestash_edit_route = 'index.php?option=com_jdocmanual&view=articlestash&la
             <div class="col-md-9">
                 <div class="row">
                     <div class="col-12 col-lg-9">
-                        <?php echo $this->form->renderField('display_title'); ?>
+                        <?php echo $this->form->renderField('title'); ?>
                         <?php echo $this->form->renderField('manual'); ?>
                         <?php echo $this->form->renderField('language'); ?>
                         <?php echo $this->form->renderField('heading'); ?>

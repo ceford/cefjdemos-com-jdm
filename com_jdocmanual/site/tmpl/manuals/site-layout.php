@@ -33,8 +33,9 @@ HTMLHelper::_('bootstrap.offcanvas', '.offcanvas', []);
         <div class="col-12 col-sm-3 g-0 d-none d-sm-block" id="index-panel">
             <div id="oncanvasMenu">
             <nav id="jdocmanual-wrapper" aria-label="Jdocmanual Menu" class="sidebar-nav">
+                <?php echo $this->addToolbarMenuLanguage(); ?>
                 <h2 class="toc ps-2"><?php echo Text::_('COM_JDOCMANUAL_MANUAL_TOC_INDEX_OF_ARTICLES'); ?></h2>
-                <?php echo $this->menu->menu; ?>
+                <?php echo $this->menu->menu ?? Text::_('COM_JDOCMANUAL_MANUAL_MENU_MISSING'); ?>
             </nav>
             </div>
         </div>
@@ -47,7 +48,7 @@ HTMLHelper::_('bootstrap.offcanvas', '.offcanvas', []);
                     Index
                     </button>
                     <h2 id="document-title">
-                    <?php echo $this->display_title; ?>
+                    <?php echo $this->title; ?>
                     <?php //echo Text::_('COM_JDOCMANUAL_MANUAL_DOCUMENT_TITLE'); ?>
                     </h2>
                 </div>
@@ -61,5 +62,5 @@ HTMLHelper::_('bootstrap.offcanvas', '.offcanvas', []);
                     <?php echo $this->in_this_page; ?>
                 </nav>
             </div>
-        </div>
+        </section>
     </div>

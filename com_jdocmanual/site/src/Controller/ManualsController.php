@@ -2,14 +2,14 @@
 
 /**
  * @package     Jdocmanual
- * @subpackage  Administrator
+ * @subpackage  Site
  *
  * @copyright   (C) 2023 - 2026 Clifford E Ford. All rights reserved.
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  * @link        https://jdocmanual.org/
  */
 
-namespace Cefjdemos\Component\Jdocmanual\Administrator\Controller;
+namespace Cefjdemos\Component\Jdocmanual\Site\Controller;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Controller\BaseController;
@@ -26,8 +26,16 @@ use Cefjdemos\Component\Jdocmanual\Administrator\Helper\InthispageHelper;
  *
  * @since  1.0.0
  */
-class ContentController extends BaseController
+class ManualsController extends BaseController
 {
+    /**
+     * The default view.
+     *
+     * @var    string
+     * @since   1.0
+     */
+    protected $default_view = 'manuals';
+
     /**
      * Get the article from the database and return title and content.
      *
@@ -35,17 +43,20 @@ class ContentController extends BaseController
      *
      * @since   1.0
      */
-    public function unusedfillpanel()
+    public function fillpanel()
     {
         $manual = $this->input->get('manual', '', 'string');
-        $heading = $this->input->get('heading', '', 'string');
-        $filename = $this->input->get('filename', '', 'string');
+        $path = $this->input->get('path', '', 'string');
 
-        $app = Factory::getApplication();
-        $rawCookie = $app->getInput()->cookie->get('jdm5cur', '', 'raw');
-
-        $cookie = rawurldecode($rawCookie);
+        $cookie = $this->input->cookie->get('jdm5cur', '', 'raw');
         list($man, $il, $language) = preg_split("'/'", $cookie);
+
+        // array [0] 'Title', [1] 'In this Article', [2] 'Page Content'
+        $result = $this->getModel()->getPage($manual, $language, $path);
+        echo json_encode('{"document_title" : ' . $result[0] . '}, {"toc_panel" : ' . $result[1] . '}, {"document_panel" : ' . $result[2] . '}');
+    
+        exit();
+
 
         $db = Factory::getContainer()->get('DatabaseDriver');
 
@@ -54,12 +65,10 @@ class ContentController extends BaseController
             ->from($db->quoteName('#__jdm_articles'))
             ->where($db->quoteName('manual') . ' = :manual')
             ->where($db->quoteName('language') . ' = :language')
-            ->where($db->quoteName('heading') . ' = :heading')
-            ->where($db->quoteName('filename') . ' = :filename')
+            ->where($db->quoteName('path') . ' = :path')
             ->bind(':manual', $manual, ParameterType::STRING)
             ->bind(':language', $language, ParameterType::STRING)
-            ->bind(':heading', $heading, ParameterType::STRING)
-            ->bind(':filename', $filename, ParameterType::STRING);
+            ->bind(':path', $path, ParameterType::STRING);
         $db->setQuery($query);
         $row = $db->loadObject();
 
@@ -72,12 +81,10 @@ class ContentController extends BaseController
             ->from($db->quoteName('#__jdm_articles'))
             ->where($db->quoteName('manual') . ' = :manual')
             ->where($db->quoteName('language') . ' = :language')
-            ->where($db->quoteName('heading') . ' = :heading')
-            ->where($db->quoteName('filename') . ' = :filename')
+            ->where($db->quoteName('path') . ' = :path')
             ->bind(':manual', $manual, ParameterType::STRING)
             ->bind(':language', $language, ParameterType::STRING)
-            ->bind(':heading', $heading, ParameterType::STRING)
-            ->bind(':filename', $filename, ParameterType::STRING);
+            ->bind(':path', $path, ParameterType::STRING);
             $db->setQuery($query);
             $row = $db->loadObject();
         }
@@ -102,5 +109,10 @@ class ContentController extends BaseController
         }
         echo json_encode($content);
         jexit();
+    }
+
+    public function display($cachable = false, $urlparams = [])
+    {
+        return parent::display();
     }
 }

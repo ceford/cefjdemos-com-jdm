@@ -1,5 +1,9 @@
 ## Installation Notes
 
+**Version 5** of Jdocmanual is a major revision. It is not backwards compatible with
+previous versions. The data files also need significant revision. This work will
+take until the summer of 2026.
+
 Jdocmanual is designed to deliver Joomla documentation in an easy to use
 reference form. It can also be used for other custom documentation.
 

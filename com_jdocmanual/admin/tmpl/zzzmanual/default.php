@@ -45,7 +45,7 @@ if (strpos($url, '/proxy/') !== false) {
 $gfmfiles_path = ComponentHelper::getComponent('com_jdocmanual')->getParams()->get('gfmfiles_path');
 
 ?>
-<?php if (empty($this->dbisgood) || !str_ends_with($gfmfiles_path, '/manuals/')) : ?>
+<?php if (empty($this->dbIspopulateded) || !str_ends_with($gfmfiles_path, '/manuals/')) : ?>
     <?php include __DIR__ . '/notes.php'; ?>
 <?php else : ?>
     <?php if (empty($this->menu)) : ?>

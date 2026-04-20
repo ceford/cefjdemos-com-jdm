@@ -12,7 +12,6 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Layout\LayoutHelper;
@@ -32,6 +31,33 @@ $wa->useStyle('com_jdocmanual.jdocmanual')
 ->useScript('com_jdocmanual.builders')
 ->useScript('com_jdocmanual.manuals');
 
+?>
+
+<?php if ($this->dbIspopulated === 0) : ?>
+
+<h2><?php echo Text::_('COM_JDOCMANUAL_MANUALS_DATA_SOURCE_NOT_SET'); ?></h2>
+<p><?php echo Text::_('COM_JDOCMANUAL_MANUALS_DATA_SOURCE_INSTRUCTIONS'); ?></p>
+
+<?php endif; ?>
+
+<?php if ($this->dbIspopulated === 1) : ?>
+
+<h2><?php echo Text::_('COM_JDOCMANUAL_MANUALS_DATA_BUILD_REQUIRED'); ?></h2>
+<p><?php echo Text::_('COM_JDOCMANUAL_MANUALS_DATA_BUILD_INSTRUCTIONS'); ?></p>
+
+<?php endif; ?>
+
+<?php if ($this->dbIspopulated === 2) : ?>
+
+<h2><?php echo Text::_('COM_JDOCMANUAL_MANUALS_MENU_BUILD_REQUIRED'); ?></h2>
+<p><?php echo Text::_('COM_JDOCMANUAL_MANUALS_MENU_BUILD_INSTRUTIONS'); ?></p>
+
+<?php endif; ?>
+
+
+
+<?php if ($this->dbIspopulated > 0) :
+
 $listOrder  = $this->escape($this->state->get('list.ordering'));
 $listDirn   = $this->escape($this->state->get('list.direction'));
 $saveOrder = $listOrder == 'a.ordering';
@@ -40,13 +66,6 @@ if ($saveOrder && !empty($this->items)) {
     $saveOrderingUrl = 'index.php?option=com_jdocmanual&task=manuals.saveOrderAjax&tmpl=component&' . Session::getFormToken() . '=1';
     HTMLHelper::_('draggablelist.draggable');
 }
-
-$states = array (
-        '0' => Text::_('JUNPUBLISHED'),
-        '1' => Text::_('JPUBLISHED'),
-        '2' => Text::_('JARCHIVED'),
-        '-2' => Text::_('JTRASHED')
-);
 
 $source_edit_route = 'index.php?option=com_jdocmanual&task=manual.edit&id=';
 
@@ -79,6 +98,9 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                 <th scope="col" class="w-1 text-center d-none d-md-table-cell">
                                     <?php echo HTMLHelper::_('searchtools.sort', '', 'a.ordering', $listDirn, $listOrder, null, 'asc', 'JGRID_HEADING_ORDERING', 'icon-sort'); ?>
                                 </th>
+                                <th>
+                                    <?php echo Text::_('JDEFAULT'); ?>
+                                </th>
                                 <th scope="col" class="text-center">
                                     <?php echo HTMLHelper::_(
                                         'searchtools.sort',
@@ -107,11 +129,17 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                     ); ?>
                                 </th>
                                 <th>
-                                    Build
+                                    <?php echo Text::_('COM_JDOCMANUAL_MANUALS_BUILD'); ?>
+                                </th>
+                                <th class="text-center">
+                                    <?php echo Text::_('COM_JDOCMANUAL_MANUALS_FORCE'); ?>
+                                </th>
+                                <th>
+                                    <?php echo Text::_('COM_JDOCMANUAL_MANUALS_BUILD_MENU'); ?>
                                 </th>
                                 <?php if ($isGitpullEnabled) : ?>
                                 <th>
-                                    Pull
+                                    <?php echo Text::_('COM_JDOCMANUAL_MANUALS_PULL'); ?>
                                 </th>
                                 <?php endif; ?>
                                 <th scope="col">
@@ -133,7 +161,7 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                             foreach ($this->items as $i => $item) :
                                 if (empty($item->state)) { $hide_selectors_css = ' d-none'; } else {$hide_selectors_css = ''; }
                             ?>
-                            <tr class="row<?php echo $i % 2; ?>" data-draggable-group="0"
+                            <tr class="row<?php echo $i % 2; ?> align-middle" data-draggable-group="0"
                                 data-item-id="<?php echo $item->id; ?>" data-parents=""
                                 data-level="0">
                                 <td class="text-center">
@@ -152,6 +180,27 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                     <?php if ($saveOrder) : ?>
                                         <input type="text" name="order[]" size="5"
                                         value="<?php echo $item->id; ?>" class="width-20 text-area-order hidden">
+                                    <?php endif; ?>
+                                </td>
+                                <td class="article-status text-center">
+                                    <?php if (!empty($item->home)) : ?>
+                                        <span id="jdm-default-<?php echo $item->id; ?>"
+                                            data-manual-id="<?php echo $item->id; ?>"
+                                            data-manual-name="<?php echo $item->manual; ?>"
+                                            class="tbody-icon jgrid" 
+                                            aria-labelledby="default-<?php echo $item->id; ?>-desc">
+                                            <span class="icon-home" aria-hidden="true"></span>
+                                        </span>
+                                        <div role="tooltip" id="default-<?php echo $item->id; ?>-desc"><?php echo Text::_('JDEFAULT'); ?></div>
+                                    <?php  else : ?>
+                                        <span id="jdm-default-<?php echo $item->id; ?>" 
+                                            data-manual-id="<?php echo $item->id; ?>" 
+                                            data-manual-name="<?php echo $item->manual; ?>"
+                                            class="tbody-icon jgrid" 
+                                            aria-labelledby="default-<?php echo $item->id; ?>-desc">
+                                            <span class="icon-unpublish" aria-hidden="true"></span>
+                                        </span>
+                                        <div role="tooltip" id="default-<?php echo $item->id; ?>-desc"><?php echo Text::_('JLIB_HTML_SETDEFAULT_ITEM'); ?></div>
                                     <?php endif; ?>
                                 </td>
                                 <td class="article-status text-center">
@@ -185,13 +234,23 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                 </td>
                                 <td>
                                     <span class="data-build-name-<?php echo $item->manual . $hide_selectors_css; ?>">
-                                    <?php echo $this->getLanguageFormHTML($item->manual, 'buildhtml'); ?>
+                                    <?php echo $this->getLanguageFormHTML($item->manual, 'buildhtml', $i); ?>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="data-force-name-<?php echo $item->manual . $hide_selectors_css; ?>">
+                                    <input class="form-check-input" type="checkbox" id="force-<?php echo $i; ?>" value="<?php echo $i; ?>">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="data-build-name-<?php echo $item->manual . $hide_selectors_css; ?>">
+                                    <?php echo $this->getLanguageFormHTML($item->manual, 'buildmenu', $i); ?>
                                     </span>
                                 </td>
                                 <?php if ($isGitpullEnabled) : ?>
                                 <td>
                                         <span class="data-fetch-name-<?php echo $item->manual . $hide_selectors_css; ?>">
-                                        <?php echo $this->getLanguageFormHTML($item->manual, 'gitpull'); ?>
+                                        <?php echo $this->getLanguageFormHTML($item->manual, 'gitpull', $i); ?>
                                         </span>
                                 </td>
                                 <?php endif; ?>
@@ -222,3 +281,5 @@ $isGitpullEnabled = $this->isGitpullEnabled();
 <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
 <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
+
+<?php endif; ?>

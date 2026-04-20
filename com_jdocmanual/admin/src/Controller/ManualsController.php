@@ -63,7 +63,7 @@ class ManualsController extends AdminController
         $manual_id = $app->input->get('manual_id', 0, 'int');
 
         // Returning json - should provide an error feedback.
-        If (empty($manual_id)) {
+        if (empty($manual_id)) {
             exit(0);
         }
         $db = Factory::getContainer()->get('DatabaseDriver');
@@ -96,6 +96,43 @@ class ManualsController extends AdminController
     }
 
     /**
+     * Method to toggle the state of a source in the manuals table
+     * 
+     * @return A json object containing result of toggle.
+     */
+    public function setdefault()
+    {
+        //$this->checkToken('get');
+
+        $app = Factory::getApplication();
+        $manual_id = $app->input->get('manual_id', 0, 'int');
+
+        // Returning json - should provide an error feedback.
+        if (empty($manual_id)) {
+            exit(0);
+        }
+        $db = Factory::getContainer()->get('DatabaseDriver');
+
+        // Update the manuals table and set the home folder to 0 for all recoeds
+        $query = $db->createQuery();
+        $query->update($db->quoteName('#__jdm_manuals'))
+            ->set($db->quoteName('home') . ' = 0');
+        $db->setQuery($query);
+        $db->execute();
+
+        $query = $db->createQuery();
+        $query->update($db->quoteName('#__jdm_manuals'))
+            ->set($db->quoteName('home') . ' = 1')
+            ->where($db->quoteName('id') . ' = :manual_id')
+            ->bind(':manual_id', $manual_id, ParameterType::INTEGER);
+        $db->setQuery($query);
+        $db->execute();
+
+        $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=manuals', false));
+
+    }
+
+    /**
      * Update the article html for the selected manual and language.
      * This function updates all of the articles (ToDo: selected article).
      *
@@ -107,11 +144,12 @@ class ManualsController extends AdminController
     {
         $manual = $this->input->get('manual', '', 'string');
         $language = $this->input->get('language', '', 'string');
+        $force = $this->input->get('force', 0, 'int');
 
         if (!empty($manual)) {
             $ba = new Buildarticles();
             $summary = "Building Articles\n";
-            $summary .= $ba->go($manual, $language);
+            $summary .= $ba->go($manual, $language, $force);
             $this->app->enqueueMessage(nl2br($summary, true));
 
             $this->buildmenus();

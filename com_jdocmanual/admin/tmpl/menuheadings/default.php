@@ -104,7 +104,7 @@ $filter_language = $this->state->get('filter.language');
                                 </td>
                                 <td class="">
                                     <input type="text" id="heading_<?php echo $item->id; ?>"
-                                    class="fix-heading" value="<?php echo $item->display_title; ?>" />
+                                    class="fix-heading" value="<?php echo $item->title; ?>" />
                                 </td>
 
                             <?php if (strcmp($filter_language, 'en') !== 0) : ?>
@@ -117,7 +117,7 @@ $filter_language = $this->state->get('filter.language');
                                     data-original_id="<?php echo $item->id; ?>"
                                     data-filter_language="<?php echo $filter_language; ?>"
                                     class="fix-heading"
-                                    value="<?php echo $item->translation_display_title; ?>"
+                                    value="<?php echo $item->translation_title; ?>"
                                     />
                                 </td>
                             <?php endif; ?>

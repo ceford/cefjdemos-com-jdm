@@ -43,16 +43,22 @@ $activeMenuitem = $sitemenu->getActive();
 
 ?>
 
-<?php $this->addToolbar(); ?>
+<div class="row align-middle">
+    <div class="col-auto">
+        <?php echo $this->addToolbarSelectManual(); ?>
+    </div>
+    <div class="col">
+        JDM
+    </div>
+    <div class="col-auto">
+        <?php echo $this->addToolbarPageLanguage(); ?>
+    </div>
+</div>
 
-<?php if (empty($this->menu)) : ?>
-    <p class="alert alert-warning">
-        <?php echo Text::_('COM_JDOCMANUAL_MANUAL_MANUAL_SELECT_MISSING'); ?>
-    </p>
-<?php else : ?>
-    <h1><?php echo $this->source->title; ?></h1>
+<div class="row">
+    <h1><?php echo $this->manualTitle; ?></h1>
 
     <?php include 'site-layout.php'; ?>
-<?php endif; ?>
 
 <?php include_once JPATH_SITE . '/components/com_jdocmanual/layouts/modalbox.php'; ?>
+</div>

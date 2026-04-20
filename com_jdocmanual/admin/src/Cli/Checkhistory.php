@@ -67,7 +67,7 @@ class Checkhistory
 
         // Check that the database table exists.
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('id, source_url, last_update')
         ->from($db->quotename('#__jdm_articles_history'))
         ->where('state = 1');
@@ -90,7 +90,7 @@ class Checkhistory
             $user = $data['query']['pages'][key($data['query']['pages'])]['revisions'][0]['user'];
             $comment = $data['query']['pages'][key($data['query']['pages'])]['revisions'][0]['comment'];
             if (true || empty($row->last_update) || $row->last_update < $date) {
-                $query = $db->getQuery(true);
+                $query = $db->createQuery();
                 $query->update($db->quoteName('#__jdm_articles_history'))
                 ->set($db->quoteName('last_update') . ' = ' . $db->quote($date))
                 ->set($db->quoteName('user') . ' = ' . $db->quote($user))

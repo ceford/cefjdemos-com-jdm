@@ -6,7 +6,7 @@
     >
 
 		<field
-			name="display_title"
+			name="title"
 			type="text"
 			label="COM_JDOCMANUAL_ARTICLES_DISPLAY_TITLE"
 			required="true"

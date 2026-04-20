@@ -34,12 +34,12 @@ $wa->useScript('keepalive')
         <div class="col">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'details')); ?>
 
-        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'details', Text::_('COM_JDOCMANUAL_SOURCE_TAB_DETAILS')); ?>
+        <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'details', Text::_('COM_JDOCMANUAL_MANUAL_TAB_DETAILS')); ?>
         <div class="row">
             <div class="col-md-9">
                 <?php echo $this->form->renderField('manual'); ?>
-                <?php echo $this->form->renderField('heading_ini'); ?>
-                <?php echo $this->form->renderField('filename_ini'); ?>
+                <?php echo $this->form->renderField('language'); ?>
+                <?php echo $this->form->renderField('path'); ?>
                 <?php echo $this->form->renderField('id'); ?>
             </div>
             <div class="col-lg-3">

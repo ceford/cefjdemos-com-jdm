@@ -15,7 +15,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
-use Cefjdemos\Component\Jdocmanual\Administrator\Helper\SetupHelper;
+use Cefjdemos\Component\Jdocmanual\Site\Helper\SetupHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -28,12 +28,11 @@ use Cefjdemos\Component\Jdocmanual\Administrator\Helper\SetupHelper;
  */
 class HtmlView extends BaseHtmlView
 {
-    protected $index_languages;
-    protected $page_languages;
+    protected $languages;
 
     protected $heading;
     protected $filename;
-    protected $display_title;
+    protected $title;
     protected $diff;
     protected $in_this_page;
     protected $page_content;
@@ -64,9 +63,8 @@ class HtmlView extends BaseHtmlView
         $model->setUseExceptions(true);
 
         try {
-           $this->manuals          = $model->getManuals();
-            $this->index_languages  = $model->getLanguages('index');
-            $this->page_languages   = $model->getLanguages('page');
+            $this->manuals          = $model->getManuals();
+            $this->languages        = $model->getLanguages();
 
             $setuphelper = new SetupHelper();
             list(
@@ -77,7 +75,7 @@ class HtmlView extends BaseHtmlView
                 $this->filename
             ) = $setuphelper->setup();
 
-            list ($this->display_title, $this->in_this_page, $this->page_content) =
+            list ($this->title, $this->in_this_page, $this->page_content) =
             $model->getPage(
                 $this->manual,
                 $this->page_language_code,
@@ -142,14 +140,14 @@ class HtmlView extends BaseHtmlView
 
         $childBar = $dropdown->getChildToolbar();
 
-        foreach ($this->index_languages as $language) {
+        foreach ($this->languages as $language) {
             $icon = '';
             if ($this->index_language_code == $language->code) {
                 $icon = 'icon-check';
             }
             $childBar->linkButton($language->code)
             ->text('<img src="media/mod_languages/images/' .
-            str_replace('-', '_', strtolower($language->locale))  . '.gif" alt="">' . ' ' . $language->locale)
+            str_replace('-', '_', strtolower($language->lang_code))  . '.gif" alt="">' . ' ' . $language->lang_code)
             ->buttonClass('set-language index border-bottom')
             ->url('jdocmanual?index_language_code='  . $language->code)
             ->icon($icon);
@@ -163,13 +161,13 @@ class HtmlView extends BaseHtmlView
 
         $childBar = $dropdown->getChildToolbar();
 
-        foreach ($this->page_languages as $language) {
+        foreach ($this->languages as $language) {
             $icon = '';
             if ($this->page_language_code == $language->code) {
                 $icon = 'icon-check';
             }
             $childBar->linkButton($language->code)
-            ->text('<img src="media/mod_languages/images/' . str_replace('-', '_', strtolower($language->locale))  . '.gif" alt="">' . ' ' . $language->title)
+            ->text('<img src="media/mod_languages/images/' . str_replace('-', '_', strtolower($language->lang_code))  . '.gif" alt="">' . ' ' . $language->title)
             ->buttonClass('set-language border-bottom')
             ->url($language->code . '/jdocmanual?page_language_code='  . $language->code)
             ->icon($icon);

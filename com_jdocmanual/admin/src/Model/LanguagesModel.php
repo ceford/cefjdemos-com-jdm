@@ -119,7 +119,7 @@ class LanguagesModel extends ListModel
         );
         $query->select($db->quoteName('b.state') . 'AS ' . $db->quote('jdm_language_state'));
         $query->from($db->quoteName('#__languages') . ' AS a');
-        $query->leftjoin($db->quoteName('#__jdm_languages') . ' AS b ON a.' . $db->quotename('lang_id') . ' = b.' . $db->quotename('lang_id'));
+        $query->leftjoin($db->quoteName('#__jdm_languages') . ' AS b ON a.' . $db->quoteName('lang_id') . ' = b.' . $db->quoteName('lang_id'));
 
         // Filter by published state
         $published = (string) $this->getState('filter.published');

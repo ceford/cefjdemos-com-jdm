@@ -54,7 +54,7 @@ class FeedbackController extends AdmincontentController
 
         // If there is already a record replace it.
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select($db->quoteName(array('id', 'comment')))
             ->from($db->quoteName('#__jdm_feedback'))
             ->where($db->quoteName('session_id') . ' = ' . $db->quote($session_id))
@@ -65,7 +65,7 @@ class FeedbackController extends AdmincontentController
         $db->setQuery($query);
         $row = $db->loadObject();
 
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         if (!empty($row->id)) {
             $query->update($db->quoteName('#__jdm_feedback'))
             ->where($db->quoteName('id') . ' = ' . $row->id);

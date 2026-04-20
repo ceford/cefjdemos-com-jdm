@@ -118,7 +118,7 @@ class HtmlView extends BaseHtmlView
      */
     public function display($tpl = null): void
     {
-        $model               = $this->getModel();
+        $model                  = $this->getModel();
         $model->setUseExceptions(true);
 
         try {

@@ -106,7 +106,7 @@ class MenustashesModel extends ListModel
     {
         $user  = $this->getCurrentUser();
         $db    = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
 
         // Select the required fields from the table.
         $query->select(
@@ -187,7 +187,7 @@ class MenustashesModel extends ListModel
     {
         $user  = $this->getCurrentUser();
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select($db->quoteName(array('a.id', 'a.user_id', 'a.manual', 'a.pr')))
         ->from($db->quoteName('#__jdm_menu_stashes') . ' AS a')
         ->where($db->quoteName('a.user_id') . ' = ' . $user->id)
@@ -206,7 +206,7 @@ class MenustashesModel extends ListModel
     public function getPullrequests()
     {
         $db = $this->getDatabase();
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select($db->quoteName(array('a.id', 'a.user_id', 'a.manual', 'a.pr')))
         ->from($db->quoteName('#__jdm_menu_stashes') . ' AS a')
         ->where($db->quoteName('a.pr') . ' = 1')

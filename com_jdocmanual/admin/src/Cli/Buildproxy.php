@@ -200,7 +200,7 @@ class Buildproxy
         // Check that is is in the database
         foreach ($files as $key => $value) {
             // The key is the part needed, example: Contacts:_Edit_Category
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $newkey = "%{$key}";
             $query->select($db->quoteName('id'))
                 ->from($db->quoteName('#__jdm_articles'))
@@ -230,8 +230,8 @@ class Buildproxy
 
         // Get the already converted html from the database.
         // Do English first.
-        $query = $db->getQuery(true);
-        $query->select($db->quoteName(array('source_url', 'language', 'heading', 'filename', 'display_title', 'html')))
+        $query = $db->createQuery();
+        $query->select($db->quoteName(array('source_url', 'language', 'heading', 'filename', 'title', 'html')))
         ->from('#__jdm_articles')
         ->where($db->quoteName('manual') . ' = ' . $db->quote('help'))
         ->where($db->quoteName('language') . ' = ' . $db->quote('en'))
@@ -243,8 +243,8 @@ class Buildproxy
         $this->fix_urls($rows);
 
         // Do the other languages second.
-        $query = $db->getQuery(true);
-        $query->select($db->quoteName(array('source_url', 'language', 'heading', 'filename', 'display_title', 'html')))
+        $query = $db->createQuery();
+        $query->select($db->quoteName(array('source_url', 'language', 'heading', 'filename', 'title', 'html')))
             ->from('#__jdm_articles')
             ->where($db->quoteName('manual') . ' = ' . $db->quote('help'))
             ->where($db->quoteName('language') . ' != ' . $db->quote('en'))
@@ -268,7 +268,7 @@ class Buildproxy
 
             $outfile = str_replace('.md', '.html', $row->filename);
             $html = $this->top;
-            $html .= '<h1>' . $row->display_title . '</h1>';
+            $html .= '<h1>' . $row->title . '</h1>';
             $html .= '<div id="toc" class="table-of-contents">';
             $html .= "{$inthispage}\n</div>\n{$content}";
             $html .= $this->bottom;

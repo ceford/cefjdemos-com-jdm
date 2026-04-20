@@ -66,7 +66,7 @@ class Router extends RouterView
         CategoryFactoryInterface $categoryFactory,
         DatabaseInterface $db
     ) {
-        $manual = new RouterViewConfiguration('manual');
+        $manual = new RouterViewConfiguration('manuals');
         $manual->setKey('id');
         $this->registerView($manual);
 

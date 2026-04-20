@@ -29,27 +29,26 @@
 		<field
 			name="manual"
 			type="text"
-			label="COM_JDOCMANUAL_SOURCE_MANUAL_LABEL"
-			description="COM_JDOCMANUAL_SOURCE_MANUAL_DESC"
+			label="COM_JDOCMANUAL_MANUAL_LABEL"
+			description="COM_JDOCMANUAL_MANUAL_DESC"
 			size="16"
 			required="true"
 		/>
 
 		<field
-			name="heading_ini"
+			name="language"
 			type="text"
-			label="COM_JDOCMANUAL_SOURCE_HEADING_INI_LABEL"
-			description="COM_JDOCMANUAL_SOURCE_HEADING_INI_DESC"
+			label="COM_JDOCMANUAL_MANUAL_LANGUAGE_LABEL"
+			description="COM_JDOCMANUAL_MANUAL_LANGUAGE_DESC"
 			size="16"
 			required="true"
 		/>
 
 		<field
-			name="filename_ini"
+			name="path"
 			type="text"
-			label="COM_JDOCMANUAL_SOURCE_FILENAME_INI_LABEL"
-			description="COM_JDOCMANUAL_SOURCE_FILENAME_INI_DESC"
-			size="16"
+			label="COM_JDOCMANUAL_MANUAL_INITIAL_ARTICLE_LABEL"
+			description="COM_JDOCMANUAL_MANUAL_INITIAL_ARTICLE_DESC"
 			required="true"
 		/>
 

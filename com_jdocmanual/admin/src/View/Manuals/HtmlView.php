@@ -100,7 +100,7 @@ class HtmlView extends BaseHtmlView
 
     protected $plugin_status;
 
-    protected $dbisgood;
+    protected $isPopulated;
 
     /**
      * Method to display the view.
@@ -117,17 +117,20 @@ class HtmlView extends BaseHtmlView
         $model               = $this->getModel();
         $model->setUseExceptions(true);
 
-        try {
-            $this->items            = $model->getItems();
-            $this->pagination       = $model->getPagination();
-            $this->state            = $model->getState();
-            $this->filterForm       = $model->getFilterForm();
-            $this->activeFilters    = $model->getActiveFilters();
-            $this->plugin_status    = $model->checkplugin();
-            $this->activeLanguages  = $model->getActiveLanguages();
-            $this->dbisgood         = CheckdbHelper::isGood();
-        } catch (\Exception $e) {
-            throw new GenericDataException($e->getMessage(), 500, $e);
+        $this->dbIspopulated         = CheckdbHelper::isPopulated();
+
+        if ($this->dbIspopulated > 0) {
+            try {
+                $this->items            = $model->getItems();
+                $this->pagination       = $model->getPagination();
+                $this->state            = $model->getState();
+                $this->filterForm       = $model->getFilterForm();
+                $this->activeFilters    = $model->getActiveFilters();
+                $this->plugin_status    = $model->checkplugin();
+                $this->activeLanguages  = $model->getActiveLanguages();
+            } catch (\Exception $e) {
+                throw new GenericDataException($e->getMessage(), 500, $e);
+            }
         }
 
         $this->addToolbar();
@@ -176,7 +179,7 @@ class HtmlView extends BaseHtmlView
         return $params->get('enable_gitpull');
     }
 
-    protected function getLanguageFormHTML($manual, $action)
+    protected function getLanguageFormHTML($manual, $action, $cbi)
     {
         // For the given manual find installed languages.
         $params = ComponentHelper::getParams('com_jdocmanual');
@@ -199,7 +202,7 @@ class HtmlView extends BaseHtmlView
         }
 
         // Compose the Select element.
-        $html = '<select id="' . $manual . '" name="' . $manual . '" class="form-select ' . $action . '">' . "\n";
+        $html = '<select id="' . $manual . '" name="' . $manual . '" class="form-select ' . $action . '" data-cbi="' . $cbi  . '">' . "\n";
         $html .= '<option value="">- Select -</option>' . "\n";
         foreach ($this->activeLanguages as $activeLanguage) {
             if (in_array($activeLanguage, $dirs)) {

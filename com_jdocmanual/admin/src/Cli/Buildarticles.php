@@ -36,25 +36,27 @@ class Buildarticles
     protected $gfmfiles_path;
 
     /**
-     * The pattern used to look for img links in markdown.md files.
+     * The pattern used to look for img links in markdown files.
      *
      * @var     string
      *
-     * Example link: ![action logs module form](../../../images/en/admin-modules/modules-actionlogs-latest-screenshot.png "Action Logs Module Form")
+     * Example link: 
+     * ![manual view](./assets/introduction-to-jdocmanual/00-jdocmanual.png) 
+     *  after tha filename there may be an optional ' Title...' or ' "Title..."'
      * In the pattern:
      * First bracket is alt text.
      * Second bracket is img url to be added to root/manual/
      * Third bracket is filename
      * Fourth bracket is title or empty
      */
-    protected $pattern = '/\!\[(.*?)\]\(..\/..\/..(\/.*)?\/(.*?\.png|.*?\.jpg|.*?\.gif)(.*)\)/m';
+    protected $imgPattern = '/\!\[(.*?)\]\(\.?\/assets\/([^\s\)]+)(?:\s+(.*?))?\)/';
 
     /**
-     * Regex pattern to select Display title from GFM comment string.
+     * Regex pattern to select metadata from html comment string in markdown file.
      *
      * @var     string
      */
-    protected $pattern2 = '/<!--.*Filename:(.*)?\/.*Display title:(.*)?-->/m';
+    protected $metadata = '/<!--.*?({.*}).*-->/ms';
 
     /**
      * Instance holder for the responsive image function called for every image.
@@ -77,6 +79,23 @@ class Buildarticles
      */
     protected $minutes;
 
+    // Remove this when function xxx is removed
+    protected $toclevel = 0;
+
+    /**
+     * Array to store ll of the paths to articles in the manual being processed
+     * 
+     * @var array
+     */
+    protected $articlePaths = [];
+
+    /**
+     * Array used for building $articlePaths in recursive call
+     * 
+     * @var array
+     */
+    protected $parentPaths = [];
+
     /**
      * Constructor
      *
@@ -98,7 +117,7 @@ class Buildarticles
      *
      * @since   1.0
      */
-    public function go($manual, $language, $force = false)
+    public function go($manual, $language, $force)
     {
         $time_start = microtime(true);
 
@@ -114,26 +133,32 @@ class Buildarticles
         // Set the time limit to 10 minutes
         set_time_limit(600);
 
-        // The articles index is always needed.
-        $check = $this->getArticlesIndex($manual, $language);
-        if (empty($check[0])) {
+        // The menu.json file is always needed. Convert to am obkect.
+        $menuObject = $this->getMenuObject($manual, $language);
+        if (empty($menuObject)) {
             // Return the error message.
-            return $check[1];
+            return 'The menu.json file is missing or invalide';
         }
-        $articles_indexed = $check[1];
+
+        // The menu list needs to be turned into an array of filenames.
+        // introduction
+        // folder_name/anarticle
+
+        // The array is stored in $this->articlePaths
+        $this->getArticlePaths($menuObject);
 
         // Get a list of files that have changed or contain changed images.
-        if (!$force) {
+        if (empty($force)) {
             $articles_updated = $this->getArticlesUpdated($manual, $language);
-            $articles = array_intersect($articles_indexed, $articles_updated);
+            $paths = array_intersect($this->articlePaths, $articles_updated);
         } else {
-            $articles = $articles_indexed;
+            $paths = $this->articlePaths;
         }
+
         $summary = '';
         $total = 0;
-        foreach ($articles as $article) {
-            list ($heading, $filename) = explode('/', $article);
-            list ($count, $note) = $this->setOneArticle($manual, $language, $heading, $filename);
+        foreach ($paths as $path) {
+            list ($count, $note) = $this->setOneArticle($manual, $language, $path);
             $summary .= $note;
             $total += $count;
         }
@@ -142,7 +167,7 @@ class Buildarticles
         $db = $this->db;
 
         $now = date('Y-m-d H:i:s');
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->update($db->quoteName('#__jdm_git_updates'))
         ->set($db->quoteName('last_update') . ' = ' . $db->quote($now))
         ->where($db->quoteName('manual') . ' = :manual')
@@ -154,7 +179,7 @@ class Buildarticles
 
         $summary .= "\nFor {$manual}/{$language} {$total} articles were updated.\n";
 
-        $summary .= $this->setMenuHeadings($manual, $language);
+        //$summary .= $this->setMenus($manual, $language);
 
         $time_end = microtime(true);
         $execution_time = $time_end - $time_start;
@@ -162,6 +187,157 @@ class Buildarticles
         $summary .= 'Total Execution Time: ' . number_format($execution_time, 2) . ' Seconds' . "\n\n";
 
         return $summary;
+    }
+
+    /**
+     * Look for repo images to make into picture srcset.
+     *
+     * @param   $manual     The manual to process.
+     * @param   $language   The language to be processed.
+     * @param   $path       The path to the image in the source folder.
+     * @param   $contents   A single page content in Markdown format.
+     *
+     * @return  $html       Content with Markdown img links converted to html picture tags.
+     *
+     * @since   1.0
+     */
+    private function fixImages($manual, $language, $path, $contents)
+    {
+        // $imgPattern = '/\!\[(.*?)\]\(\.?\/assets\/([^\s\)]+)(?:\s+(.*?))?\)/';
+        $test = preg_match_all($this->imgPattern, $contents, $matches, PREG_SET_ORDER);
+
+        $srcdir = dirname($path);
+        $dest_set = false;
+
+        foreach ($matches as $match) {
+            // Create a destination folder if it does not exist exist?
+            if (empty($dest_set)) {
+                $dest = JPATH_ROOT . "/jdmimages/{$manual}/{$language}/{$path}";
+                if (!is_dir($dest)) {
+                    mkdir($dest, 0755, true);
+                }
+                $dest_set = true;
+            }
+
+            // $match[0] is the whole line to be replaced with a picture tag.
+            // $match[1] is the alt text 
+            // $match[2] is the path, example: introduction-to-jdocmanual/00-jdocmanual.png
+            // $match[3] is a Title string or "Title string"
+
+            // Copy the image to the images folder.
+            $origin = "{$this->gfmfiles_path}{$manual}/{$language}/articles/{$srcdir}/assets/{$match[2]}";
+            $destination = JPATH_ROOT . "/jdmimages/{$manual}/{$language}/{$srcdir}/{$match[2]}";
+            $link = "jdmimages/{$manual}/{$language}/{$srcdir}/{$match[2]}";
+
+            file_put_contents($destination, file_get_contents($origin));
+
+            $title = $match[3] ?? '';
+            // Create an img src set and set of images from an img tag.
+            $img = '<img src="' . $link . '" alt="' . $match[1] . '" title="' . $title . '" class="screenshot">';
+            $processed = $this->responsive->transformImage($img);
+
+            if (!empty($processed)) {
+                $contents = str_replace($match[0], $processed, $contents);
+            }
+        }
+        return $contents;
+    }
+
+    protected function getArticlePaths($items)
+    {
+        // traverse the items in the menu list object
+        foreach($items as $key => $item) {
+            // Is this item an array?
+            if (is_array($item)) {
+                $this->parentPaths[] = $key;
+                $this->getArticlePaths($item);
+            } else {
+                $path = array_merge($this->parentPaths, [$key]);
+                $this->articlePaths[] = implode('/', $path);
+            }
+        }
+        array_pop($this->parentPaths);
+    }
+
+    /**
+     * Get a list of files updated since the last entry was made in the
+     * #__jdm_git_updates table for this manual and language. Use a linux
+     * command to find updated article and image files.
+     *
+     * @param string    $manual     The manual name.
+     * @param string    $language   The language name.
+     *
+     * @return  $array  A list of articles to update.
+     */
+    protected function getArticlesUpdated($manual, $language)
+    {
+        // Example command to find files changed less than 60 minutes ago:
+        // find /Users/ceford/git/cefjdemos/manuals/help/en/articles -mmin -60
+
+        // Tried git too but decided not to use it
+        // git diff --name-only "@{2024-09-14 22:00:00}"
+
+        $articlesDir = $this->gfmfiles_path . $manual . '/' . $language . '/articles';
+
+        // In Version 2 images are in the articles folder
+        //$images = $this->gfmfiles_path . $manual . '/' . $language . '/images';
+
+        // Get the time set for a delay since the previous build - small to catch recent changes, large to force rebuilt
+        $params = ComponentHelper::getParams('com_jdocmanual');
+        $timeout = $params->get('timeout', 5);
+
+        $threshold = time() - (($this->minutes + $timeout) * 60);
+
+        $result = [];
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($articlesDir, \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile()) {
+                if ($file->getMTime() >= $threshold) {
+                    $result[] = $file->getPathname();
+                }
+            }
+        }
+
+        $articles = [];
+        foreach ($result as $line) {
+            // Skip any extraneous lines.
+            if (str_ends_with($line, '.md')) {
+                $articles[] = $line;
+            } elseif (str_contains($line, 'assets')) {
+                // this is something in the assets folder - truncate at assets
+                $articles[] = substr($line, 0, strpos($line, 'assets')) . '.md';
+            }    
+        }
+
+        // Eliminate duplicates.
+        return array_unique($articles);
+    }
+
+    /**
+     * Read the menu-index.txt file and make an array of articles data.
+     *
+     * @param string    $manual     The manual name.
+     * @param string    $language   The language name.
+     *
+     * @return object   
+     */
+    protected function getMenuObject($manual, $language)
+    {
+
+        $menuObject = $this->gfmfiles_path . $manual . '/' . $language . '/menu.json';
+        if (!file_exists($menuObject)) {
+            return;
+        }
+
+        // Read in the menu.json file.
+        $tmp = file_get_contents($menuObject);
+
+        // Decode the json to give an object.
+        return json_decode($tmp, true);
     }
 
     /**
@@ -191,7 +367,7 @@ class Buildarticles
         // If there is an articles directory assume valid.
         if (is_dir($gitpath . '/articles')) {
             // Check for an entry in the #__jdm_git_updates table.
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->select($db->quoteName('last_update'))
             ->from($db->quoteName('#__jdm_git_updates'))
             ->where($db->quoteName('manual') . ' = :manual')
@@ -206,7 +382,7 @@ class Buildarticles
                 $last_update = '2020-01-01 00:00:00';
                 // Make a new entry.
                 $now = date('Y-m-d H:i:s');
-                $query = $db->getQuery(true);
+                $query = $db->createQuery();
                 $query->insert($db->quoteName('#__jdm_git_updates'))
                 ->set($db->quoteName('manual') . ' = :manual')
                 ->set($db->quoteName('language') . ' = :language')
@@ -227,219 +403,6 @@ class Buildarticles
     }
 
     /**
-     * Read the menu-index.txt file and make an array of articles data.
-     *
-     * @param string    $manual     The manual name.
-     * @param string    $language   The language name.
-     *
-     * @return array    [true|false, message]
-     */
-    protected function getArticlesIndex($manual, $language)
-    {
-        $articles_index = $this->gfmfiles_path . $manual . '/en/menu-index.txt';
-        if (!file_exists($articles_index)) {
-            $summary = "Skipping {$manual} - file does not exist: /en/{$articles_index}\n";
-            return [false, $summary];
-        }
-
-        // Read in the articles_index : $heading, $filename, $source_url
-        $tmp = file_get_contents($articles_index);
-
-        // Create an array from the valid lines.
-        $articles = [];
-        foreach (preg_split("/((\r?\n)|(\r\n?))/", $tmp) as $line) {
-            if (empty($line)) {
-                continue;
-            }
-            // Skip if line begins with semi-colon
-            if (ltrim($line)[0] === ';') {
-                continue;
-            }
-            // Skip if line begins with heading= or heading-1=
-            if (substr($line, 0, 7) === 'heading') {
-                continue;
-            }
-
-            // The lines may contain more than two = symbols.
-            $one_article = explode('=', $line, 3);
-
-            // Remove the manual from the start of the line.
-            array_shift($one_article);
-
-            $articles[] = implode('/', $one_article);
-        }
-        return [true, $articles];
-    }
-
-    /**
-     * Get a list of files updated since the last entry was made in the
-     * #__jdm_git_updates table for this manual and language. Use a linux
-     * command to find updated article and image files.
-     *
-     * @param string    $manual     The manual name.
-     * @param string    $language   The language name.
-     *
-     * @return  $array  A list of articles to update.
-     */
-    protected function getArticlesUpdated($manual, $language)
-    {
-        // Example command to find files changed less than 60 minutes ago:
-        // find /Users/ceford/git/cefjdemos/manuals/help/en/articles -mmin -60
-
-        // Tried git too but decided not to use it
-        // git diff --name-only "@{2024-09-14 22:00:00}"
-
-        $articles = $this->gfmfiles_path . $manual . '/' . $language . '/articles';
-        $images = $this->gfmfiles_path . $manual . '/' . $language . '/images';
-
-        // Use the find command to locate files that have changed since the last update.
-        $command1 = "find {$articles} {$images} -mmin -" . $this->minutes + 5;
-        exec($command1, $result);
-
-        $articles = [];
-        foreach ($result as $line) {
-            // Skip any extraneous lines.
-            if (str_ends_with($line, '.md')) {
-                $articles[] = $line;
-            } elseif (str_ends_with($line, '.png') || str_ends_with($line, '.jpg')) {
-                // For each image file - need to find the article that contains it.
-                // This command returns the path/to/filename.md:line no:line containing search term
-                //grep --include=\*.md -rnw '/Users/ceford/git/cefjdemos/manuals/help/en/articles/' -e "articles/articles-list.png"
-                $segments = explode('/', $line);
-                // The last two items are the parts of the image path to search for
-                $img_name = implode('/', array_slice($segments, -2));
-                // All but the last two are where to search.
-                array_pop($segments);
-                array_pop($segments);
-                $path = implode('/', $segments);
-
-                // Search in the articles for the image.
-                $path = str_replace('/images', '/articles', $path);
-                $command2 = "grep --include=\*.md -rnw '{$path}' -e '{$img_name}'";
-                exec($command2, $mdfiles);
-
-                // The output is filename:line no:line content. Could be more than 1?
-                foreach ($mdfiles as $mdfile) {
-                    $filename = explode(':', $mdfile);
-
-                    // Sometimes an empty string to skip.
-                    if (str_ends_with($filename[0], '.md')) {
-                        $articles[] = $filename[0];
-                    }
-                }
-            }
-        }
-
-        // Eliminate duplicates.
-        $articles = array_unique($articles);
-
-        // Create a new array containing just the heading and filename;
-        $heading_filename = [];
-        foreach ($articles as $article) {
-            $segments = explode('/', $article);
-            $heading_filename[] = implode('/', array_values(array_slice($segments, -2)));
-        }
-
-        // Return an array containing the headings and filenames of md files to update
-        return $heading_filename;
-    }
-
-    /**
-     * Build the HTML for one article and make an entry in the database.
-     *
-     * @param string    $manual     The manual name.
-     * @param string    $language   The language name.
-     * @param string    $heading    The item heading name.
-     * @param string    $filename   The item file name.
-     *
-     * @return array    [0|1, message].
-     */
-    protected function setOneArticle($manual, $language, $heading, $filename)
-    {
-        $db = $this->db;
-        $gfm_file = $this->gfmfiles_path . $manual . '/' . $language . '/articles/' . $heading . '/' . $filename;
-        if (!file_exists($gfm_file)) {
-            // Many manuals in languages other than en will be missing articles.
-            // Normal and no message needed.
-            return [0, ''];
-        }
-
-        // Get the last modified timestamp
-        $last_mod = date('Y-m-d H:i:s', @filemtime($gfm_file));
-
-        // Check if there is an entry for this article.
-        $query = $db->getQuery(true);
-        $query->select($db->quotename('id'))
-        ->select($db->quotename('modified'))
-        ->from($db->quotename('#__jdm_articles'))
-        ->where($db->quotename('manual') . ' = :manual')
-        ->where($db->quotename('language') . ' = :language')
-        ->where($db->quotename('heading') . ' = :heading')
-        ->where($db->quotename('filename') . ' = :filename')
-        ->bind(':manual', $manual, ParameterType::STRING)
-        ->bind(':language', $language, ParameterType::STRING)
-        ->bind(':heading', $heading, ParameterType::STRING)
-        ->bind(':filename', $filename, ParameterType::STRING);
-        $db->setQuery($query);
-        $row = $db->loadObject();
-
-        $id = empty($row) ? 0 : $row->id;
-        $contents = file_get_contents($gfm_file);
-
-        // Get the title from the contents.
-        // Look for Filename and Display Title
-        // <!-- Filename: J4.x:Http_Header_Management / Display title: HTTP Header Verwaltung -->
-        $test = preg_match($this->pattern2, $contents, $matches);
-        if (empty($test)) {
-            $summary = "Warning {$manual}/{$language}/{$heading}/{$filename} does not contain h1\n";
-            $fn = substr($filename, 0, strpos($filename, '.md'));
-            $source_url = 'Unknown';
-            $display_title = ucwords(str_replace('_', ' ', $fn));
-        } else {
-            $summary = '';
-            $source_url = trim($matches[1]);
-            $display_title = trim($matches[2]);
-        }
-
-        // Process the images for this article.
-        $contents = $this->fiximages($manual, $contents);
-
-        // Create the Markdown for this article.
-        $html = Markdown2html::go($contents);
-
-        $query = $db->getQuery(true);
-        if (empty($id)) {
-            // If id was empty do an insert.
-            $query->insert($db->quotename('#__jdm_articles'));
-        } else {
-            // Otherwise do an update.
-            $query->update($db->quotename('#__jdm_articles'));
-            $query->where($db->quotename('id') . ' = ' . $id);
-        }
-
-        $query->set($db->quotename('source_url') . ' = :source_url')
-        ->set($db->quotename('manual') . ' = :manual')
-        ->set($db->quotename('language') . ' = :language')
-        ->set($db->quotename('heading') . ' = :heading')
-        ->set($db->quotename('filename') . ' = :filename')
-        ->set($db->quotename('display_title') . ' = :display_title')
-        ->set($db->quotename('html') . ' = :html')
-        ->set($db->quotename('modified') . ' = :last_mod')
-        ->bind(':source_url', $source_url, ParameterType::STRING)
-        ->bind(':manual', $manual, ParameterType::STRING)
-        ->bind(':language', $language, ParameterType::STRING)
-        ->bind(':heading', $heading, ParameterType::STRING)
-        ->bind(':filename', $filename, ParameterType::STRING)
-        ->bind(':display_title', $display_title, ParameterType::STRING)
-        ->bind(':html', $html, ParameterType::STRING)
-        ->bind(':last_mod', $last_mod, ParameterType::STRING);
-        $db->setQuery($query);
-        $db->execute();
-
-        return [1, $summary];
-    }
-
-    /**
      * Populate the __jdm_menu_headings table. The ini file is used in building menus.
      *
      * @param string    $manual     The manual name.
@@ -447,15 +410,16 @@ class Buildarticles
      *
      * @return string    The number of headings processed.
      */
-    protected function setMenuHeadings($manual, $language)
+    protected function setMenus($manual, $language)
     {
-        // Get the menu headings file
-        $menu_headings_file = $this->gfmfiles_path . $manual . '/' . $language . '/articles/menu-headings.ini';
-        if (!file_exists($menu_headings_file)) {
-            return 'Menu headings missing: ' . $menu_headings_file . "\n";
+
+        // The articles index is always needed.
+        $menuObject = $this->getMenuObject($manual, $language);
+        if (empty($menuObject)) {
+            // Return the error message.
+            return 'The menu.json file is missing or invalide';
         }
 
-        $contents = file_get_contents($menu_headings_file);
         $db = $this->db;
         $count = 0;
 
@@ -465,7 +429,7 @@ class Buildarticles
             }
             list ($heading, $translation) = explode('=', $line);
             // Check if there is an existing entry.
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             $query->select($db->quoteName('id'))
             ->from($db->quoteName('#__jdm_menu_headings'))
             ->where($db->quoteName('manual') . ' = :manual')
@@ -477,7 +441,7 @@ class Buildarticles
             $db->setQuery($query);
             $id = $db->loadResult();
 
-            $query = $db->getQuery(true);
+            $query = $db->createQuery();
             if (empty($id)) {
                 $query->insert($db->quoteName('#__jdm_menu_headings'))
                 ->set($db->quoteName('manual') . ' = :manual')
@@ -490,7 +454,7 @@ class Buildarticles
                 $query->update($db->quoteName('#__jdm_menu_headings'))
                 ->where($db->quoteName('id') . ' = ' . $id);
             }
-            $query->set($db->quoteName('display_title') . ' = :translation')
+            $query->set($db->quoteName('title') . ' = :translation')
             ->bind(':translation', $translation, ParameterType::STRING);
             $db->setQuery($query);
             $db->execute();
@@ -500,53 +464,97 @@ class Buildarticles
     }
 
     /**
-     * Look for repo images to make picture srcset.
+     * Build the HTML for one article and make an entry in the database.
      *
-     * @param   $manual   The manual to process.
-     * @param   $contents A single page content in Markdown format.
+     * @param string    $manual     The manual name.
+     * @param string    $language   The language name.
+     * @param string    $path       The item path.
      *
-     * @return  $html     Markdown img links converted for this site.
-     *
-     * @since   1.0
+     * @return array    [0|1, message].
      */
-    private function fiximages($manual, $contents)
+    protected function setOneArticle($manual, $language, $path)
     {
-        // links are like this and must be on one line
-        // ![action logs module form](../../../help/en/images/admin-modules/modules-actionlogs-latest-screenshot.png "Action Logs Module Form")
-        $test = preg_match_all($this->pattern, $contents, $matches, PREG_SET_ORDER);
-        foreach ($matches as $match) {
-            // $match[0] is the whole line to be replaced with a picture tag.
-            // $match[1] is the alt tag.
-            // $match[2] is the path to the image in the repo source
-            // $match[3] is the image filename
-            // $match[4] is the title or empty.
-
-            // Copy the image to the images folder.
-            $destination_dir = JPATH_ROOT . '/jdmimages/manuals/' . $manual . $match[2];
-            $destination =  $destination_dir . '/' . $match[3];
-
-            // Does the destination folder exist?
-            if (!is_dir($destination_dir)) {
-                mkdir($destination_dir, 0755, true);
-            }
-            $origin = $this->gfmfiles_path . $manual . $match[2] . '/' . $match[3];
-
-            file_put_contents($destination, file_get_contents($origin));
-
-            $title = '';
-            if (!empty($match[4])) {
-                list ($gar, $title, $bage) = explode('"', $match[4]);
-                $title = ' title="' . $title . '"';
-            }
-            // Create an img src set and set of images from an img tag.
-            $img = '<img src="/jdmimages/manuals/' . $manual . $match[2] . '/' .
-            $match[3] . '" alt="' . $match[1] . '"' .
-            $title . ' class="screenshot">';
-            $processed = $this->responsive->transformImage($img);
-            if (!empty($processed)) {
-                $contents = str_replace($match[0], $processed, $contents);
-            }
+        $db = $this->db;
+        $gfm_file = $this->gfmfiles_path . $manual . '/' . $language . '/articles/' . $path;
+        if (!file_exists($gfm_file)) {
+            // Many manuals in languages other than en will be missing articles.
+            // Normal and no message needed.
+            return [0, ''];
         }
-        return $contents;
+
+        // Get the last modified timestamp
+        $last_mod = date('Y-m-d H:i:s', @filemtime($gfm_file));
+
+        // Remove .md from the end of the path.
+        $dbpath = str_replace('.md', '', $path);
+
+        // Check if there is an entry for this article.
+        $query = $db->createQuery();
+        $query->select($db->quotename('id'))
+        ->select($db->quotename('modified'))
+        ->from($db->quotename('#__jdm_articles'))
+        ->where($db->quotename('manual') . ' = :manual')
+        ->where($db->quotename('language') . ' = :language')
+        ->where($db->quotename('path') . ' = :path')
+        ->bind(':manual', $manual, ParameterType::STRING)
+        ->bind(':language', $language, ParameterType::STRING)
+        ->bind(':path', $dbpath, ParameterType::STRING);
+        $db->setQuery($query);
+        $row = $db->loadObject();
+
+        $id = empty($row) ? 0 : $row->id;
+        $contents = file_get_contents($gfm_file);
+
+        // In Version 2 there is json structute inside <!-- --> at the top of the file
+        $test = preg_match($this->metadata, $contents, $matches);
+
+        if (empty($test)) {
+            $summary = "Warning {$manual}/{$language}/{$path}.md does not contain metadata\n";
+            $fn = substr($path, strrpos($path, '/'));
+            $source_url = 'Unknown';
+            $title = ucwords(str_replace('_', ' ', $fn));
+        } else {
+            $metadata = json_decode($matches[1]);
+            $summary = '';
+            $description = $metadata->description ?? ''; 
+            $source_url = $metadata->source ?? 'Not specified in article!';
+            $title = $metadata->title ?? 'Not specified in article!';
+            $author = $metadata->author ?? '';
+        }
+
+        // Process the images for this article.
+        $contents = $this->fixImages($manual, $language, $path, $contents);
+
+        // Create the Markdown for this article.
+        $html = Markdown2html::go($contents);
+
+        $query = $db->createQuery();
+        if (empty($id)) {
+            // If id was empty do an insert.
+            $query->insert($db->quotename('#__jdm_articles'));
+        } else {
+            // Otherwise do an update.
+            $query->update($db->quotename('#__jdm_articles'));
+            $query->where($db->quotename('id') . ' = ' . $id);
+        }
+
+        $query->set($db->quotename('source_url') . ' = :source_url')
+        ->set($db->quotename('manual') . ' = :manual')
+        ->set($db->quotename('language') . ' = :language')
+        ->set($db->quotename('path') . ' = :path')
+        ->set($db->quotename('title') . ' = :title')
+        ->set($db->quotename('html') . ' = :html')
+        ->set($db->quotename('modified') . ' = :last_mod')
+        ->bind(':source_url', $source_url, ParameterType::STRING)
+        ->bind(':manual', $manual, ParameterType::STRING)
+        ->bind(':language', $language, ParameterType::STRING)
+        ->bind(':path', $dbpath, ParameterType::STRING)
+        ->bind(':title', $title, ParameterType::STRING)
+        ->bind(':html', $html, ParameterType::STRING)
+        ->bind(':last_mod', $last_mod, ParameterType::STRING);
+        $db->setQuery($query);
+        $db->execute();
+
+        return [1, $summary];
     }
 }

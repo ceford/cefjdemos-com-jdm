@@ -110,7 +110,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                                     <?php echo HTMLHelper::_(
                                         'searchtools.sort',
                                         'COM_JDOCMANUAL_ARTICLES_DISPLAY_TITLE',
-                                        'a.display_title',
+                                        'a.title',
                                         $listDirn,
                                         $listOrder
                                     ); ?>
@@ -180,7 +180,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                                     <?php echo $item->filename; ?>
                                 </td>
                                 <td>
-                                    <?php echo $item->display_title; ?>
+                                    <?php echo $item->title; ?>
                                 </td>
                                 <td class="d-none d-md-table-cell">
                                     <?php echo $item->id; ?>
@@ -254,7 +254,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                                     </a>
                                 </td>
                                 <td>
-                                    <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_DISPLAY_TITLE') . ': ' . $item->display_title; ?>
+                                    <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_DISPLAY_TITLE') . ': ' . $item->title; ?>
                                     <br>
                                     <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_MANUAL') . ': ' . $item->manual; ?>,
                                     <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_LANGUAGE') . ': ' . $item->language; ?>
@@ -317,7 +317,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                 <tr class="row<?php echo $i % 2; ?>">
                     <td>
                         <a href="<?php echo Route::_($stash_edit_route . $stash->id); ?>">
-                    <?php echo $stash->display_title; ?>
+                    <?php echo $stash->title; ?>
                         </a>
                     </td>
                     <td class="text-center">
@@ -382,7 +382,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                 <tr class="row<?php echo $i % 2; ?>">
                     <td>
                         <a href="<?php echo Route::_($stash_edit_route . $stash->id); ?>">
-                    <?php echo $stash->display_title; ?>
+                    <?php echo $stash->title; ?>
                         </a>
                     </td>
                     <td class="text-center">

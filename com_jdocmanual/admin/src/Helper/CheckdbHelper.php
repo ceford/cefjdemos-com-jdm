@@ -12,6 +12,7 @@
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Helper;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Component\ComponentHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -29,27 +30,35 @@ class CheckdbHelper
      *
      * @return int  Flag for tables populated, value, 0 or 1.
      */
-    public static function isGood()
+    public static function isPopulated()
     {
+        $params = ComponentHelper::getParams('com_jdocmanual');
+        if (empty($params->get('gfmfiles_path'))) {
+            return 0;
+        }
+
         $db = Factory::getContainer()->get('DatabaseDriver');
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('COUNT(id)')
         ->from('#__jdm_articles');
         $db->setQuery($query);
         $articles_total = $db->loadResult();
         if (empty($articles_total)) {
-            return 0;
+            // There are no articles installed
+            return 1;
         }
 
-        $query = $db->getQuery(true);
+        $query = $db->createQuery();
         $query->select('COUNT(id)')
         ->from('#__jdm_menus');
         $db->setQuery($query);
         $menus_total = $db->loadResult();
         if (empty($menus_total)) {
-            return 0;
+            // There are no menus installed
+            return 2;
         }
 
-        return 1;
+        // Data installation seems good!
+        return 3;
     }
 }

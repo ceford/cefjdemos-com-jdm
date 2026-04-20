@@ -30,7 +30,7 @@ class DisplayController extends BaseController
      * @var    string
      * @since   1.0
      */
-    protected $default_view = 'manual';
+    protected $default_view = 'manuals';
 
     public function display($cachable = false, $urlparams = [])
     {
@@ -51,6 +51,6 @@ class DisplayController extends BaseController
     public function getModel($name = '', $prefix = '', $config = [])
     {
         // Force to load the admin model
-        return parent::getModel($name, 'Administrator', $config);
+        return parent::getModel($name, $prefix, $config);
     }
 }

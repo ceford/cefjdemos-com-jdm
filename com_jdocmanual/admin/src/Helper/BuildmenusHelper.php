@@ -102,7 +102,7 @@ class BuildmenusHelper
                     $previous_heading_level++;
                 }
                 $accordionid += 1;
-                // If the display_title is missing
+                // If the title is missing
                 if (empty($heading_titles[$heading])) {
                     $alt = ucwords(str_replace('-', ' ', $heading));
                     // Output a warning
@@ -115,7 +115,7 @@ class BuildmenusHelper
                 }
             } else {
                 $count_articles += 1;
-                // Example: developer=getting-started=developer-required-software.md
+                // Example: developer=getting-started=developer-required-software
                 $title = str_replace('.md', '', $filename);
                 $title = ucwords(str_replace('-', ' ', $title));
                 $html .= $this->accordionitem($count_articles, $title);
@@ -159,17 +159,17 @@ class BuildmenusHelper
      * Create an accordian item code.
      *
      * @param   integer     $id             The sequence number of the accordion.
-     * @param   string      $display_title  The display title.
+     * @param   string      $title  The display title.
      * @param   string      $path           The link path
      *
      * @return  string      The required html code.
      */
-    protected function accordionItem($id, $display_title)
+    protected function accordionItem($id, $title)
     {
         // Escape any " character in the link.
         //'<li><span class="icon-file-alt icon-fw icon-jdocmanual" aria-hidden="true"></span>';
         $html = '<li id="article-' . $id . '">';
-        $html .= '<a href="#" class="jdm-menu-link">' . $display_title . '</a></li>' . "\n";
+        $html .= '<a href="#" class="jdm-menu-link">' . $title . '</a></li>' . "\n";
         return $html;
     }
 
@@ -189,8 +189,8 @@ class BuildmenusHelper
         // Try to get the article record from the database.
         $db = Factory::getContainer()->get('DatabaseDriver');
 
-        $query = $db->getQuery(true);
-        $query->select($db->quoteName(array('id','display_title', 'source_url')))
+        $query = $db->createQuery();
+        $query->select($db->quoteName(array('id','title', 'source_url')))
         ->from($db->quoteName('#__jdm_articles'))
         ->where($db->quoteName('manual') . ' = :manual')
         ->where($db->quoteName('language') . ' = :language')
@@ -216,8 +216,8 @@ class BuildmenusHelper
     {
         $db = Factory::getContainer()->get('DatabaseDriver');
 
-        $query = $db->getQuery(true);
-        $query->select($db->quoteName(array('heading','display_title')))
+        $query = $db->createQuery();
+        $query->select($db->quoteName(array('heading','title')))
         ->from($db->quoteName('#__jdm_menu_headings'))
         ->where($db->quoteName('manual') . ' = :manual')
         ->where($db->quoteName('language') . ' = :language')
@@ -227,7 +227,7 @@ class BuildmenusHelper
         $rows = $db->loadObjectList();
         $headings = [];
         foreach ($rows as $row) {
-            $headings[$row->heading] = $row->display_title;
+            $headings[$row->heading] = $row->title;
         }
         return $headings;
     }
