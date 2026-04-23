@@ -20,7 +20,7 @@ HTMLHelper::_('bootstrap.offcanvas', '.offcanvas', []);
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
     <div class="offcanvas-header">
-        <h2 class="offcanvas-title" id="offcanvasExampleLabel">Manual Index</h2>
+        <h2 class="offcanvas-title" id="offcanvasExampleLabel"><?php echo $this->manualTitle; ?></h2>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
@@ -33,7 +33,6 @@ HTMLHelper::_('bootstrap.offcanvas', '.offcanvas', []);
         <div class="col-12 col-sm-3 g-0 d-none d-sm-block" id="index-panel">
             <div id="oncanvasMenu">
             <nav id="jdocmanual-wrapper" aria-label="Jdocmanual Menu" class="sidebar-nav">
-                <?php echo $this->addToolbarMenuLanguage(); ?>
                 <h2 class="toc ps-2"><?php echo Text::_('COM_JDOCMANUAL_MANUAL_TOC_INDEX_OF_ARTICLES'); ?></h2>
                 <?php echo $this->menu->menu ?? Text::_('COM_JDOCMANUAL_MANUAL_MENU_MISSING'); ?>
             </nav>
@@ -45,12 +44,9 @@ HTMLHelper::_('bootstrap.offcanvas', '.offcanvas', []);
                     <button class="btn btn-secondary btn-sm d-bloc d-sm-none float-start me-2 mt-2" type="button"
                     data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample"
                     aria-controls="offcanvasExample">
-                    Index
+                    <?php echo Text::_('COM_JDOCMANUAL_MENU'); ?>
                     </button>
-                    <h2 id="document-title">
-                    <?php echo $this->title; ?>
-                    <?php //echo Text::_('COM_JDOCMANUAL_MANUAL_DOCUMENT_TITLE'); ?>
-                    </h2>
+                    <h1 id="document-title"><?php echo $this->title; ?></h1>
                 </div>
             </div>
             <div class="row">

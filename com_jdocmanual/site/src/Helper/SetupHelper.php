@@ -127,72 +127,8 @@ class SetupHelper
             $segments = explode('/', $qs, 2);
             $manual = empty($segments[0]) ? '' : $segments[0];
             $path = empty($segments[1]) ? '' : $segments[1];
-        }// else {
-            // Are there query parameters to work with.
-        //    $manual = $app->input->get('manual', '', 'string');
-        //    $path = $app->input->get('path', '', 'string');
-        //}
-
-        // Checking for page language change in url bar for site map purposes
-        /*
-        $plc = $app->input->get('page_language_code', '', 'string');
-        if (empty($plc)) {
-            $lc = $app->input->get('language', '', 'string');
-            // Get the current language code.
-            $query = $db->getQuery(true);
-            $query->select($db->quoteName('sef'))
-                ->from($db->quotename('#__languages'))
-                ->where($db->quoteName('lang_code') . ' = ' . $db->quote($lc));
-            $db->setQuery($query);
-            $page_language_code = $db->loadResult();
         }
         
-
-        // The case of a language change.
-        if (empty($manual)) {
-            $new_menu_language_code = $app->input->get('index_language_code', '', 'string');
-            $new_page_language_code = $app->input->get('page_language_code', '', 'string');
-            if (!empty($new_menu_language_code)) {
-                $menu_language_code = $new_menu_language_code;
-            }
-            if (!empty($new_page_language_code)) {
-                $page_language_code = $new_page_language_code;
-            }
-            // If there was a current manual cookie set.
-            if (!empty($old_manual)) {
-                $manual = $old_manual;
-            }
-        }
-
-        // The case of a manual change.
-        if (!empty($manual) && empty($path)) {
-            // Get the old manual cookie.
-            $cookie = $app->input->cookie->get('jdm5' . $manual, 'raw');
-            if (!empty($cookie)) {
-                // Example path: jdocmanual/introduction
-                $path = rawurldecode($cookie);
-            } else {
-                // Get the default for this manual.
-                $query = $db->getQuery(true);
-                $query->select($db->quoteName('path'))
-                ->from($db->quoteName('#__jdm_manuals'))
-                ->where($db->quoteName('manual') . ' = :manual')
-                ->bind(':manual', $manual, ParameterType::STRING);
-                $db->setQuery($query);
-                $path = $db->loadResult();
-            }
-        } else {
-            if (empty($manual) || empty($path)) {
-                // Get the default manual.
-                $query = $db->getQuery(true);
-                $query->select($db->quoteName(array('manual', 'path')))
-                ->from($db->quoteName('#__jdm_manuals'))
-                ->where($db->quoteName('home') . ' = 1');
-                $db->setQuery($query);
-                list($manual, $path) = $db->loadRow();
-            }
-        }
-        */
         // Current page: manual, menu_language, page_language Example: user-en-en
         $this->setCookie('jdm5cur', "{$manual}/{$menu_language_code}/{$page_language_code}", 10);
 

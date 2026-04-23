@@ -53,62 +53,9 @@ class ManualsController extends BaseController
 
         // array [0] 'Title', [1] 'In this Article', [2] 'Page Content'
         $result = $this->getModel()->getPage($manual, $language, $path);
-        echo json_encode('{"document_title" : ' . $result[0] . '}, {"toc_panel" : ' . $result[1] . '}, {"document_panel" : ' . $result[2] . '}');
-    
+        echo json_encode($result);
+        
         exit();
-
-
-        $db = Factory::getContainer()->get('DatabaseDriver');
-
-        $query = $db->createQuery();
-        $query->select($db->quoteName(array('title','html','order_next','order_previous')))
-            ->from($db->quoteName('#__jdm_articles'))
-            ->where($db->quoteName('manual') . ' = :manual')
-            ->where($db->quoteName('language') . ' = :language')
-            ->where($db->quoteName('path') . ' = :path')
-            ->bind(':manual', $manual, ParameterType::STRING)
-            ->bind(':language', $language, ParameterType::STRING)
-            ->bind(':path', $path, ParameterType::STRING);
-        $db->setQuery($query);
-        $row = $db->loadObject();
-
-        if (empty($row) && $language != 'en') {
-            // Try again with English
-            $query = $db->createQuery();
-            $language = 'en';
-
-            $query->select($db->quoteName(array('title','html','order_next','order_previous')))
-            ->from($db->quoteName('#__jdm_articles'))
-            ->where($db->quoteName('manual') . ' = :manual')
-            ->where($db->quoteName('language') . ' = :language')
-            ->where($db->quoteName('path') . ' = :path')
-            ->bind(':manual', $manual, ParameterType::STRING)
-            ->bind(':language', $language, ParameterType::STRING)
-            ->bind(':path', $path, ParameterType::STRING);
-            $db->setQuery($query);
-            $row = $db->loadObject();
-        }
-        if (empty($row)) {
-            $content = array('Placeholder', 'Please select a document');
-        } else {
-            if ($manual === 'magazine') {
-                $host = $_SERVER['HTTP_HOST'];  // e.g., "localhost" or "my.publicsite.org"
-                if ($host !== 'localhost') {
-                    $row->html = InthispageHelper::trim2review($row->html);
-                }
-            }
-            // separate the Table of Contents - return array(toc, content);
-            $content = InthispageHelper::doToc($row->html);
-
-            // Add the next and previous links to $content
-            $order = InthispageHelper::getPreviousNext($row->order_previous, $row->order_next);
-
-            $content[1] .= $order;
-
-            array_push($content, $row->title);
-        }
-        echo json_encode($content);
-        jexit();
     }
 
     public function display($cachable = false, $urlparams = [])

@@ -258,7 +258,7 @@ set All. Again that could be the Home page for *All* languages.
 
 ### Multilingual Sites
 
-The language selected to show the index of pages in Jdocmanual is independent
+The language selected to show the list of pages in Jdocmanual is independent
 of the current page language. This feature is useful for maintenance purposes.
 
 The language selected to show the page content is linked to the overall

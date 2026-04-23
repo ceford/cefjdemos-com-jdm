@@ -22,6 +22,13 @@
 		/>
 
 		<field
+			name="default_language"
+			type="text"
+			label="COM_JDOCMANUAL_PARAMS_INSTALLATION_DEFAULT_LANGUAGE_LABEL"
+			description="COM_JDOCMANUAL_PARAMS_INSTALLATION_DEFAULT_LANGUAGE_DESC"
+		/>
+
+		<field
 			name="enable_gitpull"
 			type="radio"
 			label="COM_JDOCMANUAL_PARAMS_ENABLE_GITPULL_LABEL"

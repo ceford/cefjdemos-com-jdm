@@ -70,6 +70,12 @@
 				com_jdocmanual_manuals
 			</menu>
 			<menu
+				link="option=com_jdocmanual&amp;view=languages"
+				img="default"
+			>
+				com_jdocmanual_languages
+			</menu>
+			<menu
 				link="option=com_jdocmanual&amp;view=articlestashes"
 				img="default"
 			>
@@ -80,12 +86,6 @@
 				img="default"
 			>
 				com_jdocmanual_menustashes
-			</menu>
-			<menu
-				link="option=com_jdocmanual&amp;view=languages"
-				img="default"
-			>
-				com_jdocmanual_languages
 			</menu>
 			<menu
 				link="option=com_jdocmanual&amp;view=menuheadings"

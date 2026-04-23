@@ -71,8 +71,6 @@ if (toggle) {
 /**
  * Set the page content by clicking a page item in the index
  */
-//let contents = document.getElementsByClassName("content-link");
-
 let getPage = function (event) {
     event.preventDefault();
 
@@ -90,7 +88,7 @@ let getPage = function (event) {
     let paramsString = url.search;
     let searchParams = new URLSearchParams(paramsString);
     
-    // First check for change of index or page language
+    // First check for change of menu or page language
     if (searchParams.get('index_language_code')) {
         location = url;
         return;
@@ -194,10 +192,11 @@ async function setPanelContent(manual, path)
         document_panel.innerHTML = response.status;
         throw new Error(Joomla.Text._('COM_MYCOMPONENT_JS_ERROR_STATUS'));
     } else {
-        let result = await response.json();
-        document_title.innerHTML = result[0];
-        toc_panel.innerHTML = result[1];
-        document_panel.innerHTML = result[2];
+        let result = await response.text();
+        let obj = JSON.parse(result);
+        document_title.innerHTML = obj[0];
+        toc_panel.innerHTML = obj[1];
+        document_panel.innerHTML = obj[2];
         setlinks();
         menuHighlight(path);
         let language = document.getElementById("language").value;

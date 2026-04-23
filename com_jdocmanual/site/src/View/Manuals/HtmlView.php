@@ -169,8 +169,8 @@ class HtmlView extends BaseHtmlView
         echo $menuToolbar->render();
     }
 
-        /**
-     * Add the page title and toolbar.
+    /**
+     * Add the manual picker.
      *
      * @return  void
      *

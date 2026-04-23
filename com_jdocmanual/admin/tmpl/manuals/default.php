@@ -129,10 +129,10 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                     ); ?>
                                 </th>
                                 <th>
-                                    <?php echo Text::_('COM_JDOCMANUAL_MANUALS_BUILD'); ?>
+                                    <?php echo Text::_('COM_JDOCMANUAL_MANUALS_BUILD_ARTICLES'); ?>
                                 </th>
                                 <th class="text-center">
-                                    <?php echo Text::_('COM_JDOCMANUAL_MANUALS_FORCE'); ?>
+                                    <?php echo Text::_('COM_JDOCMANUAL_MANUALS_TIME_BACK'); ?>
                                 </th>
                                 <th>
                                     <?php echo Text::_('COM_JDOCMANUAL_MANUALS_BUILD_MENU'); ?>
@@ -239,11 +239,13 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                 </td>
                                 <td class="text-center">
                                     <span class="data-force-name-<?php echo $item->manual . $hide_selectors_css; ?>">
-                                    <input class="form-check-input" type="checkbox" id="force-<?php echo $i; ?>" value="<?php echo $i; ?>">
+                                    <input type="number" inputmode="numeric"  
+                                    id="force-<?php echo $i; ?>" value="5" class="form-control valid form-control-success" 
+                                    max="16383" step="1" min="0" aria-invalid="false">
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="data-build-name-<?php echo $item->manual . $hide_selectors_css; ?>">
+                                    <span class="data-build-menu-<?php echo $item->manual . $hide_selectors_css; ?>">
                                     <?php echo $this->getLanguageFormHTML($item->manual, 'buildmenu', $i); ?>
                                     </span>
                                 </td>
@@ -274,6 +276,10 @@ $isGitpullEnabled = $this->isGitpullEnabled();
     </div>
 
 </form>
+<?php echo HTMLHelper::_('uitab.endTab'); ?>
+
+<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'newpages', Text::_('COM_JDOCMANUAL_MANUALS_TAB_NOTES')); ?>
+    <?php include __DIR__ . '../../manual/notes.php'; ?>
 <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
 <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'newpages', Text::_('COM_JDOCMANUAL_MANUALS_TAB_NOTES')); ?>

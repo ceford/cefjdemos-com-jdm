@@ -76,7 +76,7 @@ class Buildmenus
     protected $menuHTML = '';
 
     /**
-     * Entry point to convert menu.json to htmal and save.
+     * Entry point to convert menu.json to html and save.
      *
      * @param   string  $manual     The name of the manual to process.
      * @param   string  $language   The code of the language to process.
@@ -215,9 +215,8 @@ class Buildmenus
                 ->set($db->quoteName('order_previous') . ' = :order_previous')
                 ->set($db->quoteName('order_next') . ' = :order_next')
                 ->where($db->quoteName('manual') . ' = ' . $db->quote($manual))
-                ->where($db->quoteName('language') . ' = ' . $db->quote($langauge))
-                ->where($db->quoteName('path') . ' = ' . $db->quote($item->path))
-                ->where($db->quoteName('id') . ' = ' . $i)
+                ->where($db->quoteName('language') . ' = ' . $db->quote($language))
+                ->where($db->quoteName('path') . ' = ' . $db->quote($item[1]))
                 ->bind(':order_previous', $order_previous, ParameterType::STRING)
                 ->bind(':order_next', $order_next, ParameterType::STRING);
             $db->setQuery($query);
@@ -284,16 +283,11 @@ class Buildmenus
                 $this->menuHTML .= "<li class=\"item parent item-level-{$this->toclevel}\">";
                 $this->menuHTML .= "<a href=\"#\" class=\"has-arrow\">";
                 $this->menuHTML .= "{$wrap_label}</a>\n";
-                if (!empty($value)) {
                     // Add a path prefix 
                     $this->pathPrefix[] = $key;
 
                     // Recursively build sublist.
                     $this->renderSubmenu($value, $manual, $language);
-                } else {
-                    // Remove the added path prefix
-                    array_pop($this->pathPrefix);
-                }
                 $this->menuHTML .= "</li>\n";
             } else {
                 // Create a path to be used to get the article ID
@@ -317,6 +311,9 @@ class Buildmenus
             }
         }
         $this->menuHTML .= "</ul>\n";
+
+        // Remove the added path prefix
+        array_pop($this->pathPrefix);
 
         // On return decrease the toclevel
         $this->toclevel -= 1;

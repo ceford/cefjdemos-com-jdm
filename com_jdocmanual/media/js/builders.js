@@ -11,8 +11,7 @@ let updateHTML = function (event) {
         let cbi = this.getAttribute('data-cbi');
         const token = Joomla.getOptions('csrf.token', '');
 
-        let force = document.querySelector('#force-' + cbi).checked;
-        force = force ? '1' : '0';
+        let force = document.querySelector('#force-' + cbi).value;
         let url = '?option=com_jdocmanual&task=manuals.buildhtml&manual=' + this.id + '&language=' + this.value + '&force=' + force + '&1=' + token;
         location = url;
     }

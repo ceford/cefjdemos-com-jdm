@@ -57,6 +57,9 @@ async function toggleManual()
     // The id of the Fetch language selector
     let fetch_manual = document.querySelector('.data-fetch-name-' + manual_name);
 
+    // The id of the Build Menu language selector
+    let build_menu = document.querySelector('.data-build-menu-' + manual_name);
+
     let data = new URLSearchParams();
     data.append(token, 1);
     data.append('manual_id', manual_id);
@@ -79,6 +82,7 @@ async function toggleManual()
             innerSpan.classList.remove('icon-publish');
             innerSpan.classList.add('icon-unpublish');
             build_manual.classList.add('d-none');
+            build_menu.classList.add('d-none');
             if (fetch_manual) {
                 fetch_manual.classList.add('d-none');
             }
@@ -87,6 +91,7 @@ async function toggleManual()
             innerSpan.classList.remove('icon-unpublish');
             innerSpan.classList.add('icon-publish');
             build_manual.classList.remove('d-none');
+            build_menu.classList.remove('d-none');
             if (fetch_manual) {
                 fetch_manual.classList.remove('d-none');
             }

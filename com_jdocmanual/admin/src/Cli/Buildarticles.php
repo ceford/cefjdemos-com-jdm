@@ -40,16 +40,14 @@ class Buildarticles
      *
      * @var     string
      *
-     * Example link: 
-     * ![manual view](./assets/introduction-to-jdocmanual/00-jdocmanual.png) 
-     *  after tha filename there may be an optional ' Title...' or ' "Title..."'
-     * In the pattern:
-     * First bracket is alt text.
-     * Second bracket is img url to be added to root/manual/
-     * Third bracket is filename
-     * Fourth bracket is title or empty
+     * ![manual view](../../../en/images/jdocmanual/introduction-to-jdocmanual/00-jdocmanual.png)
+     * $matches[0] will be the matched string to be replaced
+     * $matches[1] will be the alt text, 'manual view'
+     * $matches[2] will be the language, 'en'
+     * $matches[3] will be the path segment, 'jdocmanual/introduction-to-jdocmanual/00-jdocmanual.png'
+     * $matches[4] is a Title string or "Title string"
      */
-    protected $imgPattern = '/\!\[(.*?)\]\(\.?\/assets\/([^\s\)]+)(?:\s+(.*?))?\)/';
+    protected $imgPattern = '/\!\[(.*?)\]\(.*\/(.*?)\/images\/([^\s\)]+)(?:\s+(.*?))?\)/';
 
     /**
      * Regex pattern to select metadata from html comment string in markdown file.
@@ -111,7 +109,7 @@ class Buildarticles
      *
      * @param   string  $manual     The manual to process.
      * @param   string  $language   The the language to process.
-     * @param   string  $force      Flag to force rebuild of all articles
+     * @param   integer $force      Age in minutes to be included in a rebuild, 0 for force rebuild all
      *
      * @return  string  A message reporting the outcome.
      *
@@ -148,8 +146,8 @@ class Buildarticles
         $this->getArticlePaths($menuObject);
 
         // Get a list of files that have changed or contain changed images.
-        if (empty($force)) {
-            $articles_updated = $this->getArticlesUpdated($manual, $language);
+        if (!empty($force)) {
+            $articles_updated = $this->getArticlesUpdated($manual, $language, $force);
             $paths = array_intersect($this->articlePaths, $articles_updated);
         } else {
             $paths = $this->articlePaths;
@@ -203,7 +201,7 @@ class Buildarticles
      */
     private function fixImages($manual, $language, $path, $contents)
     {
-        // $imgPattern = '/\!\[(.*?)\]\(\.?\/assets\/([^\s\)]+)(?:\s+(.*?))?\)/';
+
         $test = preg_match_all($this->imgPattern, $contents, $matches, PREG_SET_ORDER);
 
         $srcdir = dirname($path);
@@ -212,7 +210,10 @@ class Buildarticles
         foreach ($matches as $match) {
             // Create a destination folder if it does not exist exist?
             if (empty($dest_set)) {
-                $dest = JPATH_ROOT . "/jdmimages/{$manual}/{$language}/{$path}";
+                // Remove the last element of the path - the filename
+                $tmp = substr($path, 0, strrpos($path, '/'));
+
+                $dest = JPATH_ROOT . "/jdmimages/{$manual}/{$language}/{$tmp}";
                 if (!is_dir($dest)) {
                     mkdir($dest, 0755, true);
                 }
@@ -221,17 +222,18 @@ class Buildarticles
 
             // $match[0] is the whole line to be replaced with a picture tag.
             // $match[1] is the alt text 
-            // $match[2] is the path, example: introduction-to-jdocmanual/00-jdocmanual.png
-            // $match[3] is a Title string or "Title string"
+            // $match[2] is the language
+            // $match[3] is the path, example: introduction-to-jdocmanual/00-jdocmanual.png
+            // $match[4] is a Title string or "Title string"
 
             // Copy the image to the images folder.
-            $origin = "{$this->gfmfiles_path}{$manual}/{$language}/articles/{$srcdir}/assets/{$match[2]}";
-            $destination = JPATH_ROOT . "/jdmimages/{$manual}/{$language}/{$srcdir}/{$match[2]}";
-            $link = "jdmimages/{$manual}/{$language}/{$srcdir}/{$match[2]}";
+            $origin = "{$this->gfmfiles_path}{$manual}/{$language}/images/{$match[3]}";
+            $destination = JPATH_ROOT . "/jdmimages/{$manual}/{$language}/{$match[3]}";
+            $link = "jdmimages/{$manual}/{$language}/{$match[3]}";
 
             file_put_contents($destination, file_get_contents($origin));
 
-            $title = $match[3] ?? '';
+            $title = $match[4] ?? '';
             // Create an img src set and set of images from an img tag.
             $img = '<img src="' . $link . '" alt="' . $match[1] . '" title="' . $title . '" class="screenshot">';
             $processed = $this->responsive->transformImage($img);
@@ -269,7 +271,7 @@ class Buildarticles
      *
      * @return  $array  A list of articles to update.
      */
-    protected function getArticlesUpdated($manual, $language)
+    protected function getArticlesUpdated($manual, $language, $timeout)
     {
         // Example command to find files changed less than 60 minutes ago:
         // find /Users/ceford/git/cefjdemos/manuals/help/en/articles -mmin -60
@@ -278,13 +280,6 @@ class Buildarticles
         // git diff --name-only "@{2024-09-14 22:00:00}"
 
         $articlesDir = $this->gfmfiles_path . $manual . '/' . $language . '/articles';
-
-        // In Version 2 images are in the articles folder
-        //$images = $this->gfmfiles_path . $manual . '/' . $language . '/images';
-
-        // Get the time set for a delay since the previous build - small to catch recent changes, large to force rebuilt
-        $params = ComponentHelper::getParams('com_jdocmanual');
-        $timeout = $params->get('timeout', 5);
 
         $threshold = time() - (($this->minutes + $timeout) * 60);
 
@@ -307,14 +302,42 @@ class Buildarticles
             // Skip any extraneous lines.
             if (str_ends_with($line, '.md')) {
                 $articles[] = $line;
-            } elseif (str_contains($line, 'assets')) {
-                // this is something in the assets folder - truncate at assets
-                $articles[] = substr($line, 0, strpos($line, 'assets')) . '.md';
-            }    
+            }
+        }
+
+        // In Version 2 images are in a folder with the same name as the article
+        $imagesDir = $this->gfmfiles_path . $manual . '/' . $language . '/images';
+
+        $result = [];
+
+        $imgiterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($imagesDir, \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($imgiterator as $img) {
+            if ($img->isFile()) {
+                if ($img->getMTime() >= $threshold) {
+                    $result[] = $img->getPathname();
+                }
+            }
+        }
+
+        foreach ($result as $line) {
+            // Skip any lines not containing an image file
+            if ($is_picture = getimagesize($line) !== FALSE) {
+                $tmp = substr($line, 0, strrpos($line, '/')) . '.md';
+                $articles[] = $tmp;
+            }
+        }
+        // Need to remove path elements up to /articles
+        // "/Users/ceford/git/cefjdemos/manuals/docs/en/articles/jdocmanual/jugl-2025-05-20.md"
+        $updates = [];
+        foreach($articles as $article) {
+            $updates[] = preg_replace('/(.*\/articles\/)(.*)/', '', $article);
         }
 
         // Eliminate duplicates.
-        return array_unique($articles);
+        return array_unique($updates);
     }
 
     /**
@@ -509,7 +532,7 @@ class Buildarticles
         $test = preg_match($this->metadata, $contents, $matches);
 
         if (empty($test)) {
-            $summary = "Warning {$manual}/{$language}/{$path}.md does not contain metadata\n";
+            $summary = "Warning {$manual}/{$language}/{$path} does not contain metadata\n";
             $fn = substr($path, strrpos($path, '/'));
             $source_url = 'Unknown';
             $title = ucwords(str_replace('_', ' ', $fn));

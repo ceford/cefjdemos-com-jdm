@@ -43,12 +43,17 @@ $activeMenuitem = $sitemenu->getActive();
 
 ?>
 
-<div class="row align-middle">
+<div class="row align-middle pt-2 pb-2 bg-body-secondary">
     <div class="col-auto">
         <?php echo $this->addToolbarSelectManual(); ?>
     </div>
-    <div class="col">
-        JDM
+    <div class="col mt-1">
+        <a href=""><?php echo Text::_('MOD_BREADCRUMBS_HOME'); ?></a>
+        > 
+        <span id="manual-title"><?php echo $this->manualTitle; ?></span>
+    </div>
+    <div class="col-auto">
+        <?php echo $this->addToolbarMenuLanguage(); ?>
     </div>
     <div class="col-auto">
         <?php echo $this->addToolbarPageLanguage(); ?>
@@ -56,7 +61,6 @@ $activeMenuitem = $sitemenu->getActive();
 </div>
 
 <div class="row">
-    <h1><?php echo $this->manualTitle; ?></h1>
 
     <?php include 'site-layout.php'; ?>
 
