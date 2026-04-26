@@ -8,7 +8,7 @@
 			label="COM_JDOCMANUAL_ARTICLES_MANUAL_SELECT"
 			onchange="this.form.submit();"
 			default=""
-			query = "SELECT manual, title FROM `#__jdm_manuals` WHERE state = 1 ORDER BY ordering ASC"
+			query = "SELECT `manual`, `title` FROM `#__jdm_manuals` WHERE `state` = 1 ORDER BY `ordering` ASC"
 			key_field="manual"
 			value_field="title"
 			>
@@ -21,7 +21,7 @@
 			label="Language"
 			onchange="this.form.submit();"
 			default="en"
-			query = "SELECT code, title FROM `#__jdm_languages` WHERE state = 1 ORDER BY title ASC"
+			query = "SELECT `a`.`sef` AS `code`, `a`.`title` FROM `#__languages` AS `a` LEFT JOIN `#__jdm_languages` AS `b` ON `a`.`lang_id` = `b`.`lang_id` WHERE `b`.`state` = 1 ORDER BY `title` ASC"
 			key_field="code"
 			value_field="title"
 		>
@@ -45,13 +45,12 @@
 			label="JGLOBAL_SORT_BY"
 			statuses="*,0,1,2,-2"
 			onchange="this.form.submit();"
-			default="a.heading ASC, a.filename ASC"
+			default="a.path ASC"
 			validate="options"
 			>
 			<option value="">JGLOBAL_SORT_BY</option>
-			<option value="a.heading ASC, a.filename ASC">COM_JDOCMANUAL_ARTICLES_HEADING_AND_FILENAME_ASC</option>
-			<option value="a.heading ASC">COM_JDOCMANUAL_ARTICLES_HEADING_ASC</option>
-			<option value="a.heading DESC">COM_JDOCMANUAL_ARTICLES_HEADING_DESC</option>
+			<option value="a.path ASC">COM_JDOCMANUAL_ARTICLES_PATH_ASC</option>
+			<option value="a.path DESC">COM_JDOCMANUAL_ARTICLES_PATH_DESC</option>
 			<option value="a.id ASC">JGRID_HEADING_ID_ASC</option>
 			<option value="a.id DESC">JGRID_HEADING_ID_DESC</option>
 		</field>

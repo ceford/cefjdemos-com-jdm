@@ -160,7 +160,7 @@ class MenustashesModel extends ListModel
             }
         }
 
-        // Filter by search in key or heading.
+        // Filter by search in key or path.
         $search = $this->getState('filter.search');
 
         if (!empty($search)) {
@@ -168,7 +168,7 @@ class MenustashesModel extends ListModel
         }
 
         // Add the list ordering clause.
-        $orderCol  = $this->state->get('list.ordering', $db->quoteName('a.heading'), $db->quoteName('a.filename'));
+        $orderCol  = $this->state->get('list.ordering', $db->quoteName('a.path'));
         $orderDirn = $this->state->get('list.direction', 'ASC');
 
         $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));

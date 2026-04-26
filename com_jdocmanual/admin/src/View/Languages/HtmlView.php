@@ -140,7 +140,7 @@ class HtmlView extends BaseHtmlView
         }
 
         if ($tmpl !== 'component') {
-            ToolbarHelper::help('manuals', true);
+            ToolbarHelper::help('languages', true);
         }
     }
 }

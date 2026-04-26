@@ -41,8 +41,7 @@ class FeedbackModel extends ListModel
                     'id', 'a.id',
                     'manual', 'a.manual',
                     'language', 'a.language',
-                    'heading', 'a.heading',
-                    'filename', 'a.filename',
+                    'path', 'a.path',
                     'likeitornot', 'a.likeitornot',
                     'date_created', 'a.date_created',
             );
@@ -166,8 +165,7 @@ class FeedbackModel extends ListModel
         if (!empty($search)) {
             $search = trim($search);
             $search = '%' . str_replace(' ', '%', $search) . '%';
-            $query->where($db->quoteName('a.heading') . ' LIKE :search
-            OR ' . $db->quoteName('a.filename') . ' LIKE :search
+            $query->where($db->quoteName('a.path') . ' LIKE :search
             OR ' . $db->quoteName('a.comment') . ' LIKE :search')
             ->bind(':search', $search, ParameterType::STRING);
         }

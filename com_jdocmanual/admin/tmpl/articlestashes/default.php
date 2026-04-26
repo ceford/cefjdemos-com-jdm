@@ -91,17 +91,8 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                                 <th scope="col">
                                     <?php echo HTMLHelper::_(
                                         'searchtools.sort',
-                                        'COM_JDOCMANUAL_ARTICLES_HEADING',
-                                        'a.heading',
-                                        $listDirn,
-                                        $listOrder
-                                    ); ?>
-                                </th>
-                                <th scope="col">
-                                    <?php echo HTMLHelper::_(
-                                        'searchtools.sort',
-                                        'COM_JDOCMANUAL_ARTICLES_FILENAME',
-                                        'a.filename',
+                                        'COM_JDOCMANUAL_ARTICLES_PATH',
+                                        'a.path',
                                         $listDirn,
                                         $listOrder
                                     ); ?>
@@ -174,10 +165,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                                     <?php echo $item->manual; ?>
                                 </td>
                                 <td>
-                                    <?php echo $item->heading; ?>
-                                </td>
-                                <td>
-                                    <?php echo $item->filename; ?>
+                                    <?php echo $item->path; ?>
                                 </td>
                                 <td>
                                     <?php echo $item->title; ?>

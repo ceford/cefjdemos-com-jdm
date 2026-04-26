@@ -128,13 +128,19 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                         $listOrder
                                     ); ?>
                                 </th>
+                                <th class="text-center">
+                                    <label for="time-back">
+                                    <?php echo Text::_('COM_JDOCMANUAL_MANUALS_TIME_BACK'); ?>
+                                    <button type="button" class="help-icon btn btn-sm btn-outline-info" popovertarget="time-back-help" 
+                                    aria-label="What is an API key?">?</button>
+                                    </label>
+                                    <div id="time-back-help" popover class="help-popover">
+                                        <?php echo Text::_('COM_JDOCMANUAL_MANUALS_TIME_BACK_DESC'); ?>
+                                    </div>
+                                </th>
                                 <th>
                                     <?php echo Text::_('COM_JDOCMANUAL_MANUALS_BUILD_ARTICLES'); ?>
-                                </th>
-                                <th class="text-center">
-                                    <?php echo Text::_('COM_JDOCMANUAL_MANUALS_TIME_BACK'); ?>
-                                </th>
-                                <th>
+                                </th>                                <th>
                                     <?php echo Text::_('COM_JDOCMANUAL_MANUALS_BUILD_MENU'); ?>
                                 </th>
                                 <?php if ($isGitpullEnabled) : ?>
@@ -232,16 +238,16 @@ $isGitpullEnabled = $this->isGitpullEnabled();
                                 <td class="d-md-table-cell">
                                     <?php echo $item->manual; ?>
                                 </td>
-                                <td>
-                                    <span class="data-build-name-<?php echo $item->manual . $hide_selectors_css; ?>">
-                                    <?php echo $this->getLanguageFormHTML($item->manual, 'buildhtml', $i); ?>
-                                    </span>
-                                </td>
-                                <td class="text-center">
+                               <td class="text-center">
                                     <span class="data-force-name-<?php echo $item->manual . $hide_selectors_css; ?>">
                                     <input type="number" inputmode="numeric"  
                                     id="force-<?php echo $i; ?>" value="5" class="form-control valid form-control-success" 
                                     max="16383" step="1" min="0" aria-invalid="false">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="data-build-name-<?php echo $item->manual . $hide_selectors_css; ?>">
+                                    <?php echo $this->getLanguageFormHTML($item->manual, 'buildhtml', $i); ?>
                                     </span>
                                 </td>
                                 <td>
@@ -282,8 +288,8 @@ $isGitpullEnabled = $this->isGitpullEnabled();
     <?php include __DIR__ . '../../manual/notes.php'; ?>
 <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
-<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'newpages', Text::_('COM_JDOCMANUAL_MANUALS_TAB_NOTES')); ?>
-    <?php include __DIR__ . '../../manual/notes.php'; ?>
+<?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'newpages', Text::_('COM_JDOCMANUAL_MANUALS_MANAGEMENT_TAB')); ?>
+    <?php // This is a complete html document: include __DIR__ . '/../../help/en-GB/source.html'; ?>
 <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
 <?php echo HTMLHelper::_('uitab.endTabSet'); ?>

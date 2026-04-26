@@ -39,8 +39,7 @@ class ArticlestashesModel extends ListModel
                     'id', 'a.id',
                     'manual', 'a.manual',
                     'language', 'a.language',
-                    'heading', 'a.heading',
-                    'filename', 'a.filename',
+                    'path', 'a.path',
                     'state', 'a.state',
             );
         }
@@ -60,7 +59,7 @@ class ArticlestashesModel extends ListModel
      *
      * @since   1.0
      */
-    protected function populateState($ordering = 'a.heading, a.filename', $direction = 'asc')
+    protected function populateState($ordering = 'a.path', $direction = 'asc')
     {
         $search = $this->getUserStateFromRequest($this->context . '.filter.search', 'filter_search');
         $this->setState('filter.search', $search);
@@ -139,8 +138,7 @@ class ArticlestashesModel extends ListModel
                     'DISTINCT a.id',
                     'a.manual',
                     'a.language',
-                    'a.heading',
-                    'a.filename',
+                    'a.path',
                     'a.title',
                     'a.state'
                 ]
@@ -174,8 +172,7 @@ class ArticlestashesModel extends ListModel
             ' AS c WHERE ' . $db->quoteName('c.user_id') . ' = ' . $user->id .
             ' AND ' . $db->quoteName('c.eid') . ' = ' . $db->quoteName('a.id') .
             ' AND ' . $db->quoteName('c.manual') . ' = ' . $db->quoteName('a.manual') .
-            ' AND ' . $db->quoteName('c.heading') . ' = ' . $db->quoteName('a.heading') .
-            ' AND ' . $db->quoteName('c.filename') . ' = ' . $db->quoteName('a.filename') .
+            ' AND ' . $db->quoteName('c.path') . ' = ' . $db->quoteName('a.path') .
             ' AND ' . $db->quoteName('c.language') . ' = ' . $db->quote($language) . ') AS stash_id');
 
         // Select by manual.
@@ -184,7 +181,7 @@ class ArticlestashesModel extends ListModel
             $query->where($db->quoteName('a.manual') . ' = ' . $db->quote($manual));
         }
 
-        // Filter by search in key or heading.
+        // Filter by search in key or path.
         $search = $this->getState('filter.search');
 
         if (!empty($search)) {
@@ -198,17 +195,15 @@ class ArticlestashesModel extends ListModel
             $query->leftjoin($db->quoteName('#__jdm_articles') .
             ' AS d ON ' . $db->quoteName('a.manual') .
             ' = ' . $db->quoteName('d.manual') .
-            ' AND ' . $db->quoteName('a.heading') .
-            ' = ' . $db->quoteName('d.heading') .
-            ' AND ' . $db->quoteName('a.filename') .
-            ' = ' . $db->quoteName('d.filename') .
+            ' AND ' . $db->quoteName('a.path') .
+            ' = ' . $db->quoteName('d.path') .
             ' AND ' . $db->quoteName('d.language') .
             ' = ' . $db->quote($language))
             ->select($db->quoteName('d.id') . ' AS translation_id');
         }
 
         // Add the list ordering clause.
-        $orderCol  = $this->state->get('list.ordering', $db->quoteName('a.heading'));
+        $orderCol  = $this->state->get('list.ordering', $db->quoteName('a.path'));
         $orderDirn = $this->state->get('list.direction', 'ASC');
 
         $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));
@@ -263,8 +258,7 @@ class ArticlestashesModel extends ListModel
                     'a.title',
                     'a.manual',
                     'a.language',
-                    'a.heading',
-                    'a.filename',
+                    'a.path',
                     'a.pr'
                 )
             )
@@ -299,8 +293,7 @@ class ArticlestashesModel extends ListModel
                     'a.page_id',
                     'a.manual',
                     'a.language',
-                    'a.heading',
-                    'a.filename',
+                    'a.path',
                     'a.title',
                     'a.pr',
                     'b.name'

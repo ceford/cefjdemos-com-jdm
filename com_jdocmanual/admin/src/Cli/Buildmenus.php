@@ -108,7 +108,7 @@ class Buildmenus
 
         if (!is_dir($this->gfmfiles_path . $manual . '/' . $language . '/articles/')) {
             return 'The articles folder is missing!';
-        }        
+        }
         // Get the list of folder headings
         $menuFolders = file_get_contents($this->gfmfiles_path . $manual . '/' . $language . '/folders.json');
         $this->menuFolders = json_decode($menuFolders);

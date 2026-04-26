@@ -54,7 +54,7 @@ class Buildarticles
      *
      * @var     string
      */
-    protected $metadata = '/<!--.*?({.*}).*-->/ms';
+    protected $metadata = '/<!--.*?({.*?}).*-->/s';
 
     /**
      * Instance holder for the responsive image function called for every image.
@@ -213,6 +213,11 @@ class Buildarticles
                 // Remove the last element of the path - the filename
                 $tmp = substr($path, 0, strrpos($path, '/'));
 
+                // Articles in the site root will have $tmp empy and .md on the end of path
+                if (empty($tmp)) {
+                    $tmp = str_replace('.md', '', $path);
+                }
+
                 $dest = JPATH_ROOT . "/jdmimages/{$manual}/{$language}/{$tmp}";
                 if (!is_dir($dest)) {
                     mkdir($dest, 0755, true);
@@ -333,7 +338,7 @@ class Buildarticles
         // "/Users/ceford/git/cefjdemos/manuals/docs/en/articles/jdocmanual/jugl-2025-05-20.md"
         $updates = [];
         foreach($articles as $article) {
-            $updates[] = preg_replace('/(.*\/articles\/)(.*)/', '', $article);
+            $updates[] = preg_replace('/(.*\/articles\/)/', '', $article);
         }
 
         // Eliminate duplicates.

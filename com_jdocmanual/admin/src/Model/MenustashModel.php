@@ -235,13 +235,13 @@ class MenustashModel extends AdminModel
             ->where($db->quoteName('page_id') . ' = :page_id')
             ->where($db->quoteName('language') . ' = :language')
             ->where($db->quoteName('source_url') . ' = :source_url')
-            ->where($db->quoteName('heading') . ' = :heading')
+            ->where($db->quoteName('path') . ' = :path')
             ->where($db->quoteName('manual') . ' = :manual')
             ->bind(':user_id', $user->id, ParameterType::INTEGER)
             ->bind(':page_id', $data['page_id'], ParameterType::INTEGER)
             ->bind(':language', $data['language'], ParameterType::STRING)
             ->bind(':source_url', $data['source_url'], ParameterType::STRING)
-            ->bind(':heading', $data['heading'], ParameterType::STRING)
+            ->bind(':path', $data['path'], ParameterType::STRING)
             ->bind(':manual', $data['manual'], ParameterType::STRING);
         $db->setQuery($query);
         $id = $db->loadResult();

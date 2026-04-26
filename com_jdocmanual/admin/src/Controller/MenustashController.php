@@ -264,24 +264,16 @@ class MenustashController extends FormController
                 break;
 
             case 'commit':
-                 // Write out the stash to the source file.
+                 // Write out the stash to the source file. Example: $gfmfiles_path[/]docs/en/menu.json
                 $params = ComponentHelper::getParams('com_jdocmanual');
                 $gfmfiles_path = $params->get('gfmfiles_path');
+                $language = $params->get('default_language');
 
-                // check that the folder exists
-                $folder_path = $data['manual'] . '/' . $data['language'] . '/articles/' . $data['heading'];
-                if (!file_exists($gfmfiles_path . $folder_path)) {
-                    mkdir($gfmfiles_path . $folder_path);
-                }
-
-                $repo_item_path = $data['manual'] . '/' . $data['language'] . '/articles/menu-index.txt';
-                $filepath = $gfmfiles_path . $repo_item_path;
-                // .git is in the parent folder
-                $gitpath = $gfmfiles_path . $data['manual'];
+                $destination = "{$gfmfiles_path}{$data['manual']}/{$language}/menu.json";
 
                 // Send an appropriate message.
-                if (empty(file_put_contents($filepath, $data['menu_text']))) {
-                    $this->setMessage(Text::_('COM_JDOCMANUAL_MENUSTASH_GIT_SAVE_FAILED') . ' Path: ' . $filepath);
+                if (empty(file_put_contents($destination, $data['menu_text']))) {
+                    $this->setMessage(Text::_('COM_JDOCMANUAL_MENUSTASH_GIT_SAVE_FAILED') . ' Path: ' . $destination);
                 } else {
                     $this->setMessage(Text::_('COM_JDOCMANUAL_MENUSTASH_GIT_SAVE_SUCCESS'));
 
@@ -291,19 +283,22 @@ class MenustashController extends FormController
                     // In one line:
                     // % git commit -m 'Stage and commit in one line.' -- manuals/help/en/help-screens/start-here.md
                     // git --git-dir /foo/bar/.git log
+                    
+                    // Build add command - only works properly after cd to folder containing repo.
+                    $destination_dir = pathinfo($destination, PATHINFO_DIRNAME);
+                    $command1 = "cd {$destination_dir}; git add -- {$destination};";
 
-                    // Build add command - only works properly after cd to folder containing rep.
-                    $command1 = "cd {$gfmfiles_path}{$data['manual']}; git add -- {$gfmfiles_path}{$repo_item_path};";
                     // Add the file to the index
                     $result = exec($command1, $output1, $result_code1);
+                    
                     // The result is normally empty.
                     if (empty($result)) {
                         $this->app->enqueueMessage(implode("<br>\n", $output1), 'warning');
                     }
 
                     // Commit the item:
-                    $command2 = "cd {$gfmfiles_path}{$data['manual']}; git commit -m \"{$data['commit_message']}\"";
-                    $command2 .= " -- {$gfmfiles_path}{$repo_item_path};";
+                    $command2 = "cd {$destination_dir}; git commit -m \"{$data['commit_message']}\"";
+                    $command2 .= " -- {$destination};";
                     $result = exec($command2, $output2, $result_code2);
                     $this->app->enqueueMessage(implode("<br>\n", $output2), 'warning');
 
@@ -311,9 +306,9 @@ class MenustashController extends FormController
                         // Render the stash as html and store in the index table.
                         $manual = $app->getUserState('com_jdocmanual.menustash.manual');
 
-                        $command3 = "php " . JPATH_ROOT . "/cli/joomla.php jdocmanual:action buildmenus {$manual} all";
-                        $result = exec($command3, $output3, $result_code3);
-                        $this->app->enqueueMessage(implode("<br>\n", $output3), 'warning');
+                        //$command3 = "php " . JPATH_ROOT . "/cli/joomla.php jdocmanual:action buildmenus {$manual} all";
+                        //$result = exec($command3, $output3, $result_code3);
+                        $this->app->enqueueMessage("<br>\nRebuild the menu!", 'warning');
 
                         $this->setMessage(
                             Text::_('COM_JDOCMANUAL_MENUSTASH_GIT_COMMIT_SUCCESS') . " Response:  {$result}"

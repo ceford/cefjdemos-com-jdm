@@ -142,11 +142,9 @@ $wa->addInlineScript(
                 obtained from the individual articles. The Preview only works
                 on saved content. <strong>Save you Stash to see the Preview!</strong>
             </div>
-            <div class="sidebar-nav p-0" style="max-width: 250px;">
-                <ul id="jdmmenu" class="jdm-metismenu metismenu mm-show">
-                    <?php echo $this->preview; ?>
-                </ul>
-            </div>
+            <nav id="jdocmanual-wrapper" class="sidebar-nav p-0" style="max-width: 250px;">
+                <?php echo $this->preview; ?>
+            </nav>
         <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
         <?php echo HTMLHelper::_(

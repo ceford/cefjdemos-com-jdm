@@ -90,6 +90,7 @@ class HtmlView extends BaseHtmlView
             // Users/ceford/data/manuals/
             $params = ComponentHelper::getParams('com_jdocmanual');
             $basepath = $params->get('gfmfiles_path');
+            $default_language = $this->gfmfiles_path = $params->get('default_language');
 
             // Check that the basepath is not empty - forgotten to enter it on installation.
             if (empty($basepath)) {
@@ -97,14 +98,14 @@ class HtmlView extends BaseHtmlView
                 return false;
             }
 
-            $source = file_get_contents($basepath . '/' . $this->item->manual . '/en/menu-index.txt');
+            $source = trim(file_get_contents($basepath . '/' . $this->item->manual . '/' . $default_language . '/menu.json'));
 
             $this->form->setValue('source', null, $source);
             require_once(JPATH_ADMINISTRATOR . '/components/com_jdocmanual/src/Helper/diffoptions.php');
 
             // if there is a stash record use the stash content.
             if (!empty($this->item->id)) {
-                $stash = $this->item->menu_text;
+                $stash = trim($this->item->menu_text);
                 $old = $source;
             } else {
                 // Get the source text.
@@ -129,7 +130,7 @@ class HtmlView extends BaseHtmlView
 
             // Fill the preview field.
             $mh = new BuildmenusHelper();
-            $this->preview = $mh->buildmenus($this->item->manual, $new, 'en');
+            $this->preview = $mh->buildmenus($this->item->manual, 'en', $new);
 
         } catch (\Exception $e) {
             throw new GenericDataException($e->getMessage(), 500, $e);

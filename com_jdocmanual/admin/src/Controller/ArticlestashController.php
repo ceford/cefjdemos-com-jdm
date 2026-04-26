@@ -289,21 +289,18 @@ class ArticlestashController extends FormController
                 $params = ComponentHelper::getParams('com_jdocmanual');
                 $gfmfiles_path = $params->get('gfmfiles_path');
 
-                // check that the folder exists
-                $folder_path = $data['manual'] . '/' . $data['language'] . '/articles/' . $data['heading'];
-                if (!file_exists($gfmfiles_path . $folder_path)) {
-                    mkdir($gfmfiles_path . $folder_path);
+                $destination = $gfmfiles_path . $data['manual'] . '/' . $data['language'] . '/articles/' . $data['path'] . '.md';
+                $destination_dir = pathinfo($destination, PATHINFO_DIRNAME);
+                if (!is_dir($destination_dir)) {
+                    mkdir($destination_dir, 0755, true);
                 }
 
-                $repo_item_path = $data['manual'] . '/' . $data['language'] .
-                    '/articles/' . $data['heading'] . '/' . $data['filename'];
-                $filepath = $params->get('gfmfiles_path') . $repo_item_path;
                 // .git is in the parent folder
                 $gitpath = $params->get('gfmfiles_path') . $data['manual'] . '/' . $data['language'];
 
                 // Send an appropriate message.
-                if (empty(file_put_contents($filepath, $data['markdown_text']))) {
-                    $this->setMessage(Text::_('COM_JDOCMANUAL_ARTICLE_GIT_SAVE_FAILED') . ' Path: ' . $filepath);
+                if (empty(file_put_contents($destination, $data['markdown_text']))) {
+                    $this->setMessage(Text::_('COM_JDOCMANUAL_ARTICLE_GIT_SAVE_FAILED') . ' Path: ' . $destination);
                 } else {
                     $this->setMessage(Text::_('COM_JDOCMANUAL_ARTICLE_GIT_SAVE_SUCCESS'));
 
@@ -315,14 +312,15 @@ class ArticlestashController extends FormController
                     // git --git-dir /foo/bar/.git log
 
                     // Build add command - only works properly after cd to folder containing rep.
-                    $command1 = "cd {$gitpath}; git add -- {$gfmfiles_path}{$repo_item_path};";
+                    $command1 = "cd {$gitpath}; git add -- {$destination};";
+
                     // Add the file to the index
                     $result = exec($command1, $output1, $result_code1);
                     $this->app->enqueueMessage(implode("<br>\n", $output1), 'warning');
 
                     // Commit the item:
                     $command2 = "cd {$gitpath}; git commit -m \"{$data['commit_message']}\"";
-                    $command2 .= " -- {$gfmfiles_path}{$repo_item_path};";
+                    $command2 .= " -- {$destination};";
                     $result = exec($command2, $output2, $result_code2);
                     $this->app->enqueueMessage(implode("<br>\n", $output2), 'warning');
 

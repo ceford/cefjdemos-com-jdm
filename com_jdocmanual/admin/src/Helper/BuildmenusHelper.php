@@ -11,6 +11,7 @@
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Helper;
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Database\ParameterType;
 use Joomla\CMS\Factory;
 
@@ -37,140 +38,125 @@ class BuildmenusHelper
      *
      * @since   1.0
      */
-    public function buildmenus($manual, $menu)
+
+    /**
+     * Saves typing $this->db everywhere
+     *
+     * @var object
+     */
+    protected $db;
+
+    /**
+     * The level of each submenu
+     *
+     * @var    integer
+     */
+    protected $toclevel = 0;
+
+    protected $menuFolders;
+
+    protected $menuHTML = '';
+
+    protected $menuObject;
+
+    protected $pathPrefix = [];
+
+    protected $gfmfiles_path;
+
+    public function buildmenus($manual, $language, $menu)
     {
         // if any parameter is missing return false
         if (empty($manual) || empty($menu)) {
             return false;
         }
+        $params = ComponentHelper::getParams('com_jdocmanual');
+
+        // Get the the 'manuals' path from the component parameters.
+        $this->gfmfiles_path = $params->get('gfmfiles_path');
+
+        $this->db = Factory::getContainer()->get('DatabaseDriver');
+
+        $this->menuObject = json_decode($menu, true);
 
         // Fetch a list of article headings in English.
-        $heading_titles = $this->setHeadings($manual);
+        // $heading_titles = $this->setHeadings($manual);
+        // Get the list of folder headings
+        $menuFolders = file_get_contents($this->gfmfiles_path . $manual . '/' . $language . '/folders.json');
+        $this->menuFolders = json_decode($menuFolders, true);
+    
+        $this->menuHTML = '<ul id="jdmmenu" class="jdm-metismenu metismenu mm-show">' . "\n";
+        $this->renderSubmenu($this->menuObject, $manual, $language, true);
+        $this->menuHTML .= '</ul>' . "\n";
 
-        // Split the menu into lines.
-        $lines = preg_split("/((\r?\n)|(\r\n?))/", $menu);
-        $accordionid = 0;
-        $count = count($lines);
-        $count_headings = 0;
-        $count_articles = 0;
-        $previous_heading_level = 0;
-        $new_heading_level = 0;
-        $html = '';
+        return $this->menuHTML;
+    }
 
-        foreach ($lines as $line) {
-            $line = trim($line);
-            // Skip any line starting with a semi-colon
-            if (empty($line) || strpos($line, ';') === 0) {
-                continue;
-            }
+    protected function renderSubmenu($menu, $manual, $language)
+    {
+        // Increase the toclevel on entry
+        $this->toclevel += 1;
+        if ($this->toclevel > 1) {
+            $collapse = ' mm-collapse';
+            $this->menuHTML .= "<ul class=\"jdm-indent-{$this->toclevel} {$collapse}\">\n";
+        }
+        foreach ($menu as $key => $value) {
+            if (is_array($value)) {
+                $icon = "<span class=\"icon-folder\" aria-hidden=\"true\"></span>";
+                $wrap_label = "<span class=\"item-title\">{$this->menuFolders[$key]}</span>";
+                $this->menuHTML .= "<li class=\"item parent item-level-{$this->toclevel}\">";
+                $this->menuHTML .= "<a href=\"#\" class=\"has-arrow\">";
+                $this->menuHTML .= "{$wrap_label}</a>\n";
+                    // Add a path prefix 
+                    $this->pathPrefix[] = $key;
 
-            // skip lines containing close-n-headings
-            if (strpos($line, 'close-') === 0) {
-                // get the number of headings to close
-                $n = (int) substr($line, 6, 1);
-                for ($i = 0; $i < $n; $i++) {
-                    $html .= $this->accordionEnd();
-                    $previous_heading_level--;
-                }
-                continue;
-            }
-
-            list($key, $heading, $filename) = explode('=', $line);
-
-            // Does the key have a heading level? heading or heading-1 or heading-2
-            if (strpos($key, 'heading') === 0) {
-                if (
-                    strpos($key, '-') &&
-                    list($k, $l) = explode('-', $key)
-                ) {
-                    // This is a new subheading of level l
-                    $new_heading_level = $l;
-                    $key = $k;
-                } else {
-                    $new_heading_level = 0;
-                }
-            }
-
-            if ($key == 'heading') {
-                // If the line starts with 'heading=' start a new accordion
-                if ($accordionid > 0) {
-                    // End the previous accordion
-                    while ($previous_heading_level >= $new_heading_level) {
-                        $html .= $this->accordionEnd();
-                        $previous_heading_level--;
-                    }
-                    $previous_heading_level++;
-                }
-                $accordionid += 1;
-                // If the title is missing
-                if (empty($heading_titles[$heading])) {
-                    $alt = ucwords(str_replace('-', ' ', $heading));
-                    // Output a warning
-                    //$this->summary .=  "No translated heading for {$heading}. Using {$alt}\n";
-                    // Output an accordion heading.
-                    $html .= $this->accordionStart($alt);
-                } else {
-                    // Output an accordion heading.
-                    $html .= $this->accordionStart($heading_titles[$heading]);
-                }
+                    // Recursively build sublist.
+                    $this->renderSubmenu($value, $manual, $language);
+                $this->menuHTML .= "</li>\n";
             } else {
-                $count_articles += 1;
-                // Example: developer=getting-started=developer-required-software
-                $title = str_replace('.md', '', $filename);
-                $title = ucwords(str_replace('-', ' ', $title));
-                $html .= $this->accordionitem($count_articles, $title);
+                // Create a path to be used to get the article ID
+                if (empty($this->pathPrefix)) {
+                    $path = $key;
+                } else {
+                    $path = implode('/', $this->pathPrefix) . "/$key";
+                }
+                // The path is taken from the menu.json file but the .md suffix is not stored in the database.
+                $path = str_replace('.md', '', $path);
+
+                // This is an article list item. Get the article id from the database
+                $article_id = $this->getArticleId($manual, $language, $path);
+                $icon = "<span class=\"icon-file-alt\" aria-hidden=\"true\"></span>";
+
+                $link = "<a id=\"article-{$article_id}\" href=\"jdocmanual?article={$manual}/{$path}\">{$value}</a>";
+                $this->menuHTML .= "<li class=\"item item-level-{$this->toclevel}\">{$link}</li>\n";
+
+                // Store order for the Previous and Next buttons.
+                //$this->order[] = [$article_id, $path, $value, $link];
             }
         }
-        // End the previous accordion
-        while ($previous_heading_level >= $new_heading_level) {
-            $html .= $this->accordionEnd();
-            $previous_heading_level--;
-        }
-        return $html;
+        $this->menuHTML .= "</ul>\n";
+
+        // Remove the added path prefix
+        array_pop($this->pathPrefix);
+
+        // On return decrease the toclevel
+        $this->toclevel -= 1;
     }
 
-    /**
-     * Create an accordian start code.
-     *
-     * @param   integer $id     The sequence number of the accordion.
-     * @param   string  $label  A summary label.
-     *
-     * @return  $html   The required html code.
-     */
-    protected function accordionStart($label)
+    protected function getArticleId($manual, $language, $path)
     {
-        $html = "<li>\n";
-        $html .= '<a class="has-arrow jdm-menu-link"" href="#" aria-expanded="false">';
-        $html .= "{$label}</a>\n<ul class=\"jdm-indent-1\">\n";
-        return $html;
-    }
+        $db = $this->db;
 
-    /**
-     * Create an accordian end code.
-     *
-     * @return  string  The required html code.
-     */
-    protected function accordionEnd()
-    {
-        return "\n</ul>\n</li>\n";
-    }
-
-    /**
-     * Create an accordian item code.
-     *
-     * @param   integer     $id             The sequence number of the accordion.
-     * @param   string      $title  The display title.
-     * @param   string      $path           The link path
-     *
-     * @return  string      The required html code.
-     */
-    protected function accordionItem($id, $title)
-    {
-        // Escape any " character in the link.
-        //'<li><span class="icon-file-alt icon-fw icon-jdocmanual" aria-hidden="true"></span>';
-        $html = '<li id="article-' . $id . '">';
-        $html .= '<a href="#" class="jdm-menu-link">' . $title . '</a></li>' . "\n";
-        return $html;
+        $query = $db->createQuery();
+        $query->select($db->quoteName('id'))
+            ->from($db->quoteName('#__jdm_articles'))
+            ->where($db->quoteName('manual') . ' = :manual')
+            ->where($db->quoteName('language') . ' = :language')
+            ->where($db->quoteName('path') . ' = :path')
+            ->bind(':manual', $manual, ParameterType::STRING)
+            ->bind(':language', $language, ParameterType::STRING)
+            ->bind(':path', $path, ParameterType::STRING);
+        $db->setQuery($query);
+        return $db->loadResult();
     }
 
     /**

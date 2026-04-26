@@ -77,20 +77,11 @@ $listDirn   = $this->escape($this->state->get('list.direction'));
                                 <th scope="col">
                                     <?php echo HTMLHelper::_(
                                         'searchtools.sort',
-                                        'COM_JDOCMANUAL_ARTICLES_HEADING',
-                                        'a.heading, a.filename',
+                                        'COM_JDOCMANUAL_ARTICLES_PATH',
+                                        'a.path',
                                         $listDirn,
                                         $listOrder
                                     ); ?>
-                                </th>
-                                <th>
-                                <?php echo HTMLHelper::_(
-                                    'searchtools.sort',
-                                    'COM_JDOCMANUAL_ARTICLES_FILENAME',
-                                    'a.heading, a.filename',
-                                    $listDirn,
-                                    $listOrder
-                                ); ?>
                                 </th>
                                 <th>
                                 <?php echo HTMLHelper::_(
@@ -131,22 +122,19 @@ $listDirn   = $this->escape($this->state->get('list.direction'));
                                 <?php echo $item->manual; ?>
                                 </td>
                                 <td class="">
-                            <?php echo $item->language; ?>
+                                    <?php echo $item->language; ?>
                                 </td>
                                 <td class="">
-                            <?php echo $item->heading; ?>
-                                </td>
-                                <td class="">
-                            <?php echo $item->filename; ?>
+                                    <?php echo $item->path; ?>
                                 </td>
                                 <td>
-                            <?php
-                            if ($item->likeitornot === 'like') {
-                                echo Text::_('JYES');
-                            } elseif ($item->likeitornot === 'dislike') {
-                                echo Text::_('JNO');
-                            }
-                            ?>
+                                    <?php
+                                        if ($item->likeitornot === 'like') {
+                                            echo Text::_('JYES');
+                                        } elseif ($item->likeitornot === 'dislike') {
+                                            echo Text::_('JNO');
+                                        }
+                                    ?>
                                 </td>
                                 <td class="">
                                 <?php echo $item->comment; ?>

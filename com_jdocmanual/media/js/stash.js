@@ -83,3 +83,11 @@ function committer(event)
     }
 }
 
+// Select all links in the stash menu and disable them
+document.querySelectorAll('.jdm-metismenu a').forEach(link => {
+    link.addEventListener('click', function(event) {
+        event.preventDefault(); 
+        console.log('Interpreted click on: ' + this.id);
+        // You can add logic here to show "Success" or "Clicked"
+    });
+});

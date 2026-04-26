@@ -65,7 +65,7 @@
 			<option value="a.manual DESC">COM_JDOCMANUAL_FEEDBACK_MANUAL_DESC</option>
 			<option value="a.language ASC">COM_JDOCMANUAL_FEEDBACK_LANGUAGE_ASC</option>
 			<option value="a.language DESC">COM_JDOCMANUAL_FEEDBACK_LANGUAGE_DESC</option>
-			<option value="a.heading ASC, a.filename ASC">COM_JDOCMANUAL_ARTICLES_HEADING_AND_FILENAME_ASC</option>
+			<option value="a.path ASC">COM_JDOCMANUAL_ARTICLES_PATH_ASC</option>
 			<option value="a.likeordislike ASC">COM_JDOCMANUAL_FEEDBACK_LIKE_ASC</option>
 			<option value="a.likeordislike DESC">COM_JDOCMANUAL_FEEDBACK_LIKE_DESC</option>
 

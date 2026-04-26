@@ -325,10 +325,9 @@ class HtmlView extends BaseHtmlView
                 $this->item->manual,
                 $language,
                 'articles',
-                $this->item->heading,
-                $this->item->filename
+                $this->item->path,
             )
-        );
+        ) . '.md';
         if (is_file($markdown_file)) {
             return file_get_contents($markdown_file);
         }
@@ -352,7 +351,7 @@ class HtmlView extends BaseHtmlView
         // Get the last two commit hashes of a specific file.
         // git log -n 2 --pretty=format:%H  -- manuals/help/en/articles/articles.md
         // edf40a05aeffe81751fef2b9e5eea0780452c1da
-        $file_path = $basepath . $this->item->manual . '/en/articles/' . $this->item->heading . '/' . $this->item->filename;
+        $file_path = $basepath . $this->item->manual . '/en/articles/' . $this->item->path;
 
         // Check that the item exists - it won't if this is a new article.
         if (!is_file($file_path)) {
@@ -361,7 +360,7 @@ class HtmlView extends BaseHtmlView
         }
 
         $repopath = str_replace('manuals/', '', $basepath);
-        $repo_item_path = 'manuals/' . $this->item->manual . '/en/articles/' . $this->item->heading . '/' . $this->item->filename;
+        $repo_item_path = 'manuals/' . $this->item->manual . '/en/articles/' . $this->item->path;
         $command = "cd {$repopath}; git log -n 2 --pretty=format:%H -- {$repo_item_path};";
         $result = exec($command, $output, $result_code);
 

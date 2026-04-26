@@ -99,8 +99,7 @@ class ArticlestashModel extends AdminModel
                         'a.source_url',
                         'a.manual',
                         'a.language',
-                        'a.heading',
-                        'a.filename',
+                        'a.path',
                         'a.title'
                     )
                 )
@@ -127,8 +126,7 @@ class ArticlestashModel extends AdminModel
                         'a.source_url',
                         'a.manual',
                         'a.language',
-                        'a.heading',
-                        'a.filename',
+                        'a.path',
                         'a.title'
                     )
                 )
@@ -155,8 +153,7 @@ class ArticlestashModel extends AdminModel
                         'a.source_url',
                         'a.manual',
                         'a.language',
-                        'a.heading',
-                        'a.filename',
+                        'a.path',
                         'a.title'
                     )
                 )
@@ -181,8 +178,7 @@ class ArticlestashModel extends AdminModel
         $item->manual = $manual;
         $item->language = 'en';
         $item->source_url = '';
-        $item->heading = '';
-        $item->filename = '';
+        $item->path = '';
         $item->title = '';
         $item->id = 0;
         $item->eid = 0;
@@ -302,14 +298,12 @@ class ArticlestashModel extends AdminModel
             ->where($db->quoteName('page_id') . ' = :page_id')
             ->where($db->quoteName('manual') . ' = :manual')
             ->where($db->quoteName('language') . ' = :language')
-            ->where($db->quoteName('heading') . ' = :heading')
-            ->where($db->quoteName('filename') . ' = :filename')
+            ->where($db->quoteName('path') . ' = :path')
             ->bind(':user_id', $user->id, ParameterType::INTEGER)
             ->bind(':page_id', $data['page_id'], ParameterType::INTEGER)
             ->bind(':manual', $data['manual'], ParameterType::STRING)
             ->bind(':language', $data['language'], ParameterType::STRING)
-            ->bind(':heading', $data['heading'], ParameterType::STRING)
-            ->bind(':filename', $data['filename'], ParameterType::STRING);
+            ->bind(':path', $data['path'], ParameterType::STRING);
         $db->setQuery($query);
         $id = $db->loadResult();
 
@@ -319,7 +313,7 @@ class ArticlestashModel extends AdminModel
 
             return true;
         }
-        // check also for a valid heading and filenemae.
+        // check also for a valid path.
         // ToDo
 
         return false;

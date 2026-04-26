@@ -11,6 +11,7 @@
 
 namespace Cefjdemos\Component\Jdocmanual\Site\Model;
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 use Cefjdemos\Component\Jdocmanual\Administrator\Helper\InthispageHelper;
@@ -118,7 +119,29 @@ class ManualsModel extends ListModel
         ->bind(':language', $language, ParameterType::STRING)
         ->order($db->quoteName('id') . ' desc');
         $db->setQuery($query);
-        return $db->loadObject();
+        $menu = $db->loadObject();
+
+        // Check there was a menu in this language.
+        if (empty($menu)) {
+            // Get the default language;
+            $params = ComponentHelper::getParams('com_jdocmanual');
+            $language = $this->gfmfiles_path = $params->get('default_language');
+
+            $query = $db->createQuery();
+
+            $query->select($db->quoteName('menu'))
+                ->from($db->quoteName('#__jdm_menus'))
+                ->where($db->quoteName('state') . ' = 1')
+                ->where($db->quoteName('manual') . ' = :manual')
+                ->where($db->quoteName('language') . ' = :language')
+                ->bind(':manual', $manual, ParameterType::STRING)
+                ->bind(':language', $language, ParameterType::STRING)
+                ->order($db->quoteName('id') . ' desc');
+            $db->setQuery($query);
+            $menu = $db->loadObject();
+        }
+        
+        return $menu;
     }
 
     /**

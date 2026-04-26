@@ -18,7 +18,6 @@
 			name="source_url"
 			type="text"
 			label="COM_JDOCMANUAL_ARTICLES_SOURCE_URL"
-			required="true"
 			class="readonly"
 			readonly="true"
 		 />
@@ -42,18 +41,9 @@
 		/>
 
 		<field
-			name="heading"
-			type="heading"
-			label="COM_JDOCMANUAL_ARTICLE_HEADING"
-			required="true"
-			class="readonly"
-			readonly="true"
-		/>
-
-		<field
-			name="filename"
+			name="path"
 			type="text"
-			label="COM_JDOCMANUAL_ARTICLES_STASH_FILENAME"
+			label="COM_JDOCMANUAL_ARTICLES_PATH"
 			required="true"
 			class="readonly"
 			readonly="true"
