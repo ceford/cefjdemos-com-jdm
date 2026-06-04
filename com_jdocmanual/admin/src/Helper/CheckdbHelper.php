@@ -32,6 +32,7 @@ class CheckdbHelper
      */
     public static function isPopulated()
     {
+        // Check that a path has been set.
         $params = ComponentHelper::getParams('com_jdocmanual');
         if (empty($params->get('gfmfiles_path'))) {
             return 0;
