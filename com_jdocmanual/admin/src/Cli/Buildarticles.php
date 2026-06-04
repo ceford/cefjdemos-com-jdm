@@ -132,10 +132,10 @@ class Buildarticles
         set_time_limit(600);
 
         // The menu.json file is always needed. Convert to am obkect.
-        $menuObject = $this->getMenuObject($manual, $language);
+        $menuObject = $this->getMenuObject($manual);
         if (empty($menuObject)) {
             // Return the error message.
-            return 'The menu.json file is missing or invalide';
+            return 'The menu.json file is missing or invalid';
         }
 
         // The menu list needs to be turned into an array of filenames.
@@ -210,15 +210,9 @@ class Buildarticles
         foreach ($matches as $match) {
             // Create a destination folder if it does not exist exist?
             if (empty($dest_set)) {
-                // Remove the last element of the path - the filename
-                $tmp = substr($path, 0, strrpos($path, '/'));
+                $tmp = str_replace('.md', '', $path);
 
-                // Articles in the site root will have $tmp empy and .md on the end of path
-                if (empty($tmp)) {
-                    $tmp = str_replace('.md', '', $path);
-                }
-
-                $dest = JPATH_ROOT . "/jdmimages/{$manual}/{$language}/{$tmp}";
+                $dest = JPATH_ROOT . "/jdmimages/{$manual}/{$match[2]}/{$tmp}";
                 if (!is_dir($dest)) {
                     mkdir($dest, 0755, true);
                 }
@@ -232,9 +226,9 @@ class Buildarticles
             // $match[4] is a Title string or "Title string"
 
             // Copy the image to the images folder.
-            $origin = "{$this->gfmfiles_path}{$manual}/{$language}/images/{$match[3]}";
-            $destination = JPATH_ROOT . "/jdmimages/{$manual}/{$language}/{$match[3]}";
-            $link = "jdmimages/{$manual}/{$language}/{$match[3]}";
+            $origin = "{$this->gfmfiles_path}{$manual}/{$match[2]}/images/{$match[3]}";
+            $destination = JPATH_ROOT . "/jdmimages/{$manual}/{$match[2]}/{$match[3]}";
+            $link = "jdmimages/{$manual}/{$match[2]}/{$match[3]}";
 
             file_put_contents($destination, file_get_contents($origin));
 
@@ -313,27 +307,31 @@ class Buildarticles
         // In Version 2 images are in a folder with the same name as the article
         $imagesDir = $this->gfmfiles_path . $manual . '/' . $language . '/images';
 
-        $result = [];
+        // If the images folder does not exist skip this section
+        if (is_dir($imagesDir)) {
+            $result = [];
 
-        $imgiterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($imagesDir, \FilesystemIterator::SKIP_DOTS)
-        );
+            $imgiterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($imagesDir, \FilesystemIterator::SKIP_DOTS)
+            );
 
-        foreach ($imgiterator as $img) {
-            if ($img->isFile()) {
-                if ($img->getMTime() >= $threshold) {
-                    $result[] = $img->getPathname();
+            foreach ($imgiterator as $img) {
+                if ($img->isFile()) {
+                    if ($img->getMTime() >= $threshold) {
+                        $result[] = $img->getPathname();
+                    }
+                }
+            }
+
+            foreach ($result as $line) {
+                // Skip any lines not containing an image file
+                if ($is_picture = getimagesize($line) !== FALSE) {
+                    $tmp = substr($line, 0, strrpos($line, '/')) . '.md';
+                    $articles[] = $tmp;
                 }
             }
         }
 
-        foreach ($result as $line) {
-            // Skip any lines not containing an image file
-            if ($is_picture = getimagesize($line) !== FALSE) {
-                $tmp = substr($line, 0, strrpos($line, '/')) . '.md';
-                $articles[] = $tmp;
-            }
-        }
         // Need to remove path elements up to /articles
         // "/Users/ceford/git/cefjdemos/manuals/docs/en/articles/jdocmanual/jugl-2025-05-20.md"
         $updates = [];
@@ -346,17 +344,19 @@ class Buildarticles
     }
 
     /**
-     * Read the menu-index.txt file and make an array of articles data.
+     * Read the menu.json file in the default language and make an array of articles data.
      *
      * @param string    $manual     The manual name.
      * @param string    $language   The language name.
      *
      * @return object   
      */
-    protected function getMenuObject($manual, $language)
+    protected function getMenuObject($manual)
     {
+        $params = ComponentHelper::getParams('com_jdocmanual');
+        $default_language = $params->get('default_language');
 
-        $menuObject = $this->gfmfiles_path . $manual . '/' . $language . '/menu.json';
+        $menuObject = $this->gfmfiles_path . $manual . '/' . $default_language . '/menu.json';
         if (!file_exists($menuObject)) {
             return;
         }
@@ -442,10 +442,10 @@ class Buildarticles
     {
 
         // The articles index is always needed.
-        $menuObject = $this->getMenuObject($manual, $language);
+        $menuObject = $this->getMenuObject($manual);
         if (empty($menuObject)) {
             // Return the error message.
-            return 'The menu.json file is missing or invalide';
+            return 'The menu.json file is missing or invalid';
         }
 
         $db = $this->db;

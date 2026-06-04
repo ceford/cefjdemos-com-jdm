@@ -98,7 +98,9 @@ class HtmlView extends BaseHtmlView
      */
     protected $tree;
 
-    protected $plugin_status;
+    protected $cli_plugin_status;
+
+    protected $finder_plugin_status;
 
     protected $isPopulated;
 
@@ -121,13 +123,14 @@ class HtmlView extends BaseHtmlView
 
         if ($this->dbIspopulated > 0) {
             try {
-                $this->items            = $model->getItems();
-                $this->pagination       = $model->getPagination();
-                $this->state            = $model->getState();
-                $this->filterForm       = $model->getFilterForm();
-                $this->activeFilters    = $model->getActiveFilters();
-                $this->plugin_status    = $model->checkplugin();
-                $this->activeLanguages  = $model->getActiveLanguages();
+                $this->items                = $model->getItems();
+                $this->pagination           = $model->getPagination();
+                $this->state                = $model->getState();
+                $this->filterForm           = $model->getFilterForm();
+                $this->activeFilters        = $model->getActiveFilters();
+                $this->plg_system_status    = $model->checkplugin('plg_system_jdocmanualcli');
+                $this->plg_finder_status    = $model->checkplugin('plg_finder_jdocmanual');
+                $this->activeLanguages      = $model->getActiveLanguages();
             } catch (\Exception $e) {
                 throw new GenericDataException($e->getMessage(), 500, $e);
             }

@@ -87,7 +87,7 @@ CREATE TABLE IF NOT EXISTS `#__jdm_menu_headings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `manual` varchar(128) NOT NULL,
   `language` char(8) NOT NULL,
-  `path` varchar(2048) NOT NULL,
+  `heading` varchar(128) NOT NULL,
   `title` varchar(512) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

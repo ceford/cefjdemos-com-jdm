@@ -57,6 +57,8 @@ class Buildmenus
      */
     protected $db;
 
+    protected $default_language;
+
     protected $menuObject;
 
     protected $menuFolders;
@@ -98,9 +100,13 @@ class Buildmenus
 
         // Get the the 'manuals' path from the component parameters.
         $this->gfmfiles_path = $params->get('gfmfiles_path');
+        $default_language = $params->get('default_language');
 
-        // The menu.json file is always needed. Convert to am obkect.
-        $this->menuObject = $this->getMenuObject($manual, $language);
+        // Save for use in getArticleId
+        $this->default_language = $default_language;
+
+        // The menu.json file is always needed. Convert to am object.
+        $this->menuObject = $this->getMenuObject($manual, $default_language);
         if (empty($this->menuObject)) {
             // Return the error message.
             return 'The menu.json file is missing or invalid!';
@@ -109,10 +115,22 @@ class Buildmenus
         if (!is_dir($this->gfmfiles_path . $manual . '/' . $language . '/articles/')) {
             return 'The articles folder is missing!';
         }
-        // Get the list of folder headings
-        $menuFolders = file_get_contents($this->gfmfiles_path . $manual . '/' . $language . '/folders.json');
-        $this->menuFolders = json_decode($menuFolders);
+
+        // Get the list of folder headings in the default language - it should be complete
+        $menuFolders = file_get_contents($this->gfmfiles_path . $manual . '/' . $default_language . '/folders.json');
+        $this->menuFolders = json_decode($menuFolders, true);
         
+        // If this is not the default language look for headings in the specific language
+        if ($language !== $default_language) {
+            $altMenuFolders = file_get_contents($this->gfmfiles_path . $manual . '/' . $language . '/folders.json');
+            if (!empty($altMenuFolders)) {
+                $altMenuFolders = json_decode($altMenuFolders);
+                foreach ($altMenuFolders as $key => $value) {
+                    $this->menuFolders->$key = $value;
+                }
+            }
+        }
+
         $this->menuHTML = '<ul id="jdmmenu" class="jdm-metismenu metismenu mm-show">' . "\n";
         $this->renderSubmenu($this->menuObject, $manual, $language);
         $this->menuHTML .= '</ul>' . "\n";
@@ -134,12 +152,35 @@ class Buildmenus
         return $this->summary;
     }
 
+    public function buildstashmenu($manual, $language, $menu) {
+                // if any parameter is missing return false
+        if (empty($manual) || empty($menu)) {
+            return false;
+        }
+        $params = ComponentHelper::getParams('com_jdocmanual');
+
+        // Get the the 'manuals' path from the component parameters.
+        $this->gfmfiles_path = $params->get('gfmfiles_path');
+
+        $this->db = Factory::getContainer()->get('DatabaseDriver');
+        $menuFolders = file_get_contents($this->gfmfiles_path . $manual . '/' . $language . '/folders.json');
+        $this->menuFolders = json_decode($menuFolders, true);
+    
+        $menuObject = json_decode($menu, true);
+        $this->menuHTML = '<ul id="jdmmenu" class="jdm-metismenu metismenu mm-show">' . "\n";
+        $this->renderSubmenu($menuObject, $manual, $language);
+        $this->menuHTML .= '</ul>' . "\n";
+
+        return $this->menuHTML;
+
+    }
+
     protected function getArticleId($manual, $language, $path)
     {
         $db = $this->db;
 
         $query = $db->createQuery();
-        $query->select($db->quoteName('id'))
+        $query->select($db->quoteName(array('id', 'title')))
             ->from($db->quoteName('#__jdm_articles'))
             ->where($db->quoteName('manual') . ' = :manual')
             ->where($db->quoteName('language') . ' = :language')
@@ -148,7 +189,29 @@ class Buildmenus
             ->bind(':language', $language, ParameterType::STRING)
             ->bind(':path', $path, ParameterType::STRING);
         $db->setQuery($query);
-        return $db->loadResult();
+        $row = $db->loadAssoc();
+        if (!empty($row)) {
+            return $row;
+        }
+        // If not the default language try again
+        if ($language !== $this->default_language) {
+            $query = $db->createQuery();
+            $query->select($db->quoteName(array('id', 'title')))
+                ->from($db->quoteName('#__jdm_articles'))
+                ->where($db->quoteName('manual') . ' = :manual')
+                ->where($db->quoteName('language') . ' = :language')
+                ->where($db->quoteName('path') . ' = :path')
+                ->bind(':manual', $manual, ParameterType::STRING)
+                ->bind(':language', $this->default_language, ParameterType::STRING)
+                ->bind(':path', $path, ParameterType::STRING);
+            $db->setQuery($query);
+            $row = $db->loadAssoc();
+            if (!empty($row)) {
+                return $row;
+            }
+        }
+        // How can there be no article
+        return array('id' => 0, 'title' => 'Problem: ' .$path);
     }
 
     /**
@@ -274,12 +337,16 @@ class Buildmenus
         $this->toclevel += 1;
         if ($this->toclevel > 1) {
             $collapse = ' mm-collapse';
-            $this->menuHTML .= "<ul class=\"jdm-indent-{$this->toclevel} {$collapse}\">\n";
+            $this->menuHTML .= "<ul class=\"jdm-indent-1 {$collapse}\">\n";
         }
         foreach ($menu as $key => $value) {
             if (is_array($value)) {
+                // $this->menuFolders->$key could be empty, in which case...
+                if (empty($this->menuFolders[$key])) {
+                    $this->menuFolders[$key] = ucwords(str_replace('-', ' ', $key));
+                }
                 $icon = "<span class=\"icon-folder\" aria-hidden=\"true\"></span>";
-                $wrap_label = "<span class=\"item-title\">{$this->menuFolders->$key}</span>";
+                $wrap_label = "<span class=\"item-title\">{$this->menuFolders[$key]}</span>";
                 $this->menuHTML .= "<li class=\"item parent item-level-{$this->toclevel}\">";
                 $this->menuHTML .= "<a href=\"#\" class=\"has-arrow\">";
                 $this->menuHTML .= "{$wrap_label}</a>\n";
@@ -300,14 +367,14 @@ class Buildmenus
                 $path = str_replace('.md', '', $path);
 
                 // This is an article list item. Get the article id from the database
-                $article_id = $this->getArticleId($manual, $language, $path);
+                $row = $this->getArticleId($manual, $language, $path);
                 $icon = "<span class=\"icon-file-alt\" aria-hidden=\"true\"></span>";
 
-                $link = "<a id=\"article-{$article_id}\" href=\"jdocmanual?article={$manual}/{$path}\">{$value}</a>";
+                $link = "<a id=\"article-{$row['id']}\" href=\"jdocmanual?article={$manual}/{$path}\">{$row['title']}</a>";
                 $this->menuHTML .= "<li class=\"item item-level-{$this->toclevel}\">{$link}</li>\n";
 
                 // Store order for the Previous and Next buttons.
-                $this->order[] = [$article_id, $path, $value, $link];
+                $this->order[] = [$row['id'], $path, $value, $link];
             }
         }
         $this->menuHTML .= "</ul>\n";

@@ -119,6 +119,17 @@ class SetupHelper
             $menu_language_code = $mlc;
         } else if (!empty($new_man)) {
             $manual = $new_man;
+            $path = $app->getInput()->cookie->get('jdm5' . $manual, '', 'raw');
+            if (empty($path)) {
+                // Get the default path for this manual
+                $query = $db->createQuery();
+                $query->select('*')
+                    ->from('#__jdm_manuals')
+                    ->where($db->quoteName('manual') . ' = ' . $db->quote($manual));
+                $db->setQuery($query);
+                $row = $db->loadObject();
+                $path = $row->path;
+            }
         }
 
         // Try a query string of the form jdocmanual?article=user/articles/some-article[.html]

@@ -38,8 +38,8 @@
 		<field
 			name="language"
 			type="text"
-			label="COM_JDOCMANUAL_MANUAL_LANGUAGE_LABEL"
-			description="COM_JDOCMANUAL_MANUAL_LANGUAGE_DESC"
+			label="COM_JDOCMANUAL_MANUAL_DEFAULT_LANGUAGE_LABEL"
+			description="COM_JDOCMANUAL_MANUAL_DEFAULT_LANGUAGE_DESC"
 			size="16"
 			required="true"
 		/>

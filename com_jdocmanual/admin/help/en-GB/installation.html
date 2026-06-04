@@ -1,0 +1,321 @@
+<h2 id="installation-notes">Installation Notes</h2>
+<p>Jdocmanual is designed to deliver Joomla documentation in an easy to use
+reference form. It can also be used for other custom documentation.</p>
+<p>Jdocmanual consists of two parts:</p>
+<ul>
+<li>The Jdocmanual component code and an optional plugins to provide Search
+functionality and CLI access.</li>
+<li>Data files for each available Manual and Language. There are four manuals and
+eight languages available. You only need one to get started but the process
+is so easy you may as well get the English data for all manuals.</li>
+</ul>
+<p>Version 4 of Jdocmanual is not compatible with previous versions. Any previous
+version should have the <code>#__jdm_articles</code> and <code>#__jdm_menus</code> tables emptied.</p>
+<h2 id="jdocmanual-installation">Jdocmanual Installation</h2>
+<p>Install and enable Jdocmanual as you would any other Joomla extension. It can
+be obtained from:</p>
+<p><a href="https://github.com/ceford/cefjdemos-com-jdm">https://github.com/ceford/cefjdemos-com-jdm</a></p>
+<p>Select the green <strong>Code</strong> button and then the <strong>Download ZIP</strong> item. Save the
+ZIP file in your Downloads directory. In your Joomla installation select
+System &gt; Install &gt; Extensions and then select the <strong>Upload Package File</strong> tab.</p>
+<p>You may need two plugins:</p>
+<ul>
+<li>A finder plugin (<a href="https://github.com/ceford/cefjdemos-plg-finder-jdocmanual/tree/main">cefjdemos-plg-jdm-finder</a>)
+is used to implement Smart Search for Jdocmanual.</li>
+<li>A CLI plugin (<a href="https://github.com/ceford/cefjdemos-plg-jdocmanualcli">Jdocmanualcli</a>)
+is used to run data installation commands from the command line. It may be
+useful if you wish to automate updates with cron jobs.</li>
+</ul>
+<p>Install and enable the plugins.</p>
+<h2 id="data-files">Data Files</h2>
+<p>The data files should be located in your filespace but outside your
+website tree. The parent directory must be named <strong>Manuals</strong>. This is
+a suggested Linux structure:</p>
+<pre><code class="lang-bash"><span class="hljs-meta-keyword">/home/</span>username<span class="hljs-meta-keyword">/manuals/</span>developer/
+<span class="hljs-meta-keyword">/home/</span>username<span class="hljs-meta-keyword">/manuals/</span>docs/
+<span class="hljs-meta-keyword">/home/</span>username<span class="hljs-meta-keyword">/manuals/</span>help/
+<span class="hljs-meta-keyword">/home/</span>username<span class="hljs-meta-keyword">/manuals/</span>user/
+<span class="hljs-meta-keyword">/home/</span>username/public_html (where your Joomla website is located)
+</code></pre>
+<p>Obtain the English data files for each manual from the GitHub. You can
+download ZIP files or use git clone.</p>
+<h3 id="git-clone">Git Clone</h3>
+<p>This is a set of commands to use for git clone for English and German:</p>
+<pre><code class="lang-bash">    <span class="hljs-keyword">cd</span> /home/username
+    mdkdir manuals
+    <span class="hljs-keyword">cd</span> manuals
+    <span class="hljs-built_in">mkdir</span> developer
+    <span class="hljs-built_in">mkdir</span> docs
+    <span class="hljs-built_in">mkdir</span> <span class="hljs-keyword">help</span>
+    <span class="hljs-built_in">mkdir</span> user
+
+    <span class="hljs-keyword">cd</span> <span class="hljs-keyword">help</span>
+
+    git clone http<span class="hljs-variable">s:</span>//github.<span class="hljs-keyword">com</span>/ceford/cefjdemos-data-jdm-<span class="hljs-keyword">help</span>-<span class="hljs-keyword">en</span>
+    mv cefjdemos-data-jdm-<span class="hljs-keyword">help</span>-<span class="hljs-keyword">en</span> <span class="hljs-keyword">en</span>
+    git clone http<span class="hljs-variable">s:</span>//github.<span class="hljs-keyword">com</span>/ceford/cefjdemos-data-jdm-<span class="hljs-keyword">help</span>-de
+    mv cefjdemos-data-jdm-<span class="hljs-keyword">help</span>-de de
+
+    <span class="hljs-keyword">cd</span> ../developer
+    git clone http<span class="hljs-variable">s:</span>//github.<span class="hljs-keyword">com</span>/ceford/cefjdemos-data-jdm-developer-<span class="hljs-keyword">en</span>
+    mv cefjdemos-data-jdm-developer-<span class="hljs-keyword">en</span> <span class="hljs-keyword">en</span>
+    git clone http<span class="hljs-variable">s:</span>//github.<span class="hljs-keyword">com</span>/ceford/cefjdemos-data-jdm-developer-de
+    mv cefjdemos-data-jdm-developer-de de
+
+    <span class="hljs-keyword">cd</span> ../docs
+    git clone http<span class="hljs-variable">s:</span>//github.<span class="hljs-keyword">com</span>/ceford/cefjdemos-data-jdm-docs-<span class="hljs-keyword">en</span>
+    mv cefjdemos-data-jdm-docs-<span class="hljs-keyword">en</span> <span class="hljs-keyword">en</span>
+
+    <span class="hljs-keyword">cd</span> ../user
+    git clone http<span class="hljs-variable">s:</span>//github.<span class="hljs-keyword">com</span>/ceford/cefjdemos-data-jdm-user-<span class="hljs-keyword">en</span>
+    mv cefjdemos-data-jdm-user-<span class="hljs-keyword">en</span> <span class="hljs-keyword">en</span>
+    git clone http<span class="hljs-variable">s:</span>//github.<span class="hljs-keyword">com</span>/ceford/cefjdemos-data-jdm-user-de
+    mv cefjdemos-data-jdm-user-de de
+</code></pre>
+<h3 id="download-zip">Download ZIP</h3>
+<p>These are the links to download ZIP files in English:</p>
+<ul>
+<li><a href="https://github.com/ceford/cefjdemos-data-jdm-developer-en">https://github.com/ceford/cefjdemos-data-jdm-developer-en</a></li>
+<li><a href="https://github.com/ceford/cefjdemos-data-jdm-docs-en">https://github.com/ceford/cefjdemos-data-jdm-docs-en</a></li>
+<li><a href="https://github.com/ceford/cefjdemos-data-jdm-help-en">https://github.com/ceford/cefjdemos-data-jdm-help-en</a></li>
+<li><a href="https://github.com/ceford/cefjdemos-data-jdm-user-en">https://github.com/ceford/cefjdemos-data-jdm-user-en</a></li>
+</ul>
+<p>Unpack each in its appropriate directory. For example, unpack the .../user/en
+data set in the manuals/user/ directory. You will get a folder with the same
+name as the repository</p>
+<p><strong>Change the name of the folder</strong> to the <strong>language</strong> abbreviation. You
+should end up with a directory structure like this:</p>
+<pre><code class="lang-bash"><span class="hljs-meta-keyword">/home/</span>username<span class="hljs-meta-keyword">/manuals/</span>user<span class="hljs-meta-keyword">/en/</span>articles/
+<span class="hljs-meta-keyword">/home/</span>username<span class="hljs-meta-keyword">/manuals/</span>user<span class="hljs-meta-keyword">/en/</span>images/
+<span class="hljs-meta-keyword">/home/</span>username<span class="hljs-meta-keyword">/manuals/</span>user<span class="hljs-meta-keyword">/en/</span>menus-index.txt
+</code></pre>
+<p>If you add data for another language it will follow the same pattern, except
+that the menus-index.txt file is only present in the
+in the <strong>/en/</strong> folder.</p>
+<h2 id="jdocmanual-configuration">Jdocmanual Configuration</h2>
+<p>From the Administrator menu open the Jdocmanual &gt; Manual page. Until the
+component is properly configured you will see this <strong>Installation Notes</strong>
+page.</p>
+<ul>
+<li>Select the <strong>Options</strong> button in the Toolbar.</li>
+<li>In the <strong>Settings</strong> tab:<ul>
+<li>in the <strong>Markdown Source</strong> field enter the full path to the data files,
+ending in <strong>manuals/</strong>. For example:</li>
+</ul>
+</li>
+</ul>
+<pre><code class="lang-bash"><span class="hljs-regexp">/home/u</span>sername<span class="hljs-regexp">/manuals/</span>
+</code></pre>
+<ul>
+<li>If your website is in a sub-directory then enter the sub-directory name
+with a leading slash, for example /jdm4. Otherwise leave this field empty.</li>
+<li>If you are using clones of the original git sources and would like to pull
+updates from time time you cn set <strong>Enable Pull</strong> to <em>Yes</em>. This is used
+in the <em>Sources</em> page of the component menu.</li>
+<li><strong>Enable Like or Dislike buttons</strong> These are Thumb up and Thumb down buttons
+at the bottom of every page. An experimental feature to be enabled or disabled
+as reuired.</li>
+<li><strong>Enable Comments form</strong> the central button allows submission of comments
+without using Thumb up or Thumb down.</li>
+<li><strong>Save &amp; Close</strong></li>
+</ul>
+<h2 id="enable-languages">Enable Languages</h2>
+<p>The language packs for the languages you intend to use should be installed via
+the <strong>System/Languages</strong> page. After installation the languages need to be
+enabled via the <strong>System/Content Languages</strong> page.</p>
+<p>Jdocmanual has its own page to enable the languages you would like to use.
+Select the <strong>Components -&gt; Jdocmanual -&gt; Languages</strong> item from the Administrator
+menu and edit any that need to be enabled. Do not change anything else. This
+form is really intended for users who would like to add a language not in the
+Jdocmanual sources.</p>
+<h2 id="enable-manuals-and-build-articles-and-menus">Enable Manuals and Build Articles and Menus</h2>
+<p>The four Manuals available for Jdocmanual are available as separate datasets
+for each language. The source data is in Markdown format which is converted to
+HTML during the build process. The procedure for each manual is the same as
+this example for the User Manual:</p>
+<ul>
+<li>Select <strong>Components &gt; Manuals &gt; Sources</strong> from the Administrator menu.</li>
+<li>Select the <em>Jooomla User Manual</em> to open its Edit page.</li>
+<li>Change the <em>Status</em> to <strong>Published</strong> and <strong>Save</strong></li>
+<li>In the <em>Sources</em> page the table of manuals has a language selector in the
+row for each language. Select a language to build the database tables for
+that manual and language. The first time this is done the process may take
+a long time and the only indicator is the busy icon in the browser tab. Be
+patient for 5 to 10 minutes or so. Jdocmanual will build the articles and
+menus in the selected language and it will create responsive images in a
+variety of sizes. There will be a summary message, which may include problem
+reports. On the next invocation the build process will be much quicker as
+only changed pages are rebuilt.</li>
+<li>For the <em>Help</em> Manual only, the build process also builds the proxy server
+used to deliver help pages. This is very quick and is done for all installed
+languages. To use it, edit your configuration.php and change the <code>$helpurl</code>
+domain name to that of this Joomla installation.</li>
+</ul>
+<h2 id="test">Test</h2>
+<ul>
+<li>Select <strong>Components &gt; Manuals &gt; Manuals</strong> from the Administrator menu.</li>
+</ul>
+<p>You should see the first page of the User Manual.</p>
+<h2 id="maintenance">Maintenance</h2>
+<p>From time to time there will be updates to the Jdocmanual data files. You
+can download the source files and repeat the data installation process. This is
+very easy to do with <strong>git</strong>: just do <code>git pull</code> in the appropriate language
+folder, then use the Build selector in the Sources page or switch to the <em>cli</em>
+folder and run the cli commands. You can build a cron job to do this.</p>
+<h2 id="build-articles-and-menus-command-line-method">Build Articles and Menus - Command Line Method</h2>
+<p>The database jdm_articles and jdm_menus tables are populated by reading
+the data files. This can take a long time - at least a few minutes
+and perhaps much longer on slow hosts.</p>
+<p>Proceed as follows:</p>
+<ol>
+<li>Open a terminal window and cd into the cli folder within your Joomla
+installation root. Here is an example:<br>
+<code>cd /home/username/public_html/optional-subfolder/cli</code></li>
+<li>Issue the command to convert data from the markdown source files to
+html in the #__jdm_articles table of the database:<br>
+<code>php joomla.php jdocmanual:action buildarticles user en</code></li>
+<li>Issue the command to create the menus:<br>
+<code>php joomla.php jdocmanual:action buildmenus user en</code></li>
+</ol>
+<p>In these commands, <strong>user</strong> is the name of the manual to be processed and
+<strong>en</strong> is a language specifier.</p>
+<p>The Markdown format is converted to HTML and stored in the database. Also,
+if there are any images in the data source a set of responsive images
+is created.</p>
+<p>If you encounter <strong>out of memory</strong> problems or <strong>out of time</strong> problems run the
+command again.</p>
+<h2 id="database-population-cron-method">Database Population - Cron Method</h2>
+<p>If you do not have access to the command line, common with shared
+hosting, you should be able to call these commands from a cron job. Make
+sure you give the full path to the php executable, example:
+<code>/usr/local/opt/php@8.1/bin/php</code>. You need to find out where the php
+executable is located on your host operating system.</p>
+<p>But try building from the Sources page first!</p>
+<h2 id="site-menu">Site Menu</h2>
+<p>If you want to show the Manuals on the site just create a Jdocmanual
+menu item.</p>
+<p><strong>Important:</strong> The menu alias must be <strong>jdocmanual</strong> or internal links
+will be broken and lead to frontend problems.</p>
+<p>You may wish to place the menu on a page without side modules so that
+the full width of the page may be used for content. If so, go to each
+Site Module that appears in the left or right side positions and set their
+Menu Assignment / Module Assignment to <em>On all pages except those selected</em>
+and select all instances of Jdocmanual.</p>
+<h3 id="menu-items">Menu Items</h3>
+<p>Each language will require its own menu and a new menu item for Jdocmanual.
+Give each a name such as <em>Jdocmanual en-GB</em>, <em>Jdocmanual de-DE</em> and so on
+and set the Language value to that for the menu. Optionally, you could make
+Jdocmanual the Home page in each selected language.</p>
+<p>You will need a Main Menu that also has a link to Jdocmanual but has Languages
+set All. Again that could be the Home page for <em>All</em> languages.</p>
+<h3 id="multilingual-sites">Multilingual Sites</h3>
+<p>The language selected to show the list of pages in Jdocmanual is independent
+of the current page language. This feature is useful for maintenance purposes.</p>
+<p>The language selected to show the page content is linked to the overall
+current site language. It acts as a Language Switcher but is not itself
+affected by a language switcher module (so don&#39;t show one?).</p>
+<h2 id="smart-search">Smart Search</h2>
+<p>There are a number of different ways to set up Smart Search. This is the
+solution adopted for the Jdocmanual site.</p>
+<h3 id="banner-creation">Banner Creation</h3>
+<p>First remove the Template site banner. Go to <strong>System -&gt; Site Template Styles</strong>.
+Select <strong>Cassiopeia - Default</strong> and in the <strong>Advanced</strong> tab set <em>Brand</em> to <em>No</em>.
+Then <strong>Save &amp; Close</strong>. The site will have lost its default Cassiopeia banner.</p>
+<p>The replacement top banner consists of two modules assigned to the below-top
+position:</p>
+<h4 id="custom-module-for-site-name">Custom Module for Site Name</h4>
+<p>This custom module has the following content (add <em>Local</em> or <em>Test</em> to site-logo
+if this is a local test site):</p>
+<pre><code>&lt;<span class="hljs-keyword">div</span> <span class="hljs-built_in">class</span>=<span class="hljs-string">"navbar-brand"</span>&gt;
+&lt;<span class="hljs-keyword">div</span> <span class="hljs-built_in">class</span>=<span class="hljs-string">"site-logo"</span>&gt;&lt;a href=<span class="hljs-string">"jdocmanual"</span>&gt;Jdocmanual&lt;/a&gt;&lt;/<span class="hljs-keyword">div</span>&gt;
+&lt;<span class="hljs-keyword">div</span> <span class="hljs-built_in">class</span>=<span class="hljs-string">"site-description"</span>&gt;A site <span class="hljs-keyword">for</span> Joomla! documentation&lt;/<span class="hljs-keyword">div</span>&gt;
+&lt;/<span class="hljs-keyword">div</span>&gt;
+</code></pre><ul>
+<li>Set <strong>Title</strong> to <em>Hide</em>.</li>
+<li>Enter <strong>flex-grow-1</strong> in the <em>Advanced</em> tab, <em>Module Class</em> field.</li>
+<li>Set <strong>Module Style</strong> to <em>noCard</em>.</li>
+</ul>
+<p>There are some CSS statements to position the Search form to the right and
+centre it vertically in the top bar. Create a <code>user.css</code> file in your
+template and add the following style statements:</p>
+<pre><code><span class="hljs-selector-class">.site-logo</span> {
+    <span class="hljs-attribute">font-weight</span>: <span class="hljs-number">700</span>;
+}
+
+<span class="hljs-selector-class">.site-logo</span> <span class="hljs-selector-tag">a</span> {
+    <span class="hljs-attribute">text-decoration</span>: none <span class="hljs-meta">!important</span>;
+}
+
+<span class="hljs-selector-class">.site-description</span> {
+    <span class="hljs-attribute">margin-left</span>: <span class="hljs-number">0rem</span>;
+}
+
+<span class="hljs-selector-class">.container-below-top</span> {
+    <span class="hljs-attribute">align-items</span>: center <span class="hljs-meta">!important</span>;
+}
+</code></pre><h4 id="smart-search-module">Smart Search Module</h4>
+<p>The Smart Search form has the following settings:</p>
+<ul>
+<li><strong>Title</strong> set to <em>Hide</em></li>
+<li>Set <strong>Search Field Label</strong> to <em>Hide</em>.</li>
+<li>Set <strong>Menu Assignment</strong> to <em>Only on the pages selected</em> with the Jdocmanual
+page selected for each Menu.</li>
+<li><strong>Advanced</strong> Set <em>Module Style</em> to <em>noCard</em>.</li>
+</ul>
+<h4 id="no-menu-item">No Menu Item</h4>
+<p>A menu item for results is not needed.</p>
+<h2 id="user-groups">User Groups</h2>
+<p>If you wish to allow others to help maintain content this is one way to do it
+with two User Groups:</p>
+<ul>
+<li><strong>JDM Author</strong>: allowed to edit content in English and other
+languages.</li>
+<li><strong>JDM Publisher</strong>: allowed to commit and publish
+updated content.</li>
+</ul>
+<p>The <strong>JDM Author</strong> group should have Public as its parent. The
+<strong>JDM Publisher</strong> group should have <strong>JDM Author</strong> as its
+parent.</p>
+<h3 id="users-viewing-access-levels">Users: Viewing Access Levels</h3>
+<p><strong>JDM Author</strong> should be set to the Special Viewing Access level.
+From the Users / Access Levels page select <code>Special</code> and add <code>JDM
+Author</code> to the User Groups with Viewing Access.</p>
+<h3 id="global-options">Global Options</h3>
+<p>In the Global Options form select the Permissions tab and then the
+<strong>JDM Author</strong> item. Set Administrator login to Allowed.</p>
+<h3 id="jdocmanual-options">Jdocmanual Options</h3>
+<p>From the JDOC Manual, Manual page select the Options button. In the
+Permissions list select <strong>JDM Author</strong> and set the following to
+Allowed: - Access Administration Interface - Create - Delete - Edit</p>
+<p>Select <strong>JDM Publisher</strong> and set the following to Allowed: - Publish</p>
+<p>Save and Close</p>
+<p>If you now login as a user in the <strong>JDM Author</strong> group you will see
+the Home Dashboard with some modules not relevant for Jdocmanual.</p>
+<h3 id="turn-off-the-help-menu-item">Turn off the Help menu item</h3>
+<p>Go to the list of Administrator modules and find the Administrator Menu
+module. In the Module tab set the Help Menu item to Hide.</p>
+<h3 id="unpublish-or-restrict-access-to-modules">Unpublish or restrict Access to modules</h3>
+<p>In the Administrator modules list find the Logged-in Users item used in
+the cpanel position (not the cpanel-users position). Either Unpublish it
+or set Access to Super Users.</p>
+<p>Find and unpublish the Popular Articles and Recently Added Articles
+items for the cpanel position (not the cpanel-content position).</p>
+<p>There may be other modules needing similar treatment.</p>
+<p>The Home Dashboard should now be empty for a <strong>JDM Author</strong>.</p>
+<h2 id="who-can-do-what-">Who can do what?</h2>
+<p><strong>JDM Author</strong> and <strong>JDM Publisher</strong> can login but should only
+have access to the the Home Dashboard and the Jdocmanual component.</p>
+<p><strong>JDM Author</strong> does not have access to the Commit button in the
+Article Edit page toolbar so cannot update the git repository or
+displayed page. Otherwise each can use all other features.</p>
+<p><strong>Manager</strong> and <strong>Administrator</strong> can login but will not see the
+Jdocmanual component.</p>
+<p><strong>Author</strong>, <strong>Editor</strong> and <strong>Publisher</strong> do not have access
+to the Administrator interface.</p>
+<p><strong>Super Users</strong> have complete access.</p>
+<h2 id="some-reminders">Some Reminders</h2>
+<p>The System - Joomla Accessibility Checker flags the anchors
+as having empty links. So comment out line 70 of administrator/components/com_jdocmanual/libraries/vendor/league/commonmark/src/Extension/HeadingPermalink/HeadingPermalinkRenderer.php</p>
+<pre><code class="lang-php">        //$attrs-&gt;<span class="hljs-keyword">set</span>(<span class="hljs-string">'href'</span>, <span class="hljs-string">'#'</span> . $fragmentPrefix . $slug);
+        $attrs-&gt;<span class="hljs-keyword">append</span>(<span class="hljs-string">'class'</span>, $this-&gt;config-&gt;get(<span class="hljs-string">'heading_permalink/html_class'</span>));
+</code></pre>

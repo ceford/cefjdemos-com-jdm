@@ -2,7 +2,7 @@
 <updates>
     <update>
         <name>Jdocmanual</name>
-        <description>Display Joomla documentation in Manual format</description>
+        <description>Display documentation in Manual format</description>
         <element>com_jdocmanual</element>
         <type>component</type>
         <version>5.0.0</version>

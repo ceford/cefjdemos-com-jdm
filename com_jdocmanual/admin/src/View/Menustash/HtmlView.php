@@ -18,7 +18,7 @@ use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\Button\BasicButton;
 use Joomla\CMS\Toolbar\ToolbarHelper;
-use Cefjdemos\Component\Jdocmanual\Administrator\Helper\BuildmenusHelper;
+use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildmenus;
 use Jfcherng\Diff\DiffHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
@@ -129,8 +129,8 @@ class HtmlView extends BaseHtmlView
             );
 
             // Fill the preview field.
-            $mh = new BuildmenusHelper();
-            $this->preview = $mh->buildmenus($this->item->manual, 'en', $new);
+            $mh = new Buildmenus();
+            $this->preview = $mh->buildstashmenu($this->item->manual, 'en', $new);
 
         } catch (\Exception $e) {
             throw new GenericDataException($e->getMessage(), 500, $e);

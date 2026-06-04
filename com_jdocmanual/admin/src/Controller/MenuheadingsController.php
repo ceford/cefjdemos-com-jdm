@@ -112,7 +112,7 @@ class MenuheadingsController extends AdminController
     public function buildmenus()
     {
         Session::checkToken('post') or die('Is your session expired? Try a page reload!'); //|Invalid Token' );
-        // Get some the currently selected manual.
+        // Get the currently selected manual.
         $manual = $this->input->get('filter')['manual'];
         $language = $this->input->get('filter')['language'];
         if (empty($language) || empty($manual)) {
@@ -170,32 +170,40 @@ class MenuheadingsController extends AdminController
             }
 
             foreach ($languages as $language) {
+                // Check that a manual exists.
                 if (!is_dir($gfmfiles_path . $manual . '/' . $language)) {
                     continue;
                 }
+
+                // Check that the manual has a headings file
+                $path = "{$gfmfiles_path}{$manual}/{$language}/folders.json";
+                if (!is_file($path)) {
+                    continue;
+                }
+
+                // Read in the menu-headings.ini file
+                $menu_headings = file_get_contents($path);
+                $items = json_decode($menu_headings, true);
+
+                // Check that there some headings
+                if (empty($items)) {
+                    continue;
+                }
+
                 $query = $db->createQuery();
                 $query->insert($db->quoteName('#__jdm_menu_headings'));
 
-                // Read in the menu-headings.ini file
-                $path = "{$gfmfiles_path}{$manual}/{$language}/articles/menu-headings.ini";
-                $menu_headings = file_get_contents($path);
-                $lines = preg_split("/((\r?\n)|(\r\n?))/", $menu_headings);
-
                 $values = array();
 
-                foreach ($lines as $line) {
-                    if (empty(trim($line))) {
-                        continue;
-                    }
-                    list($key, $value) = explode('=', $line);
-                        $array = array(
+                foreach ($items as $key => $value) {
+                    $array = array(
                         $db->quote($manual),
                         $db->quote($language),
                         $db->quote($key),
                         $db->quote($value),
-                        );
-                        $values[] = implode(',', $array);
-                        $count += 1;
+                    );
+                    $values[] = implode(',', $array);
+                    $count += 1;
                 }
                 $query->insert($db->quoteName('#__jdm_menu_headings'));
                 $query->columns($columns);
@@ -218,12 +226,17 @@ class MenuheadingsController extends AdminController
     {
         Session::checkToken('post') or die('Is your session expired? Try a page reload!'); //|Invalid Token' );
 
-        // Get some the currently selected manual.
+        // Get the currently selected manual.
         $manual = $this->input->get('filter')['manual'];
         $language = $this->input->get('filter')['language'];
 
-        if (empty($language) || empty($manual)) {
-            $this->app->enqueueMessage("Result: no action! Either Manual or Language were not set.", 'warning');
+        $gfmfiles_path = ComponentHelper::getComponent('com_jdocmanual')->getParams()->get('gfmfiles_path');
+        $default_language = ComponentHelper::getComponent('com_jdocmanual')->getParams()->get('default_language');
+        
+        if ($language == $default_language) {
+            $this->app->enqueueMessage("Result: no action! Export of default language is not allowed!", 'warning');
+        } elseif (empty($language) || empty($manual)) {
+            $this->app->enqueueMessage("Result: no action! Either Manual or Language were not set!", 'warning');
         } else {
             $db = Factory::getContainer()->get('DatabaseDriver');
             $query = $db->createQuery();
@@ -235,22 +248,23 @@ class MenuheadingsController extends AdminController
             ->bind(':language', $language, ParameterType::STRING)
             ->order($db->quoteName('heading'));
             $db->setQuery($query);
-            $rows = $db->loadObjectList();
+            $rows = $db->loadAssocList('heading', 'title');
 
-            $gfmfiles_path = ComponentHelper::getComponent('com_jdocmanual')->getParams()->get('gfmfiles_path', ',');
-            $contents = '';
-            $count = 0;
-            foreach ($rows as $row) {
-                $contents .= "{$row->heading}={$row->title}\n";
-                $count += 1;
+            $contents = json_encode($rows, JSON_PRETTY_PRINT);
+            $count = \count($rows);
+
+            $path = $gfmfiles_path . "{$manual}/{$language}/folders.json";
+            if (file_put_contents($path, $contents)) {
+                $this->app->enqueueMessage(
+                    "Result: {$count} lines written to [data root]/{$manual}/{$language}/folders.json",
+                    'success'
+                );
+            } else {
+                $this->app->enqueueMessage(
+                    "Result: Nothing written to [data root]/{$manual}/{$language}/folders.json - no folder?",
+                    'danger'
+                );
             }
-            $path = $gfmfiles_path . "{$manual}/{$language}/articles/menu-headings.ini";
-            file_put_contents($path, $contents);
-
-            $this->app->enqueueMessage(
-                "Result: {$count} lines written to [data root]/{$manual}/{$language}/articles/menu-headings.ini.",
-                'success'
-            );
         }
         $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=menuheadings', false));
     }

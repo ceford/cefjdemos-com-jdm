@@ -29,7 +29,7 @@
 			label="Language"
 			onchange="this.form.submit();"
 			default="en"
-			query = "SELECT code, title FROM `#__jdm_languages` WHERE state = 1 ORDER BY title ASC"
+			query = "SELECT `a`.`sef` AS `code`, `a`.`title` FROM `#__languages` AS `a` LEFT JOIN `#__jdm_languages` AS `b` ON `a`.`lang_id` = `b`.`lang_id` WHERE `b`.`state` = 1 ORDER BY `title` ASC"
 			key_field="code"
 			value_field="title"
 			>

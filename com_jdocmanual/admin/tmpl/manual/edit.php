@@ -22,7 +22,6 @@ $wa = $this->document->getWebAssetManager();
 $wa->useScript('keepalive')
 //  ->useStyle('com_jdocmanual.jdocmanual')
     ->useScript('com_jdocmanual.jdocmanual');
-
 ?>
 
 <form action="<?php echo Route::_('index.php?option=com_jdocmanual&layout=edit&id=' . (int) $this->item->id); ?>"
@@ -41,13 +40,6 @@ $wa->useScript('keepalive')
                 <?php echo $this->form->renderField('language'); ?>
                 <?php echo $this->form->renderField('path'); ?>
                 <?php echo $this->form->renderField('id'); ?>
-            </div>
-            <div class="col-lg-3">
-                <div class="card card-light">
-                    <div class="card-body">
-                        <?php echo LayoutHelper::render('joomla.edit.global', $this); ?>
-                    </div>
-                </div>
             </div>
         </div>
         <?php echo HTMLHelper::_('uitab.endTab'); ?>

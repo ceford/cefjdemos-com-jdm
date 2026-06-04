@@ -32,14 +32,15 @@ list ($version, $key) = explode(':', $keyref, 2);
 if (
     !(strpos($version, 'Help4') === 0 ||
     strpos($version, 'Help5') === 0 ||
-    strpos($version, 'Help6') === 0)
+    strpos($version, 'Help6') === 0 ||
+    strpos($version, 'Help7') === 0)
 ) {
     echo "\nThere is no Help data available here for Joomla version {$version}\n";
     exit();
 }
 
 // Compose the file path for the requested file
-$filename = __DIR__ . '/' . $lang . '/' . $key_index[$key];
+$filename = __DIR__ . '/' . $lang . '/' . $key_index[$key] . '.html';
 if (is_file($filename)) {
     // Send it
     echo file_get_contents($filename);

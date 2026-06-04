@@ -1,15 +1,16 @@
 /**
- * For a new article, create the source_url and filename from the Display title
+ * For a new article, create the source_url and path from the Display title
  */
+if (document.getElementById('jform_page_id')) {
+    let pageid = document.getElementById('jform_page_id').value;
 
-let pageid = document.getElementById('jform_page_id').value;
 if (pageid === '0') {
     let displaytitle = document.getElementById('jform_title');
     displaytitle.readOnly = false;
     let sourceurl = document.getElementById('jform_source_url');
     let manual = document.getElementById('jform_manual');
-    let filename = document.getElementById('jform_filename');
-    let heading = document.getElementById('jform_heading');
+    let path = document.getElementById('jform_path');
+    path.readOnly = false;
     let prefix = 'jdocmanual?article=';
 
     displaytitle.addEventListener('change', function () {
@@ -32,24 +33,10 @@ if (pageid === '0') {
         // Replace leading or ending dashes
         tmp = tmp.replace(/^-/, '');
         tmp = tmp.replace(/-$/, '');
-        filename.value = tmp + '.md'
-        sourceurl.value = prefix + manual.value + '/' + heading.value + '/' + filename.value;
+        path.value = tmp;
+        sourceurl.value = prefix + manual.value +  '/' + path.value;
     });
-
-    heading.addEventListener('change', function () {
-        // Lower case.
-        let tmp = heading.value.trim();
-        tmp = tmp.toLowerCase();
-        // Replace non alpha-numeric with dash
-        tmp = tmp.replaceAll(/[^a-z0-9]/gi, '-');
-        // Replace multiple dashes with one dash
-        tmp = tmp.replaceAll(/-{2,}/gi, '');
-        // Replace leading or ending dashes
-        tmp = tmp.replace(/^-/, '');
-        tmp = tmp.replace(/-$/, '');
-        heading.value = tmp;
-        sourceurl.value = prefix + manual.value + '/' + heading.value + '/' + filename.value;
-    });
+}
 }
 
 /**
@@ -84,7 +71,7 @@ function committer(event)
 }
 
 // Select all links in the stash menu and disable them
-document.querySelectorAll('.jdm-metismenu a').forEach(link => {
+document.querySelectorAll('a[href*="jdocmanual"]').forEach(link => {
     link.addEventListener('click', function(event) {
         event.preventDefault(); 
         console.log('Interpreted click on: ' + this.id);

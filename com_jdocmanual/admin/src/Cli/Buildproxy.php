@@ -61,7 +61,7 @@ class Buildproxy
      * @var     string
      * @since   1.0
      */
-    protected $pattern2 = '/<!-- Filename:.*Display title:(.*)? -->/m';
+    protected $pattern2 = '/<!--.*"title":\s?"(.*?)"/m';
 
     /**
      * Path fragment of manual to process.
@@ -231,11 +231,11 @@ class Buildproxy
         // Get the already converted html from the database.
         // Do English first.
         $query = $db->createQuery();
-        $query->select($db->quoteName(array('source_url', 'language', 'heading', 'filename', 'title', 'html')))
+        $query->select($db->quoteName(array('source_url', 'language', 'path', 'title', 'html')))
         ->from('#__jdm_articles')
         ->where($db->quoteName('manual') . ' = ' . $db->quote('help'))
         ->where($db->quoteName('language') . ' = ' . $db->quote('en'))
-        ->order($db->quoteName(array('language', 'heading', 'filename')));
+        ->order($db->quoteName(array('language', 'path')));
         $db->setQuery($query);
         $rows = $db->loadObjectList();
 
@@ -244,11 +244,11 @@ class Buildproxy
 
         // Do the other languages second.
         $query = $db->createQuery();
-        $query->select($db->quoteName(array('source_url', 'language', 'heading', 'filename', 'title', 'html')))
+        $query->select($db->quoteName(array('source_url', 'language', 'path', 'title', 'html')))
             ->from('#__jdm_articles')
             ->where($db->quoteName('manual') . ' = ' . $db->quote('help'))
             ->where($db->quoteName('language') . ' != ' . $db->quote('en'))
-            ->order($db->quoteName(array('language', 'heading', 'filename')));
+            ->order($db->quoteName(array('language', 'path')));
         $db->setQuery($query);
         $rows = $db->loadObjectList();
 
@@ -266,19 +266,23 @@ class Buildproxy
         foreach ($rows as $row) {
             list($inthispage, $content) = InthispageHelper::doToc($row->html);
 
-            $outfile = str_replace('.md', '.html', $row->filename);
+            $outfile = $row->path . '.html';
             $html = $this->top;
             $html .= '<h1>' . $row->title . '</h1>';
             $html .= '<div id="toc" class="table-of-contents">';
             $html .= "{$inthispage}\n</div>\n{$content}";
             $html .= $this->bottom;
-            if (!is_dir(JPATH_ROOT . '/proxy/' . $row->language . '/' . $row->heading)) {
-                mkdir(JPATH_ROOT . '/proxy/' . $row->language . '/' . $row->heading, 0755, true);
+            $destination = JPATH_ROOT . '/proxy/' . $row->language . '/' . $row->path . '.html';
+            $dir = dirname($destination);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
             }
             // Need to replace links to jdocmanual to remove the leading /jdm3/proxy example
             // <a href="jdocmanual?manual=user&amp;heading=articles&amp;filename=adding-an-image-to-an-article.md">Adding an Image to an Article</a>
             $html = str_replace('href="jdocmanual?', 'href="' . $this->installation_subfolder . '/jdocmanual?', $html);
-            File::write(JPATH_ROOT . '/proxy/' . $row->language . '/' . $row->heading . '/' . $outfile, $html);
+
+            File::write($destination, $html);
+
             if (isset($counts[$row->language])) {
                 $counts[$row->language] += 1;
             } else {
@@ -288,17 +292,17 @@ class Buildproxy
                 // Extract key from full URL.
                 // Help5.x:Admin_Modules:_Action_Logs_-_Latest
                 // Needs to be Admin_Modules:_Action_Logs_-_Latest
-                $parts = explode(':', $row->source_url, 2);
-                if (empty($parts[1])) {
+                $parts = explode(':', $row->source_url, 3);
+                if (empty($parts[2])) {
                     echo "Problem extracting key from {$row->source_url}\n";
                 } else {
                     // A source_url may contain single quotes
-                    $key = str_replace("'", "\'", $parts[1]);
-                    $filename = str_replace('.md', '.html', $row->filename);
-                    $key_index .= "'{$key}' => '{$row->heading}/{$filename}',\n";
+                    $key = str_replace("'", "\'", $parts[2]);
+                    $filename = str_replace('.md', '.html', $row->path);
+                    $key_index .= "'{$key}' => '{$row->path}',\n";
 
                     // save the key index flipped for use later
-                    $this->key_index[$row->heading . '/' . $filename] = $key;
+                    $this->key_index[$row->path] = $key;
                 }
                 $save_key_index = 1;
             }
@@ -329,7 +333,7 @@ class Buildproxy
         $part2 = 'proxy/index.php?keyref=Help50:';
         foreach ($rows as $row) {
             $lang = '&lang=' . $row->language;
-            $file = JPATH_ROOT . '/proxy/' . $row->language . '/' . $row->heading . '/' . str_replace('.md', '.html', $row->filename);
+            $file = JPATH_ROOT . '/proxy/' . $row->language . '/' . $row->path . '.html';
             $html = file_get_contents($file);
             $test = preg_match_all($pattern, $html, $matches, PREG_SET_ORDER);
             foreach ($matches as $match) {

@@ -225,11 +225,10 @@ class HtmlView extends BaseHtmlView
                     $this->item->manual,
                     $this->item->language,
                     'articles',
-                    $this->item->heading,
-                    $this->item->filename
+                    $this->item->path
                 )
             );
-        if (is_file($translation_markdown_file)) {
+        if (is_file($translation_markdown_file . '.md')) {
             $translation_markdown = file_get_contents($translation_markdown_file);
         } else {
             $translation_markdown = '';

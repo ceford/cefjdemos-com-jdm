@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => '__root__',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => 'fda13a1274712aec3948298119be4149f20837f1',
+        'pretty_version' => 'dev-5.0-dev',
+        'version' => 'dev-5.0-dev',
+        'reference' => '8748dbf3ec9c3ba52af67bdda23284bdba4171a8',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => 'fda13a1274712aec3948298119be4149f20837f1',
+            'pretty_version' => 'dev-5.0-dev',
+            'version' => 'dev-5.0-dev',
+            'reference' => '8748dbf3ec9c3ba52af67bdda23284bdba4171a8',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -65,9 +65,9 @@
             'dev_requirement' => false,
         ),
         'league/commonmark' => array(
-            'pretty_version' => '2.8.0',
-            'version' => '2.8.0.0',
-            'reference' => '4efa10c1e56488e658d10adf7b7b7dcd19940bfb',
+            'pretty_version' => '2.8.2',
+            'version' => '2.8.2.0',
+            'reference' => '59fb075d2101740c337c7216e3f32b36c204218b',
             'type' => 'library',
             'install_path' => __DIR__ . '/../league/commonmark',
             'aliases' => array(),

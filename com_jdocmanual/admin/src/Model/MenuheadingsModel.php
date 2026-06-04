@@ -177,7 +177,7 @@ class MenuheadingsModel extends ListModel
             $query->where('(a.heading LIKE ' . $search . ')');
         }
         // Add the list ordering clause.
-        $orderCol  = $this->state->get('list.ordering', 'a.path');
+        $orderCol  = $this->state->get('list.ordering', 'a.heading');
         $orderDirn = $this->state->get('list.direction', 'ASC');
 
         $query->order($db->escape($orderCol) . ' ' . $db->escape($orderDirn));

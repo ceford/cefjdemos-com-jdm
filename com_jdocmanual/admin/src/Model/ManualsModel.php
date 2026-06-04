@@ -143,17 +143,17 @@ class ManualsModel extends ListModel
         return $query;
     }
     /**
-     * Check that the jdocmanual plugin has been enabled.
+     * Check that a jdocmanual plugin has been installed and enabled.
      *
-     * @return int The enabled value, 0 or 1.
+     * @return int The enabled value, 0 or 1 or 2.
      */
-    public function checkplugin()
+    public function checkplugin($name_of_plugin)
     {
         $db = $this->getDatabase();
         $query = $db->createQuery();
         $query->select($db->quoteName(array('extension_id', 'enabled')))
         ->from($db->quoteName('#__extensions'))
-        ->where($db->quoteName('name') . ' = ' . $db->quote('plg_system_jdocmanualcli'));
+        ->where($db->quoteName('name') . ' = ' . $db->quote($name_of_plugin));
         $db->setQuery($query);
         $row = $db->loadObject();
         if (empty($row)) {
