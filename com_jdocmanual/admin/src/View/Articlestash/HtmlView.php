@@ -276,7 +276,7 @@ class HtmlView extends BaseHtmlView
             Factory::getApplication()->enqueueMessage(Text::_('COM_JDOCMANUAL_ARTICLES_ARTICLE_COPIED'), 'warning');
         } else {
             // This must be a new English file.
-            $stash = '';
+            $stash = "<!--\n{\n  \"source\": \"\",\n  \"title\": \"\",\n  \"description\": \"\",\n  \"author\": \"\"\n}\n-->";
             $old = $stash;
         }
         $new = $stash;

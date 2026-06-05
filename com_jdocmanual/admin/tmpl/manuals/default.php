@@ -50,7 +50,7 @@ $wa->useStyle('com_jdocmanual.jdocmanual')
 <?php if ($this->dbIspopulated === 2) : ?>
 
 <h2><?php echo Text::_('COM_JDOCMANUAL_MANUALS_MENU_BUILD_REQUIRED'); ?></h2>
-<p><?php echo Text::_('COM_JDOCMANUAL_MANUALS_MENU_BUILD_INSTRUTIONS'); ?></p>
+<p><?php echo Text::_('COM_JDOCMANUAL_MANUALS_MENU_BUILD_INSTRUCTIONS'); ?></p>
 
 <?php endif; ?>
 

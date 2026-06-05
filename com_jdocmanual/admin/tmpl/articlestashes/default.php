@@ -209,8 +209,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                                     <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_DISPLAY_TITLE'); ?>,
                                     <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_MANUAL'); ?>,
                                     <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_LANGUAGE'); ?>,
-                                    <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_HEADING'); ?>,
-                                    <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_FILENAME'); ?>
+                                    <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_PATH'); ?>
                                 </th>
                                 <th scope="col">
                                     <?php echo HTMLHelper::_(
@@ -247,9 +246,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                                     <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_MANUAL') . ': ' . $item->manual; ?>,
                                     <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_LANGUAGE') . ': ' . $item->language; ?>
                                     <br>
-                                    <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_HEADING') . ': ' . $item->heading; ?>
-                                    <br>
-                                    <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_FILENAME') . ': ' . $item->filename; ?>
+                                    <?php echo Text::_('COM_JDOCMANUAL_ARTICLES_PATH') . ': ' . $item->path; ?>
                                 </td>
                                 <td class="d-none d-md-table-cell">
                                     <?php echo $item->id; ?>
@@ -287,10 +284,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                         Language
                     </th>
                     <th scope="col">
-                        Heading
-                    </th>
-                    <th scope="col">
-                        Filename
+                        Path
                     </th>
                     <th scope="col">
                         PR
@@ -315,10 +309,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                     <?php echo $stash->language; ?>
                     </td>
                     <td>
-                    <?php echo $stash->heading; ?>
-                    </td>
-                    <td>
-                    <?php echo $stash->filename; ?>
+                    <?php echo $stash->path; ?>
                     </td>
                     <td class="text-center">
                     <?php echo $stash->pr; ?>
@@ -352,10 +343,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                         Language
                     </th>
                     <th scope="col">
-                        Heading
-                    </th>
-                    <th scope="col">
-                        Filename
+                        Path
                     </th>
                     <th scope="col">
                         User
@@ -380,10 +368,7 @@ $stash_edit_route = 'index.php?option=com_jdocmanual&task=articlestash.edit&id='
                     <?php echo $stash->language; ?>
                     </td>
                     <td>
-                    <?php echo $stash->heading; ?>
-                    </td>
-                    <td>
-                    <?php echo $stash->filename; ?>
+                    <?php echo $stash->path; ?>
                     </td>
                     <td>
                     <?php echo $stash->name; ?>

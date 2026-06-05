@@ -18,6 +18,8 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\GenericDataException;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Pagination\Pagination;
+use Joomla\CMS\Session\Session;
+use Joomla\CMS\Router\Route;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\Registry\Registry;
 
@@ -164,8 +166,14 @@ class HtmlView extends BaseHtmlView
         ToolbarHelper::title(Text::_('COM_JDOCMANUAL_ARTICLES_STASHES'), 'code-branch');
 
         // Only show the New button if the selected language is English.
-        if ($this->state->get('filter.language') == 'en'  && $this->state->get('filter.manual') != 'help') {
-            $toolbar->addNew('articlestash.add');
+        $manual = $this->state->get('filter.manual');
+        $language = $this->state->get('filter.language');
+
+        if ($language === 'en'  && !empty($manual)) {
+            if ($manual !== 'help') {
+                $toolbar->linkButton('add', 'JGLOBAL_FIELD_ADD')
+                ->url(Route::_('index.php?option=com_jdocmanual&task=articlestash.add&id=0&manual=' . $manual . '&language=en&eid=0&trid=&' . Session::getFormToken() . '=1'));
+            }
         }
 
         if ($user->authorise('core.admin', 'com_jdocmanual') || $user->authorise('core.options', 'com_jdocmanual')) {

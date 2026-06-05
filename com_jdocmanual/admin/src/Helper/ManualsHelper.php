@@ -126,7 +126,7 @@ class ManualsHelper
         $db = Factory::getContainer()->get('DatabaseDriver');
 
         $query = $db->createQuery();
-        $query->select($db->quoteName(array('id', 'manual', 'language', 'heading', 'filename')))
+        $query->select($db->quoteName(array('id', 'manual', 'language', 'path')))
             ->from($db->quoteName('#__jdm_articles'))
             ->where($db->quoteName('state') . ' = 1');
         $db->setQuery($query);
@@ -139,11 +139,11 @@ class ManualsHelper
         if (!empty($rows)) {
             // output data of each row
             foreach ($rows as $row) {
-                $test = $row->manual . "/" . $row->heading. "/" . $row->filename;
+                $test = $row->manual . "/" . $row->path;
                 if (in_array($test, $menuFiles, true)) {
                     //echo "Test: Good result!" . PHP_EOL;
                 } else {
-                    $msg .= "Not in menu: id: " . $row->id . " - Data: " . $row->language . " " . $row->manual . "/" . $row->heading. "/" . $row->filename . PHP_EOL;
+                    $msg .= "Not in menu: id: " . $row->id . " - Data: " . $row->language . " " . $row->manual . "/" . $row->path . PHP_EOL;
                     $dud_count += 1;
                     $duds[] = $row->id;
                 }

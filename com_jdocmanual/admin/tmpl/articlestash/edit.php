@@ -76,8 +76,6 @@ $articlestash_edit_route = 'index.php?option=com_jdocmanual&view=articlestash&la
 <form method="post" name="adminForm" id="adminForm"
     action="<?php echo Route::_($articlestash_edit_route . $this->item->id); ?>">
 
-    <?php echo LayoutHelper::render('joomla.edit.title_alias', $this); ?>
-
     <div class="row">
         <div class="col">
         <?php echo HTMLHelper::_('uitab.startTabSet', 'myTab', array('active' => 'details', 'recall' => true)); ?>

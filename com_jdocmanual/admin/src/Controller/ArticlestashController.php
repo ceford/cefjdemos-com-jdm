@@ -11,6 +11,7 @@
 
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Controller;
 
+use Joomla\CMS\Application\CMSWebApplicationInterface;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\FormController;
@@ -86,7 +87,7 @@ class ArticlestashController extends FormController
     }
 
     /**
-     * Cancel an article stash pul request.
+     * Cancel an article stash pull request.
      *
      * @return  void
      *
@@ -209,21 +210,28 @@ class ArticlestashController extends FormController
         }
 
         // Test whether the data is valid.
-        try {
-            $validData = $model->validate($form, $data);
-        } catch (\RuntimeException $e) {
-            $this->app->enqueueMessage($e->getMessage(), 'error');
+        $validData = $model->validate($form, $data);
+
+        // Check for validation errors.
+        if ($validData === false) {
+            // Get the validation messages.
+            $errors = $model->getErrors();
+
+            // Push up to three validation messages out to the user.
+            for ($i = 0, $n = \count($errors); $i < $n && $i < 3; $i++) {
+                if ($errors[$i] instanceof \Exception) {
+                    $this->app->enqueueMessage($errors[$i]->getMessage(), CMSWebApplicationInterface::MSG_ERROR);
+                } else {
+                    $this->app->enqueueMessage($errors[$i], CMSWebApplicationInterface::MSG_ERROR);
+                }
+            }
 
             // Save the data in the session.
             $this->app->setUserState($context . '.data', $data);
 
             // Redirect back to the edit screen.
             $this->setRedirect(
-                Route::_(
-                    'index.php?option=' . $this->option . '&view=' . $this->view_item .
-                    $this->getRedirectToItemAppend($recordId, $key),
-                    false
-                )
+                Route::_('index.php?option=' . $this->option . '&view=' . $this->view_item . $this->getRedirectToItemAppend($recordId, $key), false)
             );
 
             return false;

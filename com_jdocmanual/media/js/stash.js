@@ -20,9 +20,6 @@ if (pageid === '0') {
         displaytitle.value = displaytitle.value.trim();
         // Space replaced by underline.
         sourceurl.value = displaytitle.value.replaceAll(' ', '_');
-        // Create the first stash line
-        let firstline = document.getElementsByClassName('cm-line')[0];
-        firstline.innerHTML = '&lt;!-- Filename: Help6.x:' + sourceurl.value + ' / ' + 'Display title: ' + displaytitle.value + ' --&gt;';
 
         // Lower case.
         let tmp = sourceurl.value.toLowerCase();
