@@ -83,17 +83,17 @@ class JdocmanualCommand extends AbstractCommand
         $this->addArgument(
             'manual',
             InputArgument::REQUIRED,
-            'one of developer, docs, help or user'
+            'one of the installed manuals, for example developer, docs, help or user'
         );
         $this->addArgument(
             'language',
             InputArgument::REQUIRED,
-            'two letter code, example: de'
+            'language code, for example example: de'
         );
         $this->addArgument(
-            'force',
+            'time_back',
             InputArgument::OPTIONAL,
-            'for articles only, true or false (default if omitted)'
+            'integer number of minutes to look back for article changes (0 if omitted forces full rebuild)'
         );
 
         $this->setDescription('Called on command line or by cron to run Jdocmanual action jobs.');
