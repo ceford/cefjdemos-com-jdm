@@ -126,7 +126,7 @@ class Buildmenus
             if (!empty($altMenuFolders)) {
                 $altMenuFolders = json_decode($altMenuFolders);
                 foreach ($altMenuFolders as $key => $value) {
-                    $this->menuFolders->$key = $value;
+                    $this->menuFolders[$key] = $value;
                 }
             }
         }

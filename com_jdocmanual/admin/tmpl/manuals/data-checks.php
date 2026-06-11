@@ -43,3 +43,13 @@ $plugin_status = array(
 <li>Database has no content! Please publish and build content.</li>
 <?php endif; ?>
 </ul>
+
+<h2>Installation</h2>
+<ul>
+    <li>Enable the Language Filter plugin, or the menus will not work.</li>
+    <li>Create a Menu Item: Jdocmanual</li>
+    <li>Go to the site Home page and use the newly created menu item.</li>
+    <li>Continue with the <a href="https://jdocmanual/en/jdocmanual?article=jdm/installation/configure-languages">Installation Instructions</a> on the Jdocmanual demonstration site.</li>
+</ul>
+
+<p>Please visit the <a href="https://jdocmanual.org/jdocmanual?article=jdm/introduction">Jdocmanual</a> demonstration site for more instructions on data installation.</p>

@@ -286,10 +286,6 @@ $isGitpullEnabled = $this->isGitpullEnabled();
 
 <?php echo HTMLHelper::_('uitab.addTab', 'myTab', 'newpages', Text::_('COM_JDOCMANUAL_MANUALS_TAB_CONFIGURATION')); ?>
     <?php require_once(__DIR__ . '/data-checks.php'); ?>
-
-    <p>Please visit the <a href="https://jdocmanual.org/jdocmanual?article=jdm/introduction">Jdocmanual</a>
-        demonstration site for instructions on data installation.
-    </p>
 <?php echo HTMLHelper::_('uitab.endTab'); ?>
 
 <?php echo HTMLHelper::_('uitab.endTabSet'); ?>
