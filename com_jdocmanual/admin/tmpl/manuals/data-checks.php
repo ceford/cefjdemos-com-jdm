@@ -46,6 +46,8 @@ $plugin_status = array(
 
 <h2>Installation</h2>
 <ul>
+    <li>Make sure htaccess.txt has been renamed to .htaccess</li>
+    <li>In Languages, make sure one or more languages have been selected for use in JDM.</li>
     <li>Enable the Language Filter plugin, or the menus will not work.</li>
     <li>Create a Menu Item: Jdocmanual</li>
     <li>Go to the site Home page and use the newly created menu item.</li>
@@ -53,3 +55,4 @@ $plugin_status = array(
 </ul>
 
 <p>Please visit the <a href="https://jdocmanual.org/jdocmanual?article=jdm/introduction">Jdocmanual</a> demonstration site for more instructions on data installation.</p>
+
