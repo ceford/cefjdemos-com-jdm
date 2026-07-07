@@ -32,8 +32,7 @@ HTMLHelper::_('bootstrap.modal', '#jdmFeedback', []);
         <form id="feedback_form" action="#" method="post" name="feedback_form">
             <div class="input-group">
                 <textarea id="comment" class="form-control" name="comment"
-                rows="3" columns="60" minlength="10" maxlength="256" required
-                placeholder="Text limited to 256 characters"></textarea>
+                rows="3" columns="60" minlength="10" maxlength="256" required></textarea>
                 <label for="comment" class="visually-hidden">Comment</label>
             </div>
             <input type="hidden" name="manual" id="manual" value="" />

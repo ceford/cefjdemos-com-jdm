@@ -26,7 +26,6 @@ CREATE TABLE IF NOT EXISTS `#__jdm_articles` (
   PRIMARY KEY (`id`),
   KEY `manual` (`manual`),
   KEY `language` (`language`),
-  KEY `path` (`path`),
   KEY `state` (`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -113,6 +112,5 @@ CREATE TABLE IF NOT EXISTS `#__jdm_feedback` (
     KEY `session` (`session_id`),
     KEY `manual` (`manual`),
     KEY `language` (`language`),
-    KEY `path` (`path`),
     KEY `likeitornot` (`likeitornot`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

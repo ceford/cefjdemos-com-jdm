@@ -117,7 +117,7 @@ class JdocmanualCommand extends AbstractCommand
         $action = $this->cliInput->getArgument('action');
         $manual = $this->cliInput->getArgument('manual');
         $language = $this->cliInput->getArgument('language');
-        $force = $this->cliInput->getArgument('force');
+        $force = $this->cliInput->getArgument('time_back');
 
         switch ($action) {
             case 'buildarticles':
