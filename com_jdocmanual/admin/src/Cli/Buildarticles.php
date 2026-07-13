@@ -336,7 +336,7 @@ class Buildarticles
         // "/Users/ceford/git/cefjdemos/manuals/docs/en/articles/jdocmanual/jugl-2025-05-20.md"
         $updates = [];
         foreach($articles as $article) {
-            $updates[] = preg_replace('/(.*\/articles\/)/', '', $article);
+            $updates[] = preg_replace('/(.*?\/articles\/)/', '', $article);
         }
 
         // Eliminate duplicates.
