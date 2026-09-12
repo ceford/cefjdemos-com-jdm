@@ -12,14 +12,8 @@
 namespace Cefjdemos\Component\Jdocmanual\Administrator\Controller;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\MVC\Controller\AdminController;
-use Joomla\CMS\Router\Route;
 use Joomla\Database\ParameterType;
-use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildarticles;
-use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildmenus;
-use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildproxy;
-use Cefjdemos\Component\Jdocmanual\Administrator\Helper\ManualsHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;

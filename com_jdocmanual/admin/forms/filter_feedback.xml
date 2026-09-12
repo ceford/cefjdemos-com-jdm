@@ -20,7 +20,7 @@
 			label="Language"
 			class="js-select-submit-on-change"
 			default=""
-			query = "SELECT lang_code, title FROM `#__jdm_languages` WHERE state = 1 ORDER BY title ASC"
+			query = "SELECT lang_code, title FROM `#__languages` WHERE published = 1 ORDER BY title ASC"
 			key_field="lang_code"
 			value_field="title"
 		>

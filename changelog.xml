@@ -2,6 +2,18 @@
     <changelog>
         <element>com_jdocmanual</element>
         <type>component</type>
+        <version>5.0.1</version>
+        <change>
+            <item>Changed Administrator Unpublish Deleted toolbar button to Status Report</item>
+        </change>
+        <fix>
+            <item>Bug in Unpublish deleted actually unpublished an entire language</item>
+            <item>Bug in Feedback code resulted in server side error and no feedback.</item>
+        </fix>
+    </changelog>
+    <changelog>
+        <element>com_jdocmanual</element>
+        <type>component</type>
         <version>5.0.0</version>
         <change>
             <item>New architecture!</item>

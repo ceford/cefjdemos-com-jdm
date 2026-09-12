@@ -19,7 +19,6 @@ use Joomla\Database\ParameterType;
 use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildarticles;
 use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildmenus;
 use Cefjdemos\Component\Jdocmanual\Administrator\Cli\Buildproxy;
-use Cefjdemos\Component\Jdocmanual\Administrator\Helper\ManualsHelper;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -243,9 +242,9 @@ class ManualsController extends AdminController
      */
     public function unpublishdeleted()
     {
-        $sh = new ManualsHelper;
+        $ba = new Buildarticles();
 
-        $summary = $sh->unpublishDeleted();
+        $summary = $ba->unpublishDeleted();
 
         $this->app->enqueueMessage(nl2br($summary, true));
         $this->setRedirect(Route::_('index.php?option=com_jdocmanual&view=manuals', false));

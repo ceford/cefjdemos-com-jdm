@@ -81,11 +81,18 @@ class Buildarticles
     protected $toclevel = 0;
 
     /**
-     * Array to store ll of the paths to articles in the manual being processed
+     * Array to store all of the paths to articles in the manual being processed
      * 
      * @var array
      */
     protected $articlePaths = [];
+
+    /**
+     * Array to store the paths to menus for all manuals
+     * 
+     * @var array
+     */
+    protected $menuPaths = [];
 
     /**
      * Array used for building $articlePaths in recursive call
@@ -244,17 +251,17 @@ class Buildarticles
         return $contents;
     }
 
-    protected function getArticlePaths($items)
+    protected function getArticlePaths($items, $manlang = '')
     {
         // traverse the items in the menu list object
         foreach($items as $key => $item) {
             // Is this item an array?
             if (is_array($item)) {
                 $this->parentPaths[] = $key;
-                $this->getArticlePaths($item);
+                $this->getArticlePaths($item, $manlang);
             } else {
                 $path = array_merge($this->parentPaths, [$key]);
-                $this->articlePaths[] = implode('/', $path);
+                $this->articlePaths[] = $manlang . implode('/', $path);
             }
         }
         array_pop($this->parentPaths);
@@ -440,7 +447,6 @@ class Buildarticles
      */
     protected function setMenus($manual, $language)
     {
-
         // The articles index is always needed.
         $menuObject = $this->getMenuObject($manual);
         if (empty($menuObject)) {
@@ -584,5 +590,131 @@ class Buildarticles
         $db->execute();
 
         return [1, $summary];
+    }
+
+    /**
+     * Unpublish articles that have been deleted from the manual sources but 
+     * are still in the database.
+     *
+     * @return  $array  A list of published manuals.
+     */
+    public function unpublishDeleted() {
+        // Get the the 'manuals' path from the component parameters.
+        $params = ComponentHelper::getParams('com_jdocmanual');
+        $directory = $params->get('gfmfiles_path');
+
+        // Get a list of published articles from the database
+        $db = Factory::getContainer()->get('DatabaseDriver');
+
+        $query = $db->createQuery();
+        $query->select($db->quoteName(array('id', 'manual', 'language', 'path')))
+            ->from($db->quoteName('#__jdm_articles'))
+            ->where($db->quoteName('state') . ' = 1');
+        $db->setQuery($query);
+        $rows = $db->loadObjectList();
+        $msg = '';
+        $duds = [];
+
+        // Check the article exists
+        foreach ($rows as $row) {
+            $path = "{$directory}{$row->manual}/{$row->language}/articles/{$row->path}.md";
+            if (!is_file($path)) {
+                $msg .= "Missing article: id: {$row->id} - Data: {$row->manual}/{$row->language}/articles/{$row->path}.md\n";
+                $dud_count += 1;
+                $duds[] = $row->id;
+            }
+        }
+
+        if (empty($msg)) {
+            $msg = "There are no missing articles\n";
+        }
+
+        // Unpublish missing articles.
+        if (!empty($duds)) {
+            $query = $db->createQuery();
+            $query->update($db->quoteName(array('#__jdm_articles')))
+                ->set($db->quoteName('state') . ' = 0')
+                ->where($db->quoteName('id') . ' IN (' . implode(',', $duds) . ')');
+            $db->setQuery($query);
+            $db->execute();
+
+            $dudcount = count($duds);
+            $msg .= "{$dudcount} Missing articles unpublished.\n";
+        }
+
+        // Get a count of unpublished articles
+        $query = $db->createQuery();
+        $query->select($db->quoteName(array('id', 'manual', 'language', 'path')))
+            ->from($db->quoteName('#__jdm_articles'))
+            ->where($db->quoteName('state') . ' = 0');
+        $db->setQuery($query);
+        $rows = $db->loadObjectList();
+
+        $nduds = count($rows);
+        if (!empty($nduds)) {
+            $msg .= "Number of unpublished articles: {$nduds}\n";
+            foreach($rows as $row) {
+                $msg .= "id={$row->id} path={$row->manual}/{$row->language}/articles/{$row->path}.md\n";
+            }
+        }
+
+        // Look for articles that are not in the database
+        $this->findMarkdownPaths($directory);
+
+        foreach ($this->articlePaths as $path) {
+            // There are some .md files not in the articles path
+            if (empty(strpos($path, '/articles/'))) {
+                continue;
+            }
+            // Is the article in the database?
+            $path = str_replace($directory, '', $path);
+            $parts = explode('/', $path);
+
+            // The first two elements are $manual and $language
+            $manual = array_shift($parts);
+            $language = array_shift($parts);
+
+            // Discard the articles part of the path
+            array_shift($parts);
+
+            $path = implode('/', $parts);
+
+            // Remove .md from the end of the path
+            $path = str_replace('.md', '', $path);
+            
+            $query = $db->createQuery();
+            $query->select($db->quoteName('id'))
+                ->from($db->quoteName('#__jdm_articles'))
+                ->where($db->quoteName('manual') . ' = ' . $db->quote($manual))
+                ->where($db->quoteName('language') . ' = ' . $db->quote($language))
+                ->where($db->quoteName('path') . ' = ' . $db->quote($path));
+            $db->setQuery($query);
+            $id = $db->loadResult();
+
+            if (empty($id)) {
+                $msg .= "Unused article: {$manual}/{$language}/{$path}.md\n";
+            }
+        }
+        return $msg;
+    }
+
+    /**
+    * Recursively traverses a directory and returns an array of markdown files.
+    *
+    * @param string $directory The starting directory.
+    *
+    * @return array List of .md files with their full paths.
+    */
+    protected function findMarkdownPaths($directory) {
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($directory)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && str_ends_with($file, '.md')) {
+                $this->articlePaths[] = $file->getPathname();
+            }
+        }
     }
 }

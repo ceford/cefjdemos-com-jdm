@@ -162,7 +162,7 @@ class HtmlView extends BaseHtmlView
 
         $toolbar->standardButton('manuals-unpublish-deleted')
         ->icon('fa fa-database')
-        ->text('COM_JDOCMANUAL_MANUALS_UNPUBLISH_DELETED')
+        ->text('COM_JDOCMANUAL_MANUALS_STATUS_REPORT')
         ->task('manuals.unpublishdeleted')
         ->onclick('return false')
         ->listCheck(false);

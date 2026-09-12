@@ -38,8 +38,7 @@ class FeedbackController extends AdmincontentController
         $likeitornot = $this->app->input->get('likeitornot', '', 'WORD');
         $manual = $this->app->input->get('manual', '', 'CMD');
         $language = $this->app->input->get('language', '', 'CMD');
-        $heading = $this->app->input->get('heading', '', 'CMD');
-        $filename = $this->app->input->get('filename', '', 'CMD');
+        $path = $this->app->input->get('path', '', 'STRING');
         // limit the string length or the db throws a fatal error
         $comment = substr($this->app->input->get('comment', '', 'STRING'), 0, 255);
         $session_id = $this->app->getSession()->getToken();
@@ -60,8 +59,7 @@ class FeedbackController extends AdmincontentController
             ->where($db->quoteName('session_id') . ' = ' . $db->quote($session_id))
             ->where($db->quoteName('manual') . ' = ' . $db->quote($manual))
             ->where($db->quoteName('language') . ' = ' . $db->quote($language))
-            ->where($db->quoteName('heading') . ' = ' . $db->quote($heading))
-            ->where($db->quoteName('filename') . ' = ' . $db->quote($filename));
+            ->where($db->quoteName('path') . ' = ' . $db->quote($path));
         $db->setQuery($query);
         $row = $db->loadObject();
 
@@ -89,13 +87,11 @@ class FeedbackController extends AdmincontentController
         $query->set($db->quoteName('session_id') . ' = :session_id')
             ->set($db->quoteName('manual') . ' = :manual')
             ->set($db->quoteName('language') . ' = :language')
-            ->set($db->quoteName('heading') . ' = :heading')
-            ->set($db->quoteName('filename') . ' = :filename')
+            ->set($db->quoteName('path') . ' = :path')
             ->bind(':session_id', $session_id, ParameterType::STRING)
             ->bind(':manual', $manual, ParameterType::STRING)
             ->bind(':language', $language, ParameterType::STRING)
-            ->bind(':heading', $heading, ParameterType::STRING)
-            ->bind(':filename', $filename, ParameterType::STRING);
+            ->bind(':path', $path, ParameterType::STRING);
         $db->setQuery($query);
         $db->execute();
 
