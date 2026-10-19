@@ -2,6 +2,14 @@
     <changelog>
         <element>com_jdocmanual</element>
         <type>component</type>
+        <version>5.0.2</version>
+        <fix>
+            <item>Bug in article build code missed changed images when article not changed.</item>
+        </fix>
+    </changelog>
+    <changelog>
+        <element>com_jdocmanual</element>
+        <type>component</type>
         <version>5.0.1</version>
         <change>
             <item>Changed Administrator Unpublish Deleted toolbar button to Status Report</item>

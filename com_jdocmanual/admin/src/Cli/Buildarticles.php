@@ -334,6 +334,7 @@ class Buildarticles
                 // Skip any lines not containing an image file
                 if ($is_picture = getimagesize($line) !== FALSE) {
                     $tmp = substr($line, 0, strrpos($line, '/')) . '.md';
+                    $tmp = str_replace('/images/', '/articles/', $tmp);
                     $articles[] = $tmp;
                 }
             }
